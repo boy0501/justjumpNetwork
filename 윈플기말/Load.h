@@ -2,13 +2,15 @@
 #include <Windows.h>
 
 //HBITMAP LoadBlack(HBITMAP, HINSTANCE);
-HBITMAP LoadBK(HBITMAP, HINSTANCE, int);
+HBITMAP LoadBK(HBITMAP& hbit1, HINSTANCE& g_hinst, int mapnum);
 //상태 Ui표시
 HBITMAP LoadUi(HBITMAP, HINSTANCE);
 //HP Ui 표시
 HBITMAP LoadHP(HBITMAP, HINSTANCE);
 //시작버튼
 HBITMAP LoadStart(HBITMAP , HINSTANCE,int);
+//로그인버튼
+HBITMAP LoadLogin(HINSTANCE& g_hinst, int num);
 //조작법
 HBITMAP LoadHelp(HBITMAP, HINSTANCE, int);
 

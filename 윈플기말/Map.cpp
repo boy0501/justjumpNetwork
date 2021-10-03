@@ -47,6 +47,14 @@ void MAP::CreateHelp(HINSTANCE g_hinst)
 	hbithelp[1] = LoadHelp(hbithelp[1], g_hinst,1);
 }
 
+void MAP::CreateLogin(HINSTANCE& g_hinst)
+{
+	hbitlogin[0] = LoadLogin(g_hinst, 0);
+	hbitlogin[1] = LoadLogin(g_hinst, 1);
+	hbitlogin[2] = LoadLogin(g_hinst, 2);
+	hbitlogin[3] = LoadLogin(g_hinst, 3);
+}
+
 
 void MAP::ChangeDieNotice(HINSTANCE g_hinst,int i)
 {
@@ -81,6 +89,10 @@ void MAP :: DrawBK(HDC& mem1dc, HDC& mem2dc, RECT& rectview)
 		BitBlt(mem1dc, 0, 0, 3021, 768, mem2dc, ms, 0, SRCCOPY);
 		if (ms >= 1997)
 		BitBlt(mem1dc, (3021 - ms), 0, rectview.right, 768, mem2dc, 0, 0, SRCCOPY);
+	}
+	else if (mapnum == 1)
+	{
+		BitBlt(mem1dc, 0, 0, MAPWIDTH, 768, mem2dc, 0, 0, SRCCOPY);
 	}
 	else	//일반
 	{
@@ -225,6 +237,17 @@ void MAP::DrawHelp(HDC& mem1dc, HDC& mem2dc, int i)
 	}
 	
 	else if(i == 1) TransparentBlt(mem1dc, 215,300, 400, 200, mem2dc, 0, 0, 400, 200, RGB(0, 0, 0));
+
+	DeleteObject(mem2dc);
+
+}
+
+void MAP::DrawLogin(HDC& mem1dc, HDC& mem2dc,int num)
+{
+	mem2dc = CreateCompatibleDC(mem1dc);
+	SelectObject(mem2dc, hbitlogin[num]);
+	//그릴 x,y,w,h  mem2dc 원본 x,y,w,h, 날릴색깔
+	TransparentBlt(mem1dc, 350, 490, 278, 53, mem2dc, 0, 0, 278, 53, RGB(255, 0, 0));
 
 	DeleteObject(mem2dc);
 

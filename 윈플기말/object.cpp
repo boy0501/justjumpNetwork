@@ -2,6 +2,7 @@
 #include "object.h"
 #include "Load.h"
 #include <iostream>
+
 int OBJECT::getX()
 {
 	return x;
@@ -131,7 +132,7 @@ void OBJECT::DrawObj(HDC& mem1dc, HDC& odc)
 	{
 	  TransparentBlt(mem1dc, x, y, w , h, odc, 0, 0, 1023, 62, RGB(255, 255, 255));
 	}
-	else if(type == 0)TransparentBlt(mem1dc, x, y, w, h, odc, 0, 0 + index * 768, 1024, 768, RGB(142, 203, 162));
+	else if (type == 0) TransparentBlt(mem1dc, x, y, w, h, odc, 0, 0 + index * 768, 1024, 768, RGB(142, 203, 162));
 	else if (type == 2) TransparentBlt(mem1dc, x, y, w, h + 17, odc, 11, 15, 77, 18, RGB(255, 255, 255));	// 원본그림에서 x 11~88 y 15 33 만큼 잘라내서 투명처리후 출력
 	else if (type == 3) TransparentBlt(mem1dc, x, y, w, h + 18, odc, 0, 0, 19, 19, RGB(255, 255, 255));
 	else if (type == 4) TransparentBlt(mem1dc, x, y, w, h + 42, odc, 16 + index * 272, 9, 250, 43, RGB(0, 0, 0));

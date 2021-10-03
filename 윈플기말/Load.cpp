@@ -11,7 +11,7 @@
 //}
 
 //배경화면
-HBITMAP LoadBK(HBITMAP hbit1, HINSTANCE g_hinst, int mapnum)
+HBITMAP LoadBK(HBITMAP& hbit1, HINSTANCE& g_hinst, int mapnum)
 {
 	//게임시작 인터페이스
 	if (mapnum == 9)
@@ -84,6 +84,22 @@ HBITMAP LoadStart(HBITMAP hbit, HINSTANCE g_hinst, int i)
 		hbit = (HBITMAP)LoadImage(g_hinst, TEXT("img/start3.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION); //상대경로로 변경
 	return hbit;
 }
+
+//로그인버튼
+HBITMAP LoadLogin(HINSTANCE& g_hinst, int num)
+{
+	if (num == 0)
+		return (HBITMAP)LoadImage(g_hinst, TEXT("img/LoginButton0.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
+	else if (num == 1)
+		return (HBITMAP)LoadImage(g_hinst, TEXT("img/LoginButton1.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
+	else if (num == 2)
+		return (HBITMAP)LoadImage(g_hinst, TEXT("img/LoginButton2.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
+	else if (num == 3)
+		return (HBITMAP)LoadImage(g_hinst, TEXT("img/LoginButton3.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
+
+	return NULL;
+}
+
 
 //조작법 Ui 상태변화
 HBITMAP LoadHelpChange(HINSTANCE g_hinst, int i)

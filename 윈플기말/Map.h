@@ -5,8 +5,11 @@
 #define MAPWIDTH 1024
 #define MAPHEIGHT 4098
 #define MAPSPEED 5
+
+#define LOGINBG 1
+#define STARTBG 9
 class MAP {
-	int mapnum = 9;	//1은 로그인화면, 9는 게임시작전화면, 13은 게임 끝 화면
+	int mapnum = 1;	//1은 로그인화면, 9는 게임시작전화면, 13은 게임 끝 화면
 	int black_t = 0;
 	int ms;
 	int index;
@@ -16,6 +19,7 @@ class MAP {
 	HBITMAP hbitdie;
 	HBITMAP hbitstart[3];
 	HBITMAP hbithelp[2];
+	HBITMAP hbitlogin[4];
 public:
 	//맵번호를 읽음 10~
 	int getmapnum();
@@ -46,6 +50,8 @@ public:
 	void DrawHelp(HDC&, HDC&,int);
 	//die 상태변화
 	void ChangeDieNotice(HINSTANCE,int);
+	//로그인버튼
+	void DrawLogin(HDC& mem1dc, HDC& mem2dc,int num);
 	/*void CreateBlack(HINSTANCE)*/;
 	void CreateMap(HINSTANCE);
 	void CreateUi(HINSTANCE);
@@ -53,4 +59,5 @@ public:
 	void CreateDie(HINSTANCE);
 	void CreateStart(HINSTANCE);
 	void CreateHelp(HINSTANCE);
+	void CreateLogin(HINSTANCE&);
 };

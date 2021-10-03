@@ -74,9 +74,9 @@ int WINAPI WinMain(HINSTANCE hinstance, HINSTANCE hPrevinstance, LPSTR lpszCmdPa
 LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 {
 	static PAINTSTRUCT ps;
-	static HDC hdc, mem1dc, mem2dc, loaddc, playerdc, odc, pdc, ui_dc, hp_dc,die_dc,start_dc,help_dc; // odc = 오브젝트 dc, pdc = player dc,ui_Dc : 아래 전체적인 ui hp_Dc: hp통만 나오는거 dic_dc : 사망 ui 
+	static HDC hdc, mem1dc, mem2dc, loaddc, playerdc, odc, pdc, ui_dc, hp_dc,die_dc,start_dc,help_dc,login_dc; // odc = 오브젝트 dc, pdc = player dc,ui_Dc : 아래 전체적인 ui hp_Dc: hp통만 나오는거 dic_dc : 사망 ui 
 	static RECT rectview;
-	static HBITMAP hbit1,loadbit,oldload, oldbit1, hbitobj[100], Uibit, HPbit,Diebit,Startbit,Helpbit;
+	static HBITMAP hbit1,loadbit,oldload, oldbit1, hbitobj[100], Uibit, HPbit,Diebit,Startbit,Helpbit,Loginbit;
 	static PLAYER player;
 	static MAP map;
 	static CAMERA camera;
@@ -87,7 +87,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 
 	static int obj_t = 0; //오브젝트 애니메이션을 1번타이머에 넣기위해 추가한 변수
 	static int ocount;		//obj 개수를 세주는 변수
-	static int help_button = 0,start_button = 0; //조작법 온오프
+	static int help_button = 0,start_button = 0,login_button = 0; //조작법 온오프
 	static bool occur_button = 0;	//사망했을때의 button이 활성화되었는지 
 	static bool gamemode = 0;	//0이면 기본 1이면 자유모드
 	switch (iMessage)
@@ -105,34 +105,35 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		map.CreateDie(g_hinst);
 		map.CreateStart(g_hinst);
 		map.CreateHelp(g_hinst);
+		map.CreateLogin(g_hinst);
 		player.setBit(g_hinst);
 		player.initBitPos();
 
-		if (map.getmapnum() == 9)
+		if (map.getmapnum() == 1)
 		{
 			camera.setx(0);
 			camera.sety(0);
 		}
 
 
-		cout << camera.getx() << endl;
 		sound.Sound_Setup();
 		loadbf.AlphaFormat = 0;
 		loadbf.BlendFlags = 0;
 		loadbf.BlendOp = AC_SRC_OVER;
 		loadbf.SourceConstantAlpha = 0;
-		sound.Sound_Play(BGMSOUND, MAINMENU, BGMVOL);
+		sound.Sound_Play(BGMSOUND, LOGINBGM, BGMVOL);
+		
+		//if (map.getmapnum() == 9) hbit1 = (HBITMAP)LoadImage(g_hinst, TEXT("img/start_rayer1.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
+		//else if (map.getmapnum() == 13) hbit1 = (HBITMAP)LoadImage(g_hinst, TEXT("img/clear.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
 
-		if (map.getmapnum() == 9) hbit1 = (HBITMAP)LoadImage(g_hinst, TEXT("img/start_rayer1.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
-		else if (map.getmapnum() == 13) hbit1 = (HBITMAP)LoadImage(g_hinst, TEXT("img/clear.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
-
+		Loginbit = (HBITMAP)LoadImage(g_hinst, TEXT("img/LoginButton2.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
 		Helpbit = (HBITMAP)LoadImage(g_hinst, TEXT("img/help1.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
 		Startbit = (HBITMAP)LoadImage(g_hinst, TEXT("img/start1.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
 		Uibit = (HBITMAP)LoadImage(g_hinst, TEXT("img/Ui.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
 		HPbit = (HBITMAP)LoadImage(g_hinst, TEXT("img/Ui_HP.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
 		Diebit = (HBITMAP)LoadImage(g_hinst, TEXT("img/Notice3.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
 
-		ocount = initObject(obj, 9, g_hinst);
+		//ocount = initObject(obj, 1, g_hinst);
 
 
 		SetTimer(hwnd, 1, 1, NULL);
@@ -153,7 +154,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		SelectObject(die_dc, Diebit);
 		SelectObject(start_dc, Startbit);
 		SelectObject(help_dc, Helpbit);
-
+		SelectObject(login_dc, Loginbit);
 
 
 		if (0 >= map.getblack_t())
@@ -165,22 +166,27 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		for (int i = 0; i <= ocount; i++)
 			obj[i].DrawObj(mem1dc, odc);
 
-		if (map.getmapnum() == 9)
+		if (map.getmapnum() == LOGINBG)	//로그인화면일땐 캐릭터를 안그려주기위해 if - else절로 묶었음.
 		{
-			map.DrawStart(mem1dc, start_dc, start_button);
-			map.DrawHelp(mem1dc, help_dc, help_button);
+			map.DrawLogin(mem1dc, login_dc, login_button);
+		}
+		else {
+			if (map.getmapnum() == STARTBG)
+			{
+				map.DrawStart(mem1dc, start_dc, start_button);
+				map.DrawHelp(mem1dc, help_dc, help_button);
+
+			}
+			player.draw(mem1dc, pdc);
+			if (map.getmapnum() >= 10)
+			{
+				map.DrawUi(mem1dc, ui_dc, camera);
+				map.DrawHP(mem1dc, hp_dc, camera, player);
+				if (player.getCMD_die() == 1)
+					map.DrawDie(mem1dc, die_dc, camera, sound);
+			}
 
 		}
-		player.draw(mem1dc, pdc); 
-		if (map.getmapnum() >= 10)
-		{
-			map.DrawUi(mem1dc, ui_dc, camera);
-			map.DrawHP(mem1dc, hp_dc, camera, player);
-			if (player.getCMD_die() == 1)
-				map.DrawDie(mem1dc, die_dc, camera, sound);
-		}
-
-
 
 		if (map.getblack_t() > 0) map.DrawLoadBK(mem1dc, mem2dc, loadbf);
 
@@ -198,9 +204,11 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		case 1:
 			obj_t += 1;
 
-			player.move(obj_t);
-			adjustPlayer(player, obj, map, ocount, g_hinst, sound);
-
+			if (map.getmapnum() != LOGINBG)	//로그인중일땐 캐릭터 상호작용 x 매끄럽게 하려면 Scene changer를 구현해야하지만,,,, 넘어가도록 하자 
+			{
+				player.move(obj_t);
+				adjustPlayer(player, obj, map, ocount, g_hinst, sound);
+			}
 			map.movemap();
 
 			if (map.BlackTime())
@@ -321,7 +329,23 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 			map.ChangeDieNotice(g_hinst, 0);
 			occur_button = 0;
 		}
-		if (map.getmapnum() == 9)
+		if (map.getmapnum() == LOGINBG)
+		{
+			if (LOWORD(lParam) > 350 && LOWORD(lParam) < 628)
+			{
+				if (HIWORD(lParam) > 490 && HIWORD(lParam) < 543)
+				{
+					if (login_button == 0)
+					{
+						sound.Sound_Play(EFFECTSOUND, MOVEREF, EFVOL);
+						login_button = 1;
+					}
+					break;
+				}
+			}
+			login_button = 0;
+		}
+		if (map.getmapnum() == STARTBG)
 		{
 			if (290 < LOWORD(lParam) && LOWORD(lParam) < 430)
 			{
@@ -374,7 +398,22 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 				}
 			}
 		}
-		if (map.getmapnum() == 9)
+		if (map.getmapnum() == LOGINBG)
+		{
+			if (LOWORD(lParam) > 350 && LOWORD(lParam) < 628)
+			{
+				if (HIWORD(lParam) > 490 && HIWORD(lParam) < 543)
+				{
+					if (login_button == 1)
+					{
+						sound.Sound_Play(EFFECTSOUND, MCLICKEF, EFVOL);
+						login_button = 2;
+						break;
+					}
+				}
+			}
+		}
+		if (map.getmapnum() == STARTBG)
 		{
 			if (290 < LOWORD(lParam) && LOWORD(lParam) < 430)
 			{
@@ -394,8 +433,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 			}
 
 		}
-		cout << LOWORD(lParam) << endl;
-		cout << HIWORD(lParam) + camera.gety() << endl;
+		std::cout << LOWORD(lParam) << endl;
+		std::cout << HIWORD(lParam) + camera.gety() << endl;
 		break;
 	case WM_LBUTTONUP:
 		if (player.getCMD_die() == 1)
@@ -411,7 +450,27 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 				}
 			}
 		}
-		if (map.getmapnum() == 9)
+		if (map.getmapnum() == LOGINBG)
+		{
+			if (LOWORD(lParam) > 350 && LOWORD(lParam) < 628)
+			{
+				if (HIWORD(lParam) > 490 && HIWORD(lParam) < 543)
+				{
+					map.setmapnum(9);
+					ocount = initObject(obj, map.getmapnum(), g_hinst);
+					map.CreateMap(g_hinst);
+					LoadBK(hbit1, g_hinst, 9);
+					camera.setx(0);
+					camera.sety(0);
+					player.setx(80);
+					player.sety(655);
+					sound.Sound_Play(BGMSOUND, MAINMENUBGM, BGMVOL);
+					InvalidateRgn(hwnd, NULL, FALSE);
+					break;
+				}
+			}
+		}
+		if (map.getmapnum() == STARTBG)
 		{
 			if (290 < LOWORD(lParam) && LOWORD(lParam) < 430)
 			{
@@ -420,16 +479,17 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 					occur_button = 0;
 					map.setblack_t(50);
 					map.setmapnum(map.getmapnum() + 1);
-					player.initPos();
 					for (int j = 0; j < ocount; j++)
 						obj[j].ResetObject();
 					ocount = initObject(obj, map.getmapnum(), g_hinst);
 
 					map.CreateMap(g_hinst);
-					hbit1 = (HBITMAP)LoadImage(g_hinst, TEXT("img/bk.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
+					LoadBK(hbit1, g_hinst, 0);
+					//hbit1 = (HBITMAP)LoadImage(g_hinst, TEXT("img/bk.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
 					sound.setindex(sound.getindex() + 1);
 					sound.Sound_Play(EFFECTSOUND, PORTALEF, EFVOL);
-					sound.Sound_Play(BGMSOUND, FIRSTMAP, BGMVOL);
+					sound.Sound_Play(BGMSOUND, FIRSTMAPBGM, BGMVOL);
+					player.initPos();
 					player.sethp(100);
 					camera.setx(0);
 					camera.sety(3232);
