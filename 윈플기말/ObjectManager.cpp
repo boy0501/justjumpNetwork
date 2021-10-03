@@ -343,10 +343,8 @@ void adjustPlayer(PLAYER& player, OBJECT* obj, MAP& m, int& ocount, HINSTANCE g_
 						m.CreateMap(g_hinst);
 						sound.setindex(m.getmapnum()-9);
 						FMOD_System_Update(sound.System);
-						FMOD_Channel_Stop(sound.Channel[0]);
-						FMOD_System_PlaySound(sound.System, sound.bgmSound[sound.getindex()], NULL, 0, &sound.Channel[0]);
-						FMOD_Channel_Stop(sound.Channel[1]);
-						FMOD_System_PlaySound(sound.System, sound.effectSound[1], NULL, 0, &sound.Channel[1]);
+						sound.Sound_Play(BGMSOUND, sound.getindex(), BGMVOL);
+						sound.Sound_Play(EFFECTSOUND, PORTALEF, EFVOL);
 						
 						return;
 					}

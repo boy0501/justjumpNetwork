@@ -3,6 +3,19 @@
 #include <windows.h>
 #define BGMSOUND 0
 #define EFFECTSOUND 1
+#define MAINMENU 0 
+#define FIRSTMAP 1
+#define SECONDMAP 2
+#define THIRDMAP 3
+#define LASTMAP 4
+#define JUMPEF 0
+#define PORTALEF 1
+#define TOMBSTONEEF 2
+#define MCLICKEF 3
+#define MOVEREF 4
+
+#define BGMVOL 0.2
+#define EFVOL 0.5
 class Sound {
 	int index;
 public:

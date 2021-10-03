@@ -121,10 +121,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		loadbf.BlendFlags = 0;
 		loadbf.BlendOp = AC_SRC_OVER;
 		loadbf.SourceConstantAlpha = 0;
-		sound.Sound_Play(BGMSOUND, 0, 0.1);
-		//FMOD_Channel_Stop(sound.Channel[0]);
-		//FMOD_System_PlaySound(sound.System, sound.bgmSound[0], NULL, 0, &sound.Channel[0]);
-		//FMOD_Channel_SetVolume(sound.Channel[0], 0.1);
+		sound.Sound_Play(BGMSOUND, MAINMENU, BGMVOL);
+
 		if (map.getmapnum() == 9) hbit1 = (HBITMAP)LoadImage(g_hinst, TEXT("img/start_rayer1.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
 		else if (map.getmapnum() == 13) hbit1 = (HBITMAP)LoadImage(g_hinst, TEXT("img/clear.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
 
@@ -314,8 +312,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 					map.ChangeDieNotice(g_hinst, 1);
 					if (occur_button == 0)
 					{
-						FMOD_Channel_Stop(sound.Channel[1]);
-						FMOD_System_PlaySound(sound.System, sound.effectSound[4], NULL, 0, &sound.Channel[1]);
+						sound.Sound_Play(EFFECTSOUND, MOVEREF, EFVOL);
 						occur_button = 1;
 					}
 					break;
@@ -333,8 +330,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 					//map.ChangeStartButton(g_hinst, 1);
 					if (start_button == 0)
 					{
-						FMOD_Channel_Stop(sound.Channel[1]);
-						FMOD_System_PlaySound(sound.System, sound.effectSound[4], NULL, 0, &sound.Channel[1]);
+						sound.Sound_Play(EFFECTSOUND, MOVEREF, EFVOL);
 						start_button = 1;
 					}
 					break;
@@ -350,8 +346,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 					if (help_button == 0)
 					{
 
-						FMOD_Channel_Stop(sound.Channel[1]);
-						FMOD_System_PlaySound(sound.System, sound.effectSound[4], NULL, 0, &sound.Channel[1]);
+						sound.Sound_Play(EFFECTSOUND, MOVEREF, EFVOL);
 						help_button = 1;
 					}
 					break;
@@ -374,8 +369,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 				if (338 < HIWORD(lParam) && HIWORD(lParam) < 352)
 				{
 					map.ChangeDieNotice(g_hinst, 2);
-					FMOD_Channel_Stop(sound.Channel[1]);
-					FMOD_System_PlaySound(sound.System, sound.effectSound[3], NULL, 0, &sound.Channel[1]);
+					sound.Sound_Play(EFFECTSOUND, MCLICKEF, EFVOL);
 					break;
 				}
 			}
@@ -390,8 +384,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 					{
 
 						//map.ChangeStartButton(g_hinst, 2);
-						FMOD_Channel_Stop(sound.Channel[1]);
-						FMOD_System_PlaySound(sound.System, sound.effectSound[3], NULL, 0, &sound.Channel[1]);
+						sound.Sound_Play(EFFECTSOUND, MCLICKEF, EFVOL);
 						start_button = 2;
 
 						break;
@@ -435,10 +428,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 					map.CreateMap(g_hinst);
 					hbit1 = (HBITMAP)LoadImage(g_hinst, TEXT("img/bk.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
 					sound.setindex(sound.getindex() + 1);
-					FMOD_Channel_Stop(sound.Channel[1]);
-					FMOD_System_PlaySound(sound.System, sound.effectSound[1], NULL, 0, &sound.Channel[1]);
-					FMOD_Channel_Stop(sound.Channel[0]);
-					FMOD_System_PlaySound(sound.System, sound.bgmSound[1], NULL, 0, &sound.Channel[0]);
+					sound.Sound_Play(EFFECTSOUND, PORTALEF, EFVOL);
+					sound.Sound_Play(BGMSOUND, FIRSTMAP, BGMVOL);
 					player.sethp(100);
 					camera.setx(0);
 					camera.sety(3232);

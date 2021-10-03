@@ -419,8 +419,7 @@ void PLAYER::PlayerSetting(WPARAM wParam, Sound& sound)
 		}
 		if (state != 2 && state != 7)	//점프나 공중이아니라면 점프뛸수있다. 하지만 줄에매달렸을때도 안되긴 마찬가지
 		{
-			FMOD_Channel_Stop(sound.Channel[1]);
-			FMOD_System_PlaySound(sound.System, sound.effectSound[0], NULL, 0, &sound.Channel[1]);
+			sound.Sound_Play(EFFECTSOUND, JUMPEF, EFVOL);
 			falldy = 10;	//임시
 			jumpcount++;
 			state = 2;
@@ -1076,8 +1075,7 @@ void PLAYER::hurt(Sound& sound)
 		RIGHTkey = 0;
 		UPkey = 0;
 		DOWNkey = 0;
-		FMOD_Channel_Stop(sound.Channel[1]);
-		FMOD_System_PlaySound(sound.System, sound.effectSound[2], NULL, 0, &sound.Channel[1]);
+		sound.Sound_Play(EFFECTSOUND, TOMBSTONEEF, EFVOL);
 		diecount++;
 	}
 }
