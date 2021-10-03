@@ -854,6 +854,7 @@ void PLAYER::draw(HDC& mem1dc, HDC& pdc)
 	BitBlt(gdidc, 0, 0, charw * 2, h * 2, mem1dc, x - charw, y - h, SRCCOPY);
 	//기본 움직임
 	SelectObject(pdc, hbitcur);
+	//pdc는 hbitcur 즉 sprite가 들어있음
 	if (state == 1) // 정지상태 
 	{
 
@@ -862,6 +863,11 @@ void PLAYER::draw(HDC& mem1dc, HDC& pdc)
 			//TransparentBlt(gdidc, x - charw, y - h, charw * 2, h * 2, pdc, 0, 0, 62, 50, RGB(255, 255, 255));
 			//gdidc는 0,0~ 62,50 이니까 이 위치에 투명한 캐릭터를 복사시켜주고 GdialphaBlend 를 통해 투명화처리 해준다.
 			TransparentBlt(gdidc, 0, 0, 62, 50, pdc, 0, 0, 62, 50, RGB(255, 255, 255));
+
+			//2021-10-04 주석 추가
+			//좀더 풀어서 말하면, 결국 최종적으로는 우리는 mem1dc(더블버퍼링용 hdc)에 그려줘야한다. 
+			//pdc에는 sprite이미지가 있고(857line에서 해준다), sprite에서 필요한 부분만 짤라서 gdidc에 그려준 다음
+			//gdialphablend로 gdidc에서 alpha값을 조절한다음 mem1dc에 최종적으로 그려주는것이다.
 
 			if (stealth > 0)
 			{
