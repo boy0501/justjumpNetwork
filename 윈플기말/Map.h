@@ -1,5 +1,6 @@
 #pragma once
 #include <windows.h>
+#include <string>
 #include "Camera.h"
 #include "player.h"
 #define MAPWIDTH 1024
@@ -19,7 +20,7 @@ class MAP {
 	HBITMAP hbitdie;
 	HBITMAP hbitstart[3];
 	HBITMAP hbithelp[2];
-	HBITMAP hbitlogin[4];
+	HBITMAP hbitlogin[5];
 public:
 	//맵번호를 읽음 10~
 	int getmapnum();
@@ -60,4 +61,9 @@ public:
 	void CreateStart(HINSTANCE);
 	void CreateHelp(HINSTANCE);
 	void CreateLogin(HINSTANCE&);
+
+
+	int IDinput = 1;	//아이디입력 가능
+	int PWinput = 0;	//패스워드입력
+	std::string id{""};		//아이디
 };

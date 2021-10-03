@@ -96,6 +96,8 @@ HBITMAP LoadLogin(HINSTANCE& g_hinst, int num)
 		return (HBITMAP)LoadImage(g_hinst, TEXT("img/LoginButton2.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
 	else if (num == 3)
 		return (HBITMAP)LoadImage(g_hinst, TEXT("img/LoginButton3.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
+	else if (num == 4)
+		return (HBITMAP)LoadImage(g_hinst, TEXT("img/idpassword.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
 
 	return NULL;
 }

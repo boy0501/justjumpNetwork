@@ -1,5 +1,6 @@
 #include "Map.h"
 #include "Load.h"
+#include <iostream>
 int MAP::getmapnum() { return mapnum; }
 
 int MAP::getblack_t() { return black_t; }
@@ -53,6 +54,7 @@ void MAP::CreateLogin(HINSTANCE& g_hinst)
 	hbitlogin[1] = LoadLogin(g_hinst, 1);
 	hbitlogin[2] = LoadLogin(g_hinst, 2);
 	hbitlogin[3] = LoadLogin(g_hinst, 3);
+	hbitlogin[4] = LoadLogin(g_hinst, 4);
 }
 
 
@@ -206,7 +208,8 @@ void MAP::DrawDie(HDC& mem1dc, HDC& mem2dc, CAMERA camera, Sound& sound)
 	oldfont = (HFONT)SelectObject(mem1dc, hfont);
 	TextOut(mem1dc, camera.getx() + 460, camera.gety() + 285, L"아쉽지만 확인을 누르시면 맵의 맨 처음", lstrlenW(L"아쉽지만 확인을 누르시면 맵의 맨 처음."));
 	TextOut(mem1dc, camera.getx() + 460, camera.gety() + 297, L"위치로 돌아가게 됩니다. 포기하지 마세요!", lstrlenW(L"위치로 돌아가게 됩니다. 포기하지 마세요!"));
-
+	SelectObject(mem1dc, oldfont);
+	DeleteObject(hfont);
 
 
 	DeleteObject(mem2dc);
@@ -244,11 +247,24 @@ void MAP::DrawHelp(HDC& mem1dc, HDC& mem2dc, int i)
 
 void MAP::DrawLogin(HDC& mem1dc, HDC& mem2dc,int num)
 {
+	//transparentblt 그릴 x,y,w,h  mem2dc 원본 x,y,w,h, 날릴색깔
 	mem2dc = CreateCompatibleDC(mem1dc);
+	SelectObject(mem2dc, hbitlogin[4]);
+	TransparentBlt(mem1dc, 340, 250, 332, 282, mem2dc, 0, 0, 332, 282, RGB(255, 0, 0));
 	SelectObject(mem2dc, hbitlogin[num]);
-	//그릴 x,y,w,h  mem2dc 원본 x,y,w,h, 날릴색깔
-	TransparentBlt(mem1dc, 350, 490, 278, 53, mem2dc, 0, 0, 278, 53, RGB(255, 0, 0));
+	TransparentBlt(mem1dc, 365, 440, 278, 53, mem2dc, 0, 0, 278, 53, RGB(255, 0, 0));
+
+	HFONT hfont = CreateFont(18, 0, 0, 0, 0, 0, 0, 0, HANGEUL_CHARSET, 0, 0, 0, VARIABLE_PITCH | FF_ROMAN, TEXT("메이플스토리 bold"));
+	HFONT oldfont = (HFONT)SelectObject(mem1dc, hfont);
+
+	SetTextColor(mem1dc, RGB(255, 108, 168));
+	//std::cout << id << std::endl;
+	auto tmp = std::wstring(id.begin(), id.end());
+	auto convert_wstr = tmp.c_str();
+	TextOut(mem1dc, 380, 330, convert_wstr, lstrlenW(convert_wstr));
+
+	SelectObject(mem1dc, oldfont);
+	DeleteObject(hfont);
 
 	DeleteObject(mem2dc);
-
 }

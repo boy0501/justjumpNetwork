@@ -293,6 +293,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		}
 		break;
 	case WM_KEYDOWN:
+
 		if (player.getCMD_die() == 1)
 			break;
 		if (player.getGamemode() == 0)
@@ -331,9 +332,9 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		}
 		if (map.getmapnum() == LOGINBG)
 		{
-			if (LOWORD(lParam) > 350 && LOWORD(lParam) < 628)
+			if (LOWORD(lParam) > 365 && LOWORD(lParam) < 643)
 			{
-				if (HIWORD(lParam) > 490 && HIWORD(lParam) < 543)
+				if (HIWORD(lParam) > 440 && HIWORD(lParam) < 493)
 				{
 					if (login_button == 0)
 					{
@@ -400,9 +401,18 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		}
 		if (map.getmapnum() == LOGINBG)
 		{
-			if (LOWORD(lParam) > 350 && LOWORD(lParam) < 628)
+			if (LOWORD(lParam) > 365 && LOWORD(lParam) < 565)
 			{
-				if (HIWORD(lParam) > 490 && HIWORD(lParam) < 543)
+				if (HIWORD(lParam) > 320 && HIWORD(lParam) < 360)
+				{
+					map.IDinput = 1;
+					map.PWinput = 0;
+					break;
+				}
+			}
+			if (LOWORD(lParam) > 365 && LOWORD(lParam) < 643)
+			{
+				if (HIWORD(lParam) > 440 && HIWORD(lParam) < 493)
 				{
 					if (login_button == 1)
 					{
@@ -452,9 +462,9 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		}
 		if (map.getmapnum() == LOGINBG)
 		{
-			if (LOWORD(lParam) > 350 && LOWORD(lParam) < 628)
+			if (LOWORD(lParam) > 365 && LOWORD(lParam) < 643)
 			{
-				if (HIWORD(lParam) > 490 && HIWORD(lParam) < 543)
+				if (HIWORD(lParam) > 440 && HIWORD(lParam) < 493)
 				{
 					map.setmapnum(9);
 					ocount = initObject(obj, map.getmapnum(), g_hinst);
@@ -464,6 +474,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 					camera.sety(0);
 					player.setx(80);
 					player.sety(655);
+					player.mPlayername = map.id;
 					sound.Sound_Play(BGMSOUND, MAINMENUBGM, BGMVOL);
 					InvalidateRgn(hwnd, NULL, FALSE);
 					break;
@@ -501,6 +512,28 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		}
 		break;
 	case WM_CHAR:
+		if (map.getmapnum() == LOGINBG)
+		{
+			if (map.IDinput)
+			{
+				if (wParam == 0x08)
+				{
+					if (map.id.length() > 0)
+					{
+						std::cout << "¤·¤·";
+						map.id.pop_back();
+						cout << map.id << endl;
+					}
+				}
+				else if ((wParam >= 'a' && wParam <= 'z') || (wParam >= '0' && wParam <= '9'))
+				{
+					if (map.id.length() < 10)
+						map.id += wParam;
+				}
+
+				break;
+			}
+		}
 		if (wParam == 'r')
 		{
 			player.setx(obj[ocount - 1].getX() + 10);
