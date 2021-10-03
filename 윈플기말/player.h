@@ -26,7 +26,7 @@ class PLAYER {
 public:
 	float falldy = 0;	//속도 제어
 	float GroundAccel = 0.5;	//중력가속도
-	std::string mPlayername{"Anonymous"};	//플레이어이름
+	std::string mPlayername;	//플레이어이름
 	PLAYER();
 	// 캐릭터위치 초기화 함수
 	void initPos();

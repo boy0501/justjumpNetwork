@@ -150,6 +150,20 @@ void MAP::DrawUi(HDC& mem1dc, HDC& mem2dc,CAMERA camera)
 	SelectObject(mem2dc, hbitui);
 	TransparentBlt(mem1dc, camera.getx()+400, camera.gety()+700, 199, 65, mem2dc, 0, 0, 199, 65, RGB(0, 255, 0));
 	//BitBlt(mem1dc, 0, 0, MAPWIDTH, MAPHEIGHT, mem2dc, 0, 0, SRCCOPY);	//Ui 전체 새로고침
+	
+	HFONT hfont = CreateFont(14, 0, 0, 0, 0, 0, 0, 0, HANGEUL_CHARSET, 0, 0, 0, VARIABLE_PITCH | FF_ROMAN, TEXT("메이플스토리 light"));
+	HFONT oldfont = (HFONT)SelectObject(mem1dc, hfont);
+	SetBkMode(mem1dc, TRANSPARENT);
+	SetTextColor(mem1dc, RGB(255, 255, 255));
+	//std::cout << id << std::endl;
+	auto tmp = std::wstring(id.begin(), id.end());
+	auto convert_wstr = tmp.c_str();
+	RECT rt{ camera.getx() + 475,camera.gety() + 705, camera.getx() + 575, camera.gety() + 770 };
+	DrawText(mem1dc, convert_wstr, lstrlenW(convert_wstr), &rt, DT_LEFT);
+
+	SelectObject(mem1dc, oldfont);
+	DeleteObject(hfont);
+	
 	DeleteObject(mem2dc);
 }
 //HP바

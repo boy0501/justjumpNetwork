@@ -65,5 +65,5 @@ public:
 
 	int IDinput = 1;	//아이디입력 가능
 	int PWinput = 0;	//패스워드입력
-	std::string id{""};		//아이디
+	std::string id{ "anonymous" };		//아이디
 };

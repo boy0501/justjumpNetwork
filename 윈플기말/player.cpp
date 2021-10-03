@@ -1018,14 +1018,16 @@ void PLAYER::draw(HDC& mem1dc, HDC& pdc)
 
 	}
 
-	HFONT hfont = CreateFont(12, 0, 0, 0, 0, 0, 0, 0, HANGEUL_CHARSET, 0, 0, 0, VARIABLE_PITCH | FF_ROMAN, TEXT("메이플스토리 bold"));
+	//닉네임 그려주기
+	HFONT hfont = CreateFont(14, 0, 0, 0, 0, 0, 0, 0, HANGEUL_CHARSET, 0, 0, 0, VARIABLE_PITCH | FF_ROMAN, TEXT("메이플스토리 bold"));
 	HFONT oldfont = (HFONT)SelectObject(mem1dc, hfont);
-
+	SetBkMode(mem1dc, TRANSPARENT);
 	SetTextColor(mem1dc, RGB(255, 108, 168));
 	//std::cout << id << std::endl;
 	auto tmp = std::wstring(mPlayername.begin(), mPlayername.end());
 	auto convert_wstr = tmp.c_str();
-	TextOut(mem1dc, x-30,  y+25, convert_wstr, lstrlenW(convert_wstr));
+	RECT rt{ x - 60,y + 25,x + 60,y + 65 };
+	DrawText(mem1dc, convert_wstr, lstrlenW(convert_wstr), &rt, DT_CENTER );
 
 	SelectObject(mem1dc, oldfont);
 	DeleteObject(hfont);

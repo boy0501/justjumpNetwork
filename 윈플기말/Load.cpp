@@ -41,7 +41,7 @@ HBITMAP LoadBK(HBITMAP& hbit1, HINSTANCE& g_hinst, int mapnum)
 //상태 Ui표시
 HBITMAP LoadUi(HBITMAP hbit, HINSTANCE g_hinst)
 {
-	hbit = (HBITMAP)LoadImage(g_hinst, TEXT("img/Ui.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION); //상대경로로 변경
+	hbit = (HBITMAP)LoadImage(g_hinst, TEXT("img/NoNameUi.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION); //상대경로로 변경
 	return hbit;
 
 }
