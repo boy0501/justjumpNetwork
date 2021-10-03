@@ -6,7 +6,7 @@
 #define MAPHEIGHT 4098
 #define MAPSPEED 5
 class MAP {
-	int mapnum = 9;
+	int mapnum = 9;	//1은 로그인화면, 9는 게임시작전화면, 13은 게임 끝 화면
 	int black_t = 0;
 	int ms;
 	int index;

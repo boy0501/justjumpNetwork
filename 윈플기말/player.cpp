@@ -662,7 +662,6 @@ void PLAYER::move(int obj_t)
 				falldy -= GroundAccel;	//속력은 가속도에 의해 계속 변화된다.
 			if (falldy < 0)	//속력이 -가 되면 떨어지고있다는 점! 코드를 더럽게 짜서 state로 플레이어 상태를 변화시켜줘야 하는 불편함이 존재함				
 			{
-				std::cout << "ㅇㅇ";
 				state = 7;	//딱히 수정하진 않을듯? 어차피 1회용코드임
 			}
 			y -= falldy;

@@ -25,6 +25,11 @@ HBITMAP LoadBK(HBITMAP hbit1, HINSTANCE g_hinst, int mapnum)
 		hbit1 = (HBITMAP)LoadImage(g_hinst, TEXT("img/clear.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION); //상대경로로 변경
 		return hbit1;
 	}
+	else if (mapnum == 1)
+	{
+		hbit1 = (HBITMAP)LoadImage(g_hinst, TEXT("img/login.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
+		return hbit1;
+	}
 	//나머지 게임맵
 	else {
 		hbit1 = (HBITMAP)LoadImage(g_hinst, TEXT("img/bk.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION); //상대경로로 변경

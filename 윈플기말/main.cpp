@@ -171,7 +171,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 			map.DrawHelp(mem1dc, help_dc, help_button);
 
 		}
-		player.draw(mem1dc, pdc);
+		player.draw(mem1dc, pdc); 
 		if (map.getmapnum() >= 10)
 		{
 			map.DrawUi(mem1dc, ui_dc, camera);
