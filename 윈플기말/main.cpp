@@ -84,7 +84,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 	static BLENDFUNCTION loadbf;
 	static Sound sound;
 	
-
+	static int nCaretPosx, nCaretPosy;	//폰트 x,y크기 , 캐럿 x y 위치
 	static int obj_t = 0; //오브젝트 애니메이션을 1번타이머에 넣기위해 추가한 변수
 	static int ocount;		//obj 개수를 세주는 변수
 	static int help_button = 0,start_button = 0,login_button = 0; //조작법 온오프
@@ -108,7 +108,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		map.CreateLogin(g_hinst);
 		player.setBit(g_hinst);
 		player.initBitPos();
-
+		nCaretPosx = 380 + map.id.length()*10;
+		nCaretPosy = 330;
 		if (map.getmapnum() == 1)
 		{
 			camera.setx(0);
@@ -169,6 +170,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		if (map.getmapnum() == LOGINBG)	//로그인화면일땐 캐릭터를 안그려주기위해 if - else절로 묶었음.
 		{
 			map.DrawLogin(mem1dc, login_dc, login_button);
+			
 		}
 		else {
 			if (map.getmapnum() == STARTBG)
@@ -405,8 +407,21 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 			{
 				if (HIWORD(lParam) > 320 && HIWORD(lParam) < 360)
 				{
-					map.IDinput = 1;
-					map.PWinput = 0;
+					map.LoginInputFlag = false;
+					map.UpdateFontSize(hwnd);
+					nCaretPosx = 380 + map.mFontSize.cx;
+					nCaretPosy = 330;
+					SetCaretPos(nCaretPosx, nCaretPosy);
+					break;
+				}
+				if (HIWORD(lParam) > 360 && HIWORD(lParam) < 400)
+				{
+
+					map.LoginInputFlag = true;
+					map.UpdateFontSize(hwnd);
+					nCaretPosx = 380 + map.mFontSize.cx;
+					nCaretPosy = 380;
+					SetCaretPos(nCaretPosx, nCaretPosy);
 					break;
 				}
 			}
@@ -514,28 +529,47 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 	case WM_CHAR:
 		if (map.getmapnum() == LOGINBG)
 		{
-			if (map.IDinput)
+			//굉~장히 map 안의 내부 함수로 넘겨서 키보드입력처리 따로 해주고싶은데,,, 나중에 구조를 따로 옮기기 위해 일단 빼둠
+			//wParam 0x08 - 백스페이스 
+			//0x09 - 탭 , 0x0A - Line Feed , 0x0D - 엔터, 0x1B - esc 이거빼곤 나머지 다 입력가능한 것. 나중에 채팅창 쓸때 사용하도록 
+			HideCaret(hwnd);
+			if (wParam == 0x08)
 			{
-				//굉~장히 map 안의 내부 함수로 넘겨서 키보드입력처리 따로 해주고싶은데,,, 나중에 구조를 따로 옮기기 위해 일단 빼둠
-				//wParam 0x08 - 백스페이스 
-				//0x09 - 탭 , 0x0A - Line Feed , 0x0D - 엔터, 0x1B - esc 이거빼곤 나머지 다 입력가능한 것. 나중에 채팅창 쓸때 사용하도록 
-				if (wParam == 0x08)
+				if (map.LoginInputFlag == false)
 				{
 					if (map.id.length() > 0)
 					{
-						std::cout << "ㅇㅇ";
 						map.id.pop_back();
 						cout << map.id << endl;
 					}
 				}
-				else if ((wParam >= 'a' && wParam <= 'z') || (wParam >= '0' && wParam <= '9'))
+				else
+				{
+					if (map.pass.length() > 0)
+					{
+						map.pass.pop_back();
+						cout << map.pass << endl;
+					}
+				}
+			}
+			else if ((wParam >= 'a' && wParam <= 'z') || (wParam >= '0' && wParam <= '9'))
+			{
+				if (map.LoginInputFlag == false)
 				{
 					if (map.id.length() < 10)
 						map.id += wParam;
 				}
-
-				break;
+				else {
+					if (map.pass.length() < 10)
+						map.pass += wParam;
+				}
 			}
+			map.UpdateFontSize(hwnd);
+			nCaretPosx = 380 + map.mFontSize.cx;
+			cout << map.mFontSize.cx << endl;
+			SetCaretPos(nCaretPosx, nCaretPosy);
+			ShowCaret(hwnd);
+			break;
 		}
 		if (wParam == 'r')
 		{
@@ -554,6 +588,15 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		}
 		InvalidateRect(hwnd, NULL, FALSE);
 		break;
+	case WM_SETFOCUS:
+
+		CreateCaret(hwnd, NULL, 2, 20);
+		SetCaretPos(nCaretPosx, nCaretPosy);
+		ShowCaret(hwnd);
+		return 0;
+	case WM_KILLFOCUS:
+		DestroyCaret();
+		return 0;
 	case WM_DESTROY:
 		for (int i = 0; i < 5; ++i)	FMOD_Sound_Release(sound.effectSound[i]);
 		for (int i = 0; i < 5; ++i)	FMOD_Sound_Release(sound.bgmSound[i]);

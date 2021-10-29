@@ -270,15 +270,42 @@ void MAP::DrawLogin(HDC& mem1dc, HDC& mem2dc,int num)
 
 	HFONT hfont = CreateFont(18, 0, 0, 0, 0, 0, 0, 0, HANGEUL_CHARSET, 0, 0, 0, VARIABLE_PITCH | FF_ROMAN, TEXT("메이플스토리 bold"));
 	HFONT oldfont = (HFONT)SelectObject(mem1dc, hfont);
-
+	
 	SetTextColor(mem1dc, RGB(255, 108, 168));
 	//std::cout << id << std::endl;
-	auto tmp = std::wstring(id.begin(), id.end());
-	auto convert_wstr = tmp.c_str();
-	TextOut(mem1dc, 380, 330, convert_wstr, lstrlenW(convert_wstr));
-
+	auto idtmp = std::wstring(id.begin(), id.end());
+	auto id_convert_wstr = idtmp.c_str();
+	TextOut(mem1dc, 380, 330, id_convert_wstr, lstrlenW(id_convert_wstr));
+	auto passtmp = std::wstring(pass.begin(), pass.end());
+	auto pass_convert_wstr = passtmp.c_str();
+	TextOut(mem1dc, 380, 380, pass_convert_wstr, lstrlenW(pass_convert_wstr));
+	
 	SelectObject(mem1dc, oldfont);
 	DeleteObject(hfont);
 
 	DeleteObject(mem2dc);
+}
+
+void MAP::UpdateFontSize(HWND& hwnd)
+{
+	HDC mem1dc = GetDC(hwnd);	//임시용 HDC Create 
+	HFONT hfont = CreateFont(18, 0, 0, 0, 0, 0, 0, 0, HANGEUL_CHARSET, 0, 0, 0, VARIABLE_PITCH | FF_ROMAN, TEXT("메이플스토리 bold"));	//폰트크기체크용 폰트 Create
+	HFONT oldfont = (HFONT)SelectObject(mem1dc, hfont);
+
+	SetTextColor(mem1dc, RGB(255, 108, 168));
+	if (LoginInputFlag)
+	{
+		auto passtmp = std::wstring(pass.begin(), pass.end());
+		auto pass_convert_wstr = passtmp.c_str();
+		GetTextExtentPoint(mem1dc, pass_convert_wstr, lstrlenW(pass_convert_wstr), &mFontSize);
+	}
+	else {
+		auto idtmp = std::wstring(id.begin(), id.end());
+		auto id_convert_wstr = idtmp.c_str();
+		GetTextExtentPoint(mem1dc, id_convert_wstr, lstrlenW(id_convert_wstr), &mFontSize);
+	}
+
+	SelectObject(mem1dc, oldfont);	//기존 brush로 복구
+	DeleteObject(hfont);			//Create 했던것 Delete
+	ReleaseDC(hwnd, mem1dc);		//Create 했던것 Delete
 }

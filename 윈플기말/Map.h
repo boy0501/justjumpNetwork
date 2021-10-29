@@ -53,6 +53,8 @@ public:
 	void ChangeDieNotice(HINSTANCE,int);
 	//로그인버튼
 	void DrawLogin(HDC& mem1dc, HDC& mem2dc,int num);
+	//
+	void UpdateFontSize(HWND& hwnd);
 	/*void CreateBlack(HINSTANCE)*/;
 	void CreateMap(HINSTANCE);
 	void CreateUi(HINSTANCE);
@@ -63,7 +65,8 @@ public:
 	void CreateLogin(HINSTANCE&);
 
 
-	int IDinput = 1;	//아이디입력 가능
-	int PWinput = 0;	//패스워드입력
+	SIZE mFontSize;		//캐럿을 위한 문자열 총 size저장변수
 	std::string id{ "anonymous" };		//아이디
+	std::string pass{""};					//비밀번호
+	bool LoginInputFlag = false;		//false면 아이디입력받는 상태 , true면 비밀번호 입력받는 상태
 };
