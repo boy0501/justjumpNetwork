@@ -491,6 +491,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 					player.sety(655);
 					player.mPlayername = map.id;
 					sound.Sound_Play(BGMSOUND, MAINMENUBGM, BGMVOL);
+					HideCaret(hwnd);
 					InvalidateRgn(hwnd, NULL, FALSE);
 					break;
 				}
@@ -589,10 +590,12 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		InvalidateRect(hwnd, NULL, FALSE);
 		break;
 	case WM_SETFOCUS:
-
-		CreateCaret(hwnd, NULL, 2, 20);
-		SetCaretPos(nCaretPosx, nCaretPosy);
-		ShowCaret(hwnd);
+		if (map.getmapnum() == LOGINBG)
+		{
+			CreateCaret(hwnd, NULL, 2, 20);
+			SetCaretPos(nCaretPosx, nCaretPosy);
+			ShowCaret(hwnd);
+		}
 		return 0;
 	case WM_KILLFOCUS:
 		DestroyCaret();
