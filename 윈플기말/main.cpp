@@ -204,8 +204,6 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		switch (wParam)
 		{
 		case 1:
-			if (map.getmapnum() == LOGINBG)
-				break;
 			obj_t += 1;
 
 			if (map.getmapnum() != LOGINBG)	//로그인중일땐 캐릭터 상호작용 x 매끄럽게 하려면 Scene changer를 구현해야하지만,,,, 넘어가도록 하자 
