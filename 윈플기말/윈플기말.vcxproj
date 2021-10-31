@@ -151,24 +151,38 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Button.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="DieHUD.cpp" />
+    <ClCompile Include="GameHUD.cpp" />
     <ClCompile Include="Load.cpp" />
+    <ClCompile Include="LoginHUD.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Map.cpp" />
     <ClCompile Include="object.cpp" />
     <ClCompile Include="ObjectManager.cpp" />
     <ClCompile Include="player.cpp" />
     <ClCompile Include="Sound.cpp" />
+    <ClCompile Include="StartHUD.cpp" />
+    <ClCompile Include="Text.cpp" />
+    <ClCompile Include="UI.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Button.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="DieHUD.h" />
+    <ClInclude Include="GameHUD.h" />
     <ClInclude Include="Load.h" />
+    <ClInclude Include="LoginHUD.h" />
     <ClInclude Include="Map.h" />
     <ClInclude Include="object.h" />
     <ClInclude Include="ObjectManager.h" />
     <ClInclude Include="player.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Sound.h" />
+    <ClInclude Include="StartHUD.h" />
+    <ClInclude Include="Text.h" />
+    <ClInclude Include="UI.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc" />
