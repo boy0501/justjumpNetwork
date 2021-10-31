@@ -73,17 +73,25 @@ void update(float delta_time)
 		}
 	}
 	//UiClear 끝
-	
+
+	//Sound업데이트
+	FMOD_System_Update(Sound::GetSelf()->System);
+	//Sound업데이트 끝
 	if (map.getmapnum() == LOGINBG)
 		return;
 	obj_t += 1;
 
 	if (map.getmapnum() != LOGINBG)	//로그인중일땐 캐릭터 상호작용 x 
 	{
+		
 		player.move(obj_t);
 		adjustPlayer(player, obj, map, ocount, g_hinst);
 		if (player.getCMD_die())
-			mUI.emplace_back(map.mDieUi);
+		{
+			if(player.WhenPlayerDied==false)
+				mUI.emplace_back(map.mDieUi);
+			player.WhenPlayerDied = true;
+		}
 	}
 	map.movemap();
 
@@ -105,7 +113,7 @@ void update(float delta_time)
 	player.stealthtime();
 	player.spike_hurttime();
 
-	// 이거를 따로 넣는게 낳을듯 오브젝트 멤버함수로다가
+	// 이거를 따로 넣는게 나을듯 오브젝트 멤버함수로다가
 	for (int i = 0; i <= ocount; i++)
 	{
 		if (obj[i].getType() == 0)
@@ -349,6 +357,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		dieui->addButton([dieui]() {
 			player.initPos();
 			player.sethp(100);
+			player.WhenPlayerDied = false;
 			dieui->closeUI();
 		}, g_hinst, "img/notice", 380, 240, 260, 130, RGB(255, 0, 0));
 		map.mDieUi = dieui;

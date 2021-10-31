@@ -342,7 +342,6 @@ void adjustPlayer(PLAYER& player, OBJECT* obj, MAP& m, int& ocount, HINSTANCE g_
 						ocount = initObject(obj, m.getmapnum(), g_hinst);
 						m.CreateMap(g_hinst);
 						Sound::GetSelf()->setindex(m.getmapnum()-9);
-						FMOD_System_Update(Sound::GetSelf()->System);
 						Sound::GetSelf()->Sound_Play(BGMSOUND, Sound::GetSelf()->getindex(), BGMVOL);
 						Sound::GetSelf()->Sound_Play(EFFECTSOUND, PORTALEF, EFVOL);
 						

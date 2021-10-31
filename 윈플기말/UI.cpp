@@ -109,7 +109,7 @@ void UI::draw(HDC& mem1dc)
 	}
 	for (const auto& button : mButtons)
 	{
-		button->draw(mem1dc);
+		button->drawByScreenButton(mem1dc);
 	}
 }
 void UI::drawByUserUi(HDC& mem1dc)

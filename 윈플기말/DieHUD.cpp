@@ -1,5 +1,6 @@
 #include "DieHUD.h"
 #include "player.h"
+#include "Button.h"
 #include "Camera.h"
 DieHUD::DieHUD(const int& cnt, PLAYER& player,CAMERA& camera)
 	:UI(cnt)
@@ -18,7 +19,12 @@ DieHUD::~DieHUD()
 
 void DieHUD::draw(HDC& mem1dc)
 {
-	UI::draw(mem1dc);
+	drawDieButton(mem1dc);
+	drawDieText(mem1dc);	
+}
+
+void DieHUD::drawDieText(HDC& mem1dc)
+{
 	HFONT hfont = CreateFont(14, 0, 0, 0, 0, 0, 0, 0, HANGEUL_CHARSET, 0, 0, 0, VARIABLE_PITCH | FF_ROMAN, TEXT("메이플스토리 bold"));
 	HFONT oldfont = (HFONT)SelectObject(mem1dc, hfont);
 
@@ -40,7 +46,19 @@ void DieHUD::draw(HDC& mem1dc)
 	SelectObject(mem1dc, oldfont);
 	DeleteObject(hfont);
 }
+void DieHUD::drawDieButton(HDC& mem1dc)
+{
+	for (const auto& button : mButtons)
+	{
+		button->drawByUserButton(mem1dc, mCamera);
+	}/*
+	HDC tmpdc;
+	tmpdc = CreateCompatibleDC(mem1dc);
+	auto oldtmp = SelectObject(tmpdc, hbit[mOnButton]);
+	TransparentBlt(mem1dc, mPosx, mPosy, mWidth, mHeight, tmpdc, 0, 0, mWidth, mHeight, mCRTransparent);
 
+	DeleteObject(tmpdc);*/
+}
 
 void DieHUD::update(float deltatime)
 {
