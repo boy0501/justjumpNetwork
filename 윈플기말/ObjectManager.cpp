@@ -76,7 +76,7 @@ bool collp2w(PLAYER player, OBJECT object)
 
 
 //플레이어와 오브젝트간 상호작용 판단하고 그에맞게 바꿔줌
-void adjustPlayer(PLAYER& player, OBJECT* obj, MAP& m, int& ocount, HINSTANCE g_hinst, Sound& sound)
+void adjustPlayer(PLAYER& player, OBJECT* obj, MAP& m, int& ocount, HINSTANCE g_hinst)
 {
 	int check_coll = 0;	//하나라도 부딪혔는지 판별하기위함
 	if (player.getx() - player.getw() < 0)
@@ -109,7 +109,7 @@ void adjustPlayer(PLAYER& player, OBJECT* obj, MAP& m, int& ocount, HINSTANCE g_
 						{
 							player.setCMD_move(player.getdir());	//보고있는방향으로 앞으로 나가게, 떨어졌는데 가만히있진 않지요
 							player.setstate(6);		//피격으로감
-							player.hurt(sound);
+							player.hurt();
 							return;
 						}
 					}
@@ -179,7 +179,7 @@ void adjustPlayer(PLAYER& player, OBJECT* obj, MAP& m, int& ocount, HINSTANCE g_
 						else {
 							player.setstate(6);		//피격으로감
 						}
-						player.hurt(sound);
+						player.hurt();
 					}
 				}
 				else if (obj[i].getType() == 102) //Break Pipe Left
@@ -247,7 +247,7 @@ void adjustPlayer(PLAYER& player, OBJECT* obj, MAP& m, int& ocount, HINSTANCE g_
 								player.setCMD_move(1); //무조건 왼쪽임
 								player.setstate(6);
 							}
-							player.hurt(sound);
+							player.hurt();
 						}
 					}
 				}
@@ -289,7 +289,7 @@ void adjustPlayer(PLAYER& player, OBJECT* obj, MAP& m, int& ocount, HINSTANCE g_
 							player.setCMD_move(player.getdir());
 							player.setstate(6);		//피격으로감
 						}
-						player.hurt(sound);
+						player.hurt();
 					}
 				}
 				else if (obj[i].getType() == 107)
@@ -322,7 +322,7 @@ void adjustPlayer(PLAYER& player, OBJECT* obj, MAP& m, int& ocount, HINSTANCE g_
 							player.setCMD_move(player.getdir());
 							player.setstate(6);		//피격으로감
 						}
-						player.hurt(sound);
+						player.hurt();
 					}
 				}
 			}
@@ -341,10 +341,10 @@ void adjustPlayer(PLAYER& player, OBJECT* obj, MAP& m, int& ocount, HINSTANCE g_
 							obj[j].ResetObject();
 						ocount = initObject(obj, m.getmapnum(), g_hinst);
 						m.CreateMap(g_hinst);
-						sound.setindex(m.getmapnum()-9);
-						FMOD_System_Update(sound.System);
-						sound.Sound_Play(BGMSOUND, sound.getindex(), BGMVOL);
-						sound.Sound_Play(EFFECTSOUND, PORTALEF, EFVOL);
+						Sound::GetSelf()->setindex(m.getmapnum()-9);
+						FMOD_System_Update(Sound::GetSelf()->System);
+						Sound::GetSelf()->Sound_Play(BGMSOUND, Sound::GetSelf()->getindex(), BGMVOL);
+						Sound::GetSelf()->Sound_Play(EFFECTSOUND, PORTALEF, EFVOL);
 						
 						return;
 					}

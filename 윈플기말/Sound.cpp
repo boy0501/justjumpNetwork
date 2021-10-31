@@ -1,10 +1,18 @@
 #include "Sound.h"
 
+Sound* Sound::mSound = nullptr;
+
 int Sound::getindex()
 {
 	return index;
 }
 
+Sound* Sound::GetSelf()
+{
+	if (mSound == nullptr)
+		mSound = new Sound();
+	return mSound;
+}
 void Sound::setindex(int i)
 {
 	index = i;

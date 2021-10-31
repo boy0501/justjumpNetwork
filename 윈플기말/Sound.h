@@ -21,8 +21,11 @@
 #define EFVOL 0.5
 class Sound {
 	int index;
+	static class Sound* mSound;
+	Sound() {};
 public:
 	int getindex();
+	static class Sound* GetSelf();
 
 	FMOD_SYSTEM *System;
 	FMOD_SOUND *bgmSound[6];	//3는 배경브금갯수

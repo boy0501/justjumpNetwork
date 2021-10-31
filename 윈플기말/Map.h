@@ -1,6 +1,7 @@
 #pragma once
 #include <windows.h>
 #include <string>
+#include <memory>
 #include "Camera.h"
 #include "player.h"
 #define MAPWIDTH 1024
@@ -22,6 +23,10 @@ class MAP {
 	HBITMAP hbithelp[2];
 	HBITMAP hbitlogin[5];
 public:
+	std::shared_ptr<class UI> mStartui;
+	std::shared_ptr<class UI> mGameUi;
+	std::shared_ptr<class UI> mDieUi;
+	~MAP();
 	//맵번호를 읽음 10~
 	int getmapnum();
 	//Black Screen Time get
@@ -44,7 +49,7 @@ public:
 	//HP바
 	void DrawHP(HDC&, HDC&, CAMERA,PLAYER);
 	//die ui
-	void DrawDie(HDC&, HDC&, CAMERA, Sound&);
+	void DrawDie(HDC&, HDC&, CAMERA);
 	//시작 버튼
 	void DrawStart(HDC&, HDC&, int);
 	//조작법
@@ -67,6 +72,5 @@ public:
 
 	SIZE mFontSize;		//캐럿을 위한 문자열 총 size저장변수
 	std::string id{ "anonymous" };		//아이디
-	std::string pass{""};					//비밀번호
 	bool LoginInputFlag = false;		//false면 아이디입력받는 상태 , true면 비밀번호 입력받는 상태
 };

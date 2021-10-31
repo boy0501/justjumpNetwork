@@ -234,7 +234,7 @@ int PLAYER::getspike_hurt()
 	return spike_hurt;
 }
 //플레이어 상태 변경
-void PLAYER::PlayerSetting(WPARAM wParam, Sound& sound)
+void PLAYER::PlayerSetting(WPARAM wParam)
 {
 	if (wParam == VK_LEFT)
 	{
@@ -267,7 +267,7 @@ void PLAYER::PlayerSetting(WPARAM wParam, Sound& sound)
 				dir = 1;
 			}
 			COMMAND_move = 1;	//1이든 4든 누르면 일단은 움직임형태를 바꿔줌
-			std::cout << "LEFT눌림" << std::endl;
+			//std::cout << "LEFT눌림" << std::endl;
 		}
 		else if (state == 2)
 		{
@@ -319,7 +319,7 @@ void PLAYER::PlayerSetting(WPARAM wParam, Sound& sound)
 				
 			}
 			COMMAND_move = 2;	//1이든 4든 누르면 일단은 움직임형태를 바꿔줌
-			std::cout << "RIGHT 눌림" << std::endl;
+			//std::cout << "RIGHT 눌림" << std::endl;
 		}
 		else if (state == 2)
 		{
@@ -419,7 +419,7 @@ void PLAYER::PlayerSetting(WPARAM wParam, Sound& sound)
 		}
 		if (state != 2 && state != 7)	//점프나 공중이아니라면 점프뛸수있다. 하지만 줄에매달렸을때도 안되긴 마찬가지
 		{
-			sound.Sound_Play(EFFECTSOUND, JUMPEF, EFVOL);
+			Sound::GetSelf()->Sound_Play(EFFECTSOUND, JUMPEF, EFVOL);
 			falldy = 10;	//임시
 			jumpcount++;
 			state = 2;
@@ -1078,7 +1078,7 @@ void PLAYER::spike_hurttime()
 	}
 }
 
-void PLAYER::hurt(Sound& sound)
+void PLAYER::hurt()
 {
 	if (COMMAND_die == false)
 		hp -= 5;
@@ -1095,7 +1095,7 @@ void PLAYER::hurt(Sound& sound)
 		RIGHTkey = 0;
 		UPkey = 0;
 		DOWNkey = 0;
-		sound.Sound_Play(EFFECTSOUND, TOMBSTONEEF, EFVOL);
+		Sound::GetSelf()->Sound_Play(EFFECTSOUND, TOMBSTONEEF, EFVOL);		
 		diecount++;
 	}
 }

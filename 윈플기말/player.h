@@ -123,7 +123,7 @@ public:
 
 
 	//방향키 눌렀을때 플레이어 세팅
-	void PlayerSetting(WPARAM,Sound&);
+	void PlayerSetting(WPARAM);
 	//방향키 땠을때 플레이어 세팅풀기
 	void PlayerWaiting(WPARAM);
 	//떨어지는 시점의 y좌표 기억
@@ -141,7 +141,7 @@ public:
 	//가시한테 찔렸을때 강제이동값
 	void spike_hurttime();
 	//다쳤을때 피 다는 계산식 + 뒤지면초기화
-	void hurt(Sound&);
+	void hurt();
 	//뒤지면 초기화
 	void die();
 };
