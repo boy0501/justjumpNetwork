@@ -103,25 +103,13 @@ void UI::update(float deltatime)
 }
 void UI::draw(HDC& mem1dc)
 {
-	//HDC tmpdc;
-	//tmpdc = CreateCompatibleDC(mem1dc);
-	//for (int i = 0; i < mUiCount; ++i)
-	//{
-	//	auto info = mUiInfo[i];
-	//	SelectObject(tmpdc, hbits[i]);
-	//	if(info.mIsUserUi)
-	//		TransparentBlt(mem1dc, mCamera->getx() + info.mx, mCamera->gety() + info.my, info.mw, info.mh, tmpdc, 0, 0, info.mw, info.mh, info.mcr);
-	//	else
-	//		TransparentBlt(mem1dc, info.mx,info.my, info.mw, info.mh, tmpdc, 0, 0, info.mw, info.mh, info.mcr);
-	//}
-	//DeleteObject(tmpdc);
 	for (const auto& txt : mText)
 	{
 		txt->draw(mem1dc);
 	}
 	for (const auto& button : mButtons)
 	{
-		button->draw(mem1dc);
+		button->drawByScreenButton(mem1dc);
 	}
 }
 void UI::drawByUserUi(HDC& mem1dc)

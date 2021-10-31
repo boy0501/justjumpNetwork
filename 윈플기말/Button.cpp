@@ -1,4 +1,5 @@
 #include "Button.h"
+#include "Camera.h"
 #include <iostream>
 Button::Button(std::function<void()> click, const int& x, const int& y,const int& width,const int& height,const COLORREF& transparantcolor)
 	: mClick(click)
@@ -25,13 +26,27 @@ void Button::initailize()
 
 }
 
-void Button::draw(HDC& mem1dc)
+void Button::drawByScreenButton(HDC& mem1dc)
 {
 	HDC tmpdc;
 	tmpdc = CreateCompatibleDC(mem1dc);
 	auto oldtmp = SelectObject(tmpdc, hbit[mOnButton]);
 	TransparentBlt(mem1dc, mPosx, mPosy, mWidth, mHeight, tmpdc, 0, 0, mWidth, mHeight, mCRTransparent);
 
+	DeleteObject(tmpdc);
+
+}
+
+void Button::drawByUserButton(HDC& mem1dc,CAMERA* camera)
+{
+	if (camera == NULL)
+		return;
+	HDC tmpdc;
+	tmpdc = CreateCompatibleDC(mem1dc);
+	auto oldtmp = SelectObject(tmpdc, hbit[mOnButton]);
+	
+
+	TransparentBlt(mem1dc,camera->getx() + mPosx, camera->gety() + mPosy, mWidth, mHeight, tmpdc, 0, 0, mWidth, mHeight, mCRTransparent);
 	DeleteObject(tmpdc);
 
 }

@@ -11,7 +11,6 @@ GameHUD::GameHUD(const int& cnt,PLAYER& player)
 GameHUD::~GameHUD()
 {
 	if (mHpBitmap) DeleteObject(mHpBitmap);
-	std::cout << "dd" << std::endl;
 }
 
 
@@ -55,8 +54,7 @@ void GameHUD::drawHP(HDC& mem1dc)
 	TextOut(mem1dc, mCamera->getx() + 505, mCamera->gety() + 729, L"/100", lstrlenW(L"/100"));
 	SetTextColor(mem1dc, RGB(255, 255, 255));
 	TextOut(mem1dc, mCamera->getx() + 505, mCamera->gety() + 728, L"/100", lstrlenW(L"/100"));
-	//StretchBlt(mem1dc, camera.getx() + 421, camera.gety() + 728, hp, 65, mem2dc, 0, 0,hp, 65,SRCCOPY);
-	//BitBlt(mem1dc, 0, 0, MAPWIDTH, MAPHEIGHT, mem2dc, 0, 0, SRCCOPY);	//HP 전체 새로고침
+
 	SelectObject(mem1dc, oldfont);
 	DeleteObject(hfont);
 	DeleteObject(mem2dc);

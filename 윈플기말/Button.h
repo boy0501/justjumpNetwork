@@ -12,7 +12,8 @@ public:
 
 	virtual void initailize();
 
-	void draw(HDC& mem1dc);
+	void drawByScreenButton(HDC& mem1dc);
+	void drawByUserButton(HDC& mem1dc,class CAMERA* camera);
 
 	bool containMouse(const int& mx, const int& my) const;
 	void LoadButtonBitmap(const HINSTANCE& g_hinst, std::string name, std::string name1, std::string name2, std::string name3);

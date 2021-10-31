@@ -16,12 +16,6 @@ class MAP {
 	int ms;
 	int index;
 	HBITMAP hbitbk;
-	HBITMAP hbitui;
-	HBITMAP hbithp;
-	HBITMAP hbitdie;
-	HBITMAP hbitstart[3];
-	HBITMAP hbithelp[2];
-	HBITMAP hbitlogin[5];
 public:
 	std::shared_ptr<class UI> mStartui;
 	std::shared_ptr<class UI> mGameUi;
@@ -44,33 +38,14 @@ public:
 	void DrawBK(HDC&, HDC&, RECT&);
 	//서서히 거매지는 것 구현
 	void DrawLoadBK(HDC&, HDC&, BLENDFUNCTION);
-	//상태창
-	void DrawUi(HDC&, HDC&, CAMERA);
-	//HP바
-	void DrawHP(HDC&, HDC&, CAMERA,PLAYER);
-	//die ui
-	void DrawDie(HDC&, HDC&, CAMERA);
-	//시작 버튼
-	void DrawStart(HDC&, HDC&, int);
-	//조작법
-	void DrawHelp(HDC&, HDC&,int);
 	//die 상태변화
 	void ChangeDieNotice(HINSTANCE,int);
-	//로그인버튼
-	void DrawLogin(HDC& mem1dc, HDC& mem2dc,int num);
-	//
+
 	void UpdateFontSize(HWND& hwnd);
 	/*void CreateBlack(HINSTANCE)*/;
 	void CreateMap(HINSTANCE);
-	void CreateUi(HINSTANCE);
-	void CreateHP(HINSTANCE);
-	void CreateDie(HINSTANCE);
-	void CreateStart(HINSTANCE);
-	void CreateHelp(HINSTANCE);
-	void CreateLogin(HINSTANCE&);
 
 
 	SIZE mFontSize;		//캐럿을 위한 문자열 총 size저장변수
-	std::string id{ "anonymous" };		//아이디
 	bool LoginInputFlag = false;		//false면 아이디입력받는 상태 , true면 비밀번호 입력받는 상태
 };
