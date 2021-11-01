@@ -12,7 +12,10 @@ public:
 
 	
 	void UpdateFontSize(HWND& hwnd);
+	void pushByteChar(const char& c) { mText.pop_back(); mText += c; }
 	void pushChar(const char& c) { mText += c; }
+	void pushwChar(const wchar_t& c) { mText += c; }
+	void changewChar(const wchar_t& c) { mText[mText.size()-1] = c; }
 	void popChar() { mText.pop_back(); }
 	const int& getTextLen() const { return mText.length(); }
 	const SIZE& getFontLen() const { return mFontLength; }
