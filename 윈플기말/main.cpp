@@ -17,8 +17,9 @@
 #include "DieHUD.h"
 #include "Button.h"
 #include "Text.h"
-#ifdef _DEBUG
 #pragma comment(lib,"Winmm.lib")
+#pragma comment(lib,"imm32.lib")
+#ifdef _DEBUG
 #pragma comment(linker, "/entry:WinMainCRTStartup /subsystem:console")
 #endif
 
@@ -37,6 +38,7 @@ static MAP map;
 static CAMERA camera;
 static OBJECT obj[150];
 static BLENDFUNCTION loadbf;
+bool isComposit = false;
 
 HWND hWnd;
 static int nCaretPosx, nCaretPosy;	//폰트 x,y크기 , 캐럿 x y 위치
@@ -220,7 +222,7 @@ void ProcessingLoop()
 		Fps++;
 		if (elapsedtime > 1.0f)
 		{
-			cout << "FPS:" << Fps << endl;
+			//cout << "FPS:" << Fps << endl;
 			Fps = 0;
 			elapsedtime = 0;
 		}
@@ -230,6 +232,101 @@ void ProcessingLoop()
 		ShowCaret(hWnd);
 	}
 }
+
+HIMC m_hIMC = NULL;   // IME 핸들
+wchar_t wszComp[256] = { 0, };
+wchar_t wsz1Comp[256] = { 0, };
+
+int GetText(HWND hWnd, UINT msg, WPARAM wparam, LPARAM lparam)
+{
+	int len;
+	switch (msg)
+	{
+	case WM_IME_COMPOSITION:
+		m_hIMC = ImmGetContext(hWnd);	// ime핸들을 얻는것
+		if (lparam & GCS_RESULTSTR)
+		{
+			if ((len = ImmGetCompositionString(m_hIMC, GCS_RESULTSTR, NULL, 0)) > 0)
+			{
+				// 완성된 글자가 있다.
+				ImmGetCompositionString(m_hIMC, GCS_RESULTSTR, wszComp, len);
+
+				if (map.LoginInputFlag == false)
+				{
+					if (mUI.back()->FindTextByNameTag("id")->getTextLen() < 10)
+					{
+						mUI.back()->FindTextByNameTag("id")->changewChar(*wszComp);
+						isComposit = false;
+					}
+					mUI.back()->FindTextByNameTag("id")->UpdateFontSize(hWnd);
+					nCaretPosx = 380 + mUI.back()->FindTextByNameTag("id")->getFontLen().cx;
+				}
+				else {
+					if (mUI.back()->FindTextByNameTag("pass")->getTextLen() < 10)
+					{
+						mUI.back()->FindTextByNameTag("pass")->changewChar(*wszComp);
+						isComposit = false;
+					}
+					mUI.back()->FindTextByNameTag("pass")->UpdateFontSize(hWnd);
+					nCaretPosx = 380 + mUI.back()->FindTextByNameTag("pass")->getFontLen().cx;
+				}
+			}
+
+		}
+		else if (lparam & GCS_COMPSTR)
+		{
+			// 현재 글자를 조합 중이다.
+
+			// 조합중인 길이를 얻는다.
+			// str에  조합중인 문자를 얻는다.
+			len = ImmGetCompositionString(m_hIMC, GCS_COMPSTR, NULL, 0);
+			ImmGetCompositionString(m_hIMC, GCS_COMPSTR, wsz1Comp, len);
+			wsz1Comp[len] = 0;
+			if (map.LoginInputFlag == false)
+			{
+				if (mUI.back()->FindTextByNameTag("id")->getTextLen() < 10)
+				{
+					if (!isComposit)
+					{
+						mUI.back()->FindTextByNameTag("id")->pushwChar(NULL);
+						isComposit = true;
+					}
+					mUI.back()->FindTextByNameTag("id")->changewChar(*wsz1Comp);
+				}
+				mUI.back()->FindTextByNameTag("id")->UpdateFontSize(hWnd);
+				nCaretPosx = 380 + mUI.back()->FindTextByNameTag("id")->getFontLen().cx;
+			}
+			else {
+				if (mUI.back()->FindTextByNameTag("pass")->getTextLen() < 10)
+				{
+					if (!isComposit)
+					{
+						mUI.back()->FindTextByNameTag("pass")->pushwChar(NULL);
+						isComposit = true;
+					}
+					mUI.back()->FindTextByNameTag("pass")->changewChar(*wsz1Comp);
+				}
+				mUI.back()->FindTextByNameTag("pass")->UpdateFontSize(hWnd);
+				nCaretPosx = 380 + mUI.back()->FindTextByNameTag("pass")->getFontLen().cx;
+			}
+
+			
+		}
+
+		ImmReleaseContext(hWnd, m_hIMC);	// IME 핸들 반환!!
+		return 0;
+
+
+	case WM_CHAR:				// 1byte 문자 (ex : 영어)
+		return 1;
+	case WM_IME_NOTIFY:			// 한자입력...
+		return 0;
+	case WM_KEYDOWN:			// 키다운..
+		return 1;
+	}
+	return 1;
+}
+
 
 int WINAPI WinMain(HINSTANCE hinstance, HINSTANCE hPrevinstance, LPSTR lpszCmdParam, int nCmdShow)
 {
@@ -285,10 +382,13 @@ int WINAPI WinMain(HINSTANCE hinstance, HINSTANCE hPrevinstance, LPSTR lpszCmdPa
 
 
 }
-
 LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 {
-	
+	if (GetText(hwnd, iMessage, wParam, lParam) == 0)
+	{
+		return 0;
+	}
+
 	switch (iMessage)
 	{
 	case WM_CREATE: {
@@ -383,8 +483,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		Sound::GetSelf()->Sound_Play(BGMSOUND, LOGINBGM, BGMVOL);
 
 
-		break;
 	}
+	break;
 	case WM_KEYDOWN:
 		if (player.getCMD_die() == 1)
 			break;
@@ -443,14 +543,15 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		
 		break;
 	case WM_CHAR:
-		if (map.getmapnum() == LOGINBG)
+	if (map.getmapnum() == LOGINBG)
 		{
 			//굉~장히 map 안의 내부 함수로 넘겨서 키보드입력처리 따로 해주고싶은데,,, 나중에 구조를 따로 옮기기 위해 일단 빼둠
 			//wParam 0x08 - 백스페이스 
 			//0x09 - 탭 , 0x0A - Line Feed , 0x0D - 엔터, 0x1B - esc 이거빼곤 나머지 다 입력가능한 것. 나중에 채팅창 쓸때 사용하도록 
 			HideCaret(hwnd);
-			if (wParam == 0x08)
+			switch (wParam)
 			{
+			case 0x08:
 				if (map.LoginInputFlag == false)
 				{
 					if (mUI.back()->FindTextByNameTag("id")->getTextLen() > 0)
@@ -465,13 +566,16 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 					mUI.back()->FindTextByNameTag("pass")->UpdateFontSize(hwnd);
 					nCaretPosx = 380 + mUI.back()->FindTextByNameTag("pass")->getFontLen().cx;
 				}
-			}
-			else if ((wParam >= 'a' && wParam <= 'z') || (wParam >= '0' && wParam <= '9'))
-			{
+				break;
+			case 0x09:
+			case 0x0A:
+			case 0x0D:
+			case 0x1B:
+				break;
+			default:
 				if (map.LoginInputFlag == false)
 				{
-
-					if(mUI.back()->FindTextByNameTag("id")->getTextLen() < 10)
+					if (mUI.back()->FindTextByNameTag("id")->getTextLen() < 10)
 						mUI.back()->FindTextByNameTag("id")->pushChar(wParam);
 					mUI.back()->FindTextByNameTag("id")->UpdateFontSize(hwnd);
 					nCaretPosx = 380 + mUI.back()->FindTextByNameTag("id")->getFontLen().cx;
@@ -482,8 +586,9 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 					mUI.back()->FindTextByNameTag("pass")->UpdateFontSize(hwnd);
 					nCaretPosx = 380 + mUI.back()->FindTextByNameTag("pass")->getFontLen().cx;
 				}
+				isComposit = false;
+				break;
 			}
-			cout << map.mFontSize.cx << endl;
 			SetCaretPos(nCaretPosx, nCaretPosy);
 			ShowCaret(hwnd);
 			break;
