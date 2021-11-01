@@ -2,6 +2,7 @@
 #include "player.h"
 #include "Load.h"
 #include <iostream>
+
 int ROWSPEED = 3; 	//가로 이동속도
 int COLSPEED = 10;	//세로 이동속도
 int ROPESPEED = 2;
@@ -13,6 +14,8 @@ bool LRkey = 0;//왼쪽오른쪽키 동시에 눌렀는지 1이면눌림 0이면 안눌림
 bool UDkey = 0;
 int jumpcount = 0;
 int diecount = 0;
+
+
 PLAYER::PLAYER()
 {
 	// x y 는 캐릭터의 중심좌표이고 w,h 는 xy에서 좌우로 반틈씩만 간 좌표이다. 
@@ -234,336 +237,336 @@ int PLAYER::getspike_hurt()
 	return spike_hurt;
 }
 //플레이어 상태 변경
-void PLAYER::PlayerSetting(WPARAM wParam)
-{
-	if (wParam == VK_LEFT)
-	{
-		
-		LEFTkey = true;				//키 누름상태
-		if (RIGHTkey == true)		//좌우를 동시에 누르고있다면 움직이지않음
-		{
-			LRkey = true;
-			if (state == 4)		//움직이고 있을때나 1로 해서 멈추게하는거지 다를때 1로바꾸면 난리남
-				state = 1;
-			return;
-		}
-
-		if (state == 7)
-		{
-			dir = 1;	//방향은 바꿔주지만 움직임형태는 냅둠 (아래 move에서 몇초이상 누르면 조금씩은 바뀌게해줌)
-		}
-		else if (state == 1 || state == 4)
-		{
-
-			if (state == 1)//멈춰있다가 움직일때 한번 바로 움직여줘야함
-			{
-
-				state = 4;
-				dir = 1;
-				
-			}
-			else {
-				state = 4;
-				dir = 1;
-			}
-			COMMAND_move = 1;	//1이든 4든 누르면 일단은 움직임형태를 바꿔줌
-			//std::cout << "LEFT눌림" << std::endl;
-		}
-		else if (state == 2)
-		{
-			if (COMMAND_hurt != 1)	//쳐맞고있을때는 이 로직 안통해요~
-				ROWSPEED = 1;	//점프했을때 방향을 바꾸려하면 드라마틱하게 다시 오는경우는 없지만 그래도 원했던것보단 조금 나감
-			dir = 1;	//방향은 바꿔주지만 움직임형태는 냅둠
-		}
-		else if (state == 3)
-		{
-
-			h += 12;
-			y -= 12;
-			state = 4;
-			dir = 1;
-			COMMAND_move = 1;
-		}
-		else if (state == 5 || state == 8)
-		{
-			dir = 1;
-			//COMMAND_move = 1;
-		}
-		return;
-	}
-	if (wParam == VK_RIGHT)
-	{
-		RIGHTkey = true;	//키 누름상태
-		if (LEFTkey == true)
-		{
-			LRkey = true;
-			if (state == 4)		//움직이고 있을때나 1로 해서 멈추게하는거지 다를때 1로바꾸면 난리남
-				state = 1;
-			return;
-		}
-		if (state == 7)
-		{
-			dir = 2;	//방향은 바꿔주지만 움직임형태는 냅둠 (아래 move에서 몇초이상 누르면 조금씩은 바뀌게해줌)
-		}
-		else if (state == 1 || state == 4)
-		{
-			if (state == 1)//멈춰있다가 움직일때 한번 바로 움직여줘야함
-			{
-
-				state = 4;
-				dir = 2;
-			}
-			else {
-				state = 4;
-				dir = 2;
-				
-			}
-			COMMAND_move = 2;	//1이든 4든 누르면 일단은 움직임형태를 바꿔줌
-			//std::cout << "RIGHT 눌림" << std::endl;
-		}
-		else if (state == 2)
-		{
-			if (COMMAND_hurt != 1)	//쳐맞고있을때는 이 로직 안통해요~
-				ROWSPEED = 1;	//점프했을때 방향을 바꾸려하면 드라마틱하게 다시 오는경우는 없지만 그래도 원했던것보단 조금 나감
-			dir = 2;	//방향은 바꿔주지만 움직임형태는 냅둠
-		}
-		else if (state == 3)
-		{
-			h += 12;
-			y -= 12;
-			state = 4;
-			dir = 2;
-			COMMAND_move = 2;
-		}
-		else if (state == 5 || state == 8)
-		{
-			dir = 2;
-			//COMMAND_move = 2;
-		}
-
-		return;
-	}
-	if (wParam == VK_UP)
-	{
-		UPkey = true;
-
-		if (DOWNkey == true)
-		{
-			UDkey = true;
-			if (state == 8)
-				state = 5;
-			return;
-		}
-		if (state == 5 || state == 8)
-		{
-			state = 8;
-			COMMAND_move = 3;
-
-		}
-
-		return;
-	}
-	if (wParam == VK_DOWN)
-	{
-		if (COMMAND_hurt == 1)
-			return;
-		DOWNkey = true;
-		if (UPkey == true)
-		{
-			UDkey = true;
-			if (state == 8)
-				state = 5;
-			return;
-		}
-		if (state == 5 || state == 8)
-		{
-			
-			if (state == 5)//멈춰있다가 움직일때 한번 바로 움직여줘야함
-			{
-
-				state = 8;
-			}
-			else {
-				//BitMove();
-				state = 8;
-			}
-			COMMAND_move = 4;
-
-		}
-		else if (state == 1) {
-
-			state = 3;	//숙이는거는 가만히 있을때만 가능하다
-			h -= 12;		//숙이면 키도 줄어들어야한다.
-			y += 12;
-		}
-
-		return;
-	}
-	if (wParam == VK_SPACE)
-	{
-		if (DOWNkey == true)//수그리고있을땐 점프못함
-		{
-			return;	//아무것도해주지않는다 현상태유지
-		}
-		if (state == 5 || state == 8)//줄에 매달렸을때
-		{
-			if (LRkey == 0)		//동시에 좌우키가 눌리지 않았으면서
-			{
-				if (LEFTkey == 1 || RIGHTkey == 1)	//둘중에 하나의 키라도 누르고있었다면 점프뜀 하지만 아니면 못뜀
-				{
-					COMMAND_move = dir;	//그리고 이때 어디로뛸건지 강제로 정함
-					jumpignore = 2;	//점프시 다시못잡게도 바꿔줌
-				}
-				else return;//아니면못뜀
-			}else return;//아니면 못뜀
-		}
-		if (state != 2 && state != 7)	//점프나 공중이아니라면 점프뛸수있다. 하지만 줄에매달렸을때도 안되긴 마찬가지
-		{
-			Sound::GetSelf()->Sound_Play(EFFECTSOUND, JUMPEF, EFVOL);
-			falldy = 10;	//임시
-			jumpcount++;
-			state = 2;
-			savey = y;
-		}
-		return;
-	}
-}
-//플레이어 대기상태
-void PLAYER::PlayerWaiting(WPARAM wParam)
-{
-	if (wParam == VK_DOWN)
-	{
-		if (UPkey == true)
-		{
-			if (state == 5)			//둘다눌럿을때의 로직은 state==1일때에만 발동이 된다. 
-				COMMAND_move = 3;
-		}
-		else if (UPkey == false)	//오른쪽키를 누르고있지 않았다면 움직이는상태였을땐 멈춰줘야한다.
-		{
-			if (state == 8)
-			{
-				state = 5;
-				COMMAND_move = 0;	//움직이는 방향은 그대로지만 움직이지는 않는다.
-			}
-			else if (state == 5)	//종종버그성 플레이로인해서 (점프키와 동시에 키를 누른후 바닥에 닿음과 동시에 땔때) 이경우가있는데, 이때도 멈춰주도록한다.
-			{
-				COMMAND_move = 0;
-			}
-		}
-		if (DOWNkey == true)
-		{
-			if (state == 3)
-			{
-				h += 12;
-				y -= 12;	//다시 키 늘려줌
-				state = 1;
-			}
-		}
-
-		UDkey = false;
-		DOWNkey = false;
-		return;
-	}
-	if (wParam == VK_LEFT)
-	{
-		if (RIGHTkey == true)		//오른쪽키도 누르고있었다면 왼쪽키를 땟을때 오른쪽으로 몸을틀어야한다
-		{
-			dir = 2;
-			if (state == 1)			//둘다눌럿을때의 로직은 state==1일때에만 발동이 된다. 
-				COMMAND_move = 2;
-		}
-		else if (RIGHTkey == false)	//오른쪽키를 누르고있지 않았다면 움직이는상태였을땐 멈춰줘야한다.
-		{
-			if (state == 4)
-			{
-				state = 1;
-				COMMAND_move = 0;	//움직이는 방향은 그대로지만 움직이지는 않는다.
-			}
-			else if (state == 1)	//종종버그성 플레이로인해서 (점프키와 동시에 키를 누른후 바닥에 닿음과 동시에 땔때) 이경우가있는데, 이때도 멈춰주도록한다.
-			{
-				COMMAND_move = 0;
-			}
-			if (DOWNkey == true)//만약 수그리고있었다면
-			{
-				if (state == 1)	//수그리기의 원래 알고리즘인 state==1 일때만 수그리도록 한다
-				{
-					state = 3;
-					h -= 12;
-					y += 12;//원래대로 돌려놔주자
-				}
-			}
-		}
-
-
-		LRkey = false;				//한개를 땠으니 false
-		LEFTkey = false;			//LEFTkey 땠으니 false
-
-		//std::cout << "LEFT 똄" << std::endl;
-
-		return;
-	}
-	if (wParam == VK_RIGHT)
-	{
-		if (LEFTkey == true)		//왼쪽키도 누르고있었다면 오른쪽키를 땟을때 왼쪽으로 몸을틀어야한다
-		{
-			dir = 1;
-			if (state == 1)			//둘다눌럿을때의 로직은 state==1일때에만 발동이 된다. 
-				COMMAND_move = 1;
-		}
-		else if (LEFTkey == false)	//왼쪽키를 누르고있지 않았다면 움직이는상태였을땐 멈춰줘야한다.
-		{
-			if (state == 4)
-			{
-				state = 1;
-				COMMAND_move = 0;	//움직이는 방향은 그대로지만 움직이지는 않는다.
-			}
-			else if (state == 1)	//종종버그성 플레이로인해서 (점프키와 동시에 키를 누른후 바닥에 닿음과 동시에 땔때) 이경우가있는데, 이때도 멈춰주도록한다.
-			{
-				COMMAND_move = 0;
-			}
-			if (DOWNkey == true)//만약 수그리고있었다면
-			{
-				if (state == 1)	//수그리기의 원래 알고리즘인 state==1 일때만 수그리도록 한다
-				{
-					state = 3;
-					h -= 12;
-					y += 12;//원래대로 돌려놔주자
-				}
-			}
-		}
-
-
-
-		LRkey = false;				//한개를 땠으니 false
-		RIGHTkey = false;			//RIGHTkey 땠으니 false
-		//std::cout << "RIGTH 뗌" << std::endl;
-
-		return;
-	}
-	if (wParam == VK_UP)
-	{
-		if (DOWNkey == true)
-		{
-			if (state == 5)			//둘다눌럿을때의 로직은 state==5일때에만 발동이 된다. 
-				COMMAND_move = 4;
-		}
-		else if (DOWNkey == false)	
-		{
-			if (state == 8)
-			{
-				state = 5;
-				COMMAND_move = 0;	//움직이는 방향은 그대로지만 움직이지는 않는다.
-			}
-		}
-
-		UPkey = false;
-		UDkey = false;
-		return;
-	}
-	return;
-}
-
-
+//void PLAYER::PlayerSetting(WPARAM wParam)
+//{
+//	if (wParam == VK_LEFT)
+//	{
+//		
+//		LEFTkey = true;				//키 누름상태
+//		if (RIGHTkey == true)		//좌우를 동시에 누르고있다면 움직이지않음
+//		{
+//			LRkey = true;
+//			if (state == 4)		//움직이고 있을때나 1로 해서 멈추게하는거지 다를때 1로바꾸면 난리남
+//				state = 1;
+//			return;
+//		}
+//
+//		if (state == 7)
+//		{
+//			dir = 1;	//방향은 바꿔주지만 움직임형태는 냅둠 (아래 move에서 몇초이상 누르면 조금씩은 바뀌게해줌)
+//		}
+//		else if (state == 1 || state == 4)
+//		{
+//
+//			if (state == 1)//멈춰있다가 움직일때 한번 바로 움직여줘야함
+//			{
+//
+//				state = 4;
+//				dir = 1;
+//				
+//			}
+//			else {
+//				state = 4;
+//				dir = 1;
+//			}
+//			COMMAND_move = 1;	//1이든 4든 누르면 일단은 움직임형태를 바꿔줌
+//			//std::cout << "LEFT눌림" << std::endl;
+//		}
+//		else if (state == 2)
+//		{
+//			if (COMMAND_hurt != 1)	//쳐맞고있을때는 이 로직 안통해요~
+//				ROWSPEED = 1;	//점프했을때 방향을 바꾸려하면 드라마틱하게 다시 오는경우는 없지만 그래도 원했던것보단 조금 나감
+//			dir = 1;	//방향은 바꿔주지만 움직임형태는 냅둠
+//		}
+//		else if (state == 3)
+//		{
+//
+//			h += 12;
+//			y -= 12;
+//			state = 4;
+//			dir = 1;
+//			COMMAND_move = 1;
+//		}
+//		else if (state == 5 || state == 8)
+//		{
+//			dir = 1;
+//			//COMMAND_move = 1;
+//		}
+//		return;
+//	}
+//	if (wParam == VK_RIGHT)
+//	{
+//		RIGHTkey = true;	//키 누름상태
+//		if (LEFTkey == true)
+//		{
+//			LRkey = true;
+//			if (state == 4)		//움직이고 있을때나 1로 해서 멈추게하는거지 다를때 1로바꾸면 난리남
+//				state = 1;
+//			return;
+//		}
+//		if (state == 7)
+//		{
+//			dir = 2;	//방향은 바꿔주지만 움직임형태는 냅둠 (아래 move에서 몇초이상 누르면 조금씩은 바뀌게해줌)
+//		}
+//		else if (state == 1 || state == 4)
+//		{
+//			if (state == 1)//멈춰있다가 움직일때 한번 바로 움직여줘야함
+//			{
+//
+//				state = 4;
+//				dir = 2;
+//			}
+//			else {
+//				state = 4;
+//				dir = 2;
+//				
+//			}
+//			COMMAND_move = 2;	//1이든 4든 누르면 일단은 움직임형태를 바꿔줌
+//			//std::cout << "RIGHT 눌림" << std::endl;
+//		}
+//		else if (state == 2)
+//		{
+//			if (COMMAND_hurt != 1)	//쳐맞고있을때는 이 로직 안통해요~
+//				ROWSPEED = 1;	//점프했을때 방향을 바꾸려하면 드라마틱하게 다시 오는경우는 없지만 그래도 원했던것보단 조금 나감
+//			dir = 2;	//방향은 바꿔주지만 움직임형태는 냅둠
+//		}
+//		else if (state == 3)
+//		{
+//			h += 12;
+//			y -= 12;
+//			state = 4;
+//			dir = 2;
+//			COMMAND_move = 2;
+//		}
+//		else if (state == 5 || state == 8)
+//		{
+//			dir = 2;
+//			//COMMAND_move = 2;
+//		}
+//
+//		return;
+//	}
+//	if (wParam == VK_UP)
+//	{
+//		UPkey = true;
+//
+//		if (DOWNkey == true)
+//		{
+//			UDkey = true;
+//			if (state == 8)
+//				state = 5;
+//			return;
+//		}
+//		if (state == 5 || state == 8)
+//		{
+//			state = 8;
+//			COMMAND_move = 3;
+//
+//		}
+//
+//		return;
+//	}
+//	if (wParam == VK_DOWN)
+//	{
+//		if (COMMAND_hurt == 1)
+//			return;
+//		DOWNkey = true;
+//		if (UPkey == true)
+//		{
+//			UDkey = true;
+//			if (state == 8)
+//				state = 5;
+//			return;
+//		}
+//		if (state == 5 || state == 8)
+//		{
+//			
+//			if (state == 5)//멈춰있다가 움직일때 한번 바로 움직여줘야함
+//			{
+//
+//				state = 8;
+//			}
+//			else {
+//				//BitMove();
+//				state = 8;
+//			}
+//			COMMAND_move = 4;
+//
+//		}
+//		else if (state == 1) {
+//
+//			state = 3;	//숙이는거는 가만히 있을때만 가능하다
+//			h -= 12;		//숙이면 키도 줄어들어야한다.
+//			y += 12;
+//		}
+//
+//		return;
+//	}
+//	if (wParam == VK_SPACE)
+//	{
+//		if (DOWNkey == true)//수그리고있을땐 점프못함
+//		{
+//			return;	//아무것도해주지않는다 현상태유지
+//		}
+//		if (state == 5 || state == 8)//줄에 매달렸을때
+//		{
+//			if (LRkey == 0)		//동시에 좌우키가 눌리지 않았으면서
+//			{
+//				if (LEFTkey == 1 || RIGHTkey == 1)	//둘중에 하나의 키라도 누르고있었다면 점프뜀 하지만 아니면 못뜀
+//				{
+//					COMMAND_move = dir;	//그리고 이때 어디로뛸건지 강제로 정함
+//					jumpignore = 2;	//점프시 다시못잡게도 바꿔줌
+//				}
+//				else return;//아니면못뜀
+//			}else return;//아니면 못뜀
+//		}
+//		if (state != 2 && state != 7)	//점프나 공중이아니라면 점프뛸수있다. 하지만 줄에매달렸을때도 안되긴 마찬가지
+//		{
+//			Sound::GetSelf()->Sound_Play(EFFECTSOUND, JUMPEF, EFVOL);
+//			falldy = 10;	//임시
+//			jumpcount++;
+//			state = 2;
+//			savey = y;
+//		}
+//		return;
+//	}
+//}
+////플레이어 대기상태
+//void PLAYER::PlayerWaiting(WPARAM wParam)
+//{
+//	if (wParam == VK_DOWN)
+//	{
+//		if (UPkey == true)
+//		{
+//			if (state == 5)			//둘다눌럿을때의 로직은 state==1일때에만 발동이 된다. 
+//				COMMAND_move = 3;
+//		}
+//		else if (UPkey == false)	//오른쪽키를 누르고있지 않았다면 움직이는상태였을땐 멈춰줘야한다.
+//		{
+//			if (state == 8)
+//			{
+//				state = 5;
+//				COMMAND_move = 0;	//움직이는 방향은 그대로지만 움직이지는 않는다.
+//			}
+//			else if (state == 5)	//종종버그성 플레이로인해서 (점프키와 동시에 키를 누른후 바닥에 닿음과 동시에 땔때) 이경우가있는데, 이때도 멈춰주도록한다.
+//			{
+//				COMMAND_move = 0;
+//			}
+//		}
+//		if (DOWNkey == true)
+//		{
+//			if (state == 3)
+//			{
+//				h += 12;
+//				y -= 12;	//다시 키 늘려줌
+//				state = 1;
+//			}
+//		}
+//
+//		UDkey = false;
+//		DOWNkey = false;
+//		return;
+//	}
+//	if (wParam == VK_LEFT)
+//	{
+//		if (RIGHTkey == true)		//오른쪽키도 누르고있었다면 왼쪽키를 땟을때 오른쪽으로 몸을틀어야한다
+//		{
+//			dir = 2;
+//			if (state == 1)			//둘다눌럿을때의 로직은 state==1일때에만 발동이 된다. 
+//				COMMAND_move = 2;
+//		}
+//		else if (RIGHTkey == false)	//오른쪽키를 누르고있지 않았다면 움직이는상태였을땐 멈춰줘야한다.
+//		{
+//			if (state == 4)
+//			{
+//				state = 1;
+//				COMMAND_move = 0;	//움직이는 방향은 그대로지만 움직이지는 않는다.
+//			}
+//			else if (state == 1)	//종종버그성 플레이로인해서 (점프키와 동시에 키를 누른후 바닥에 닿음과 동시에 땔때) 이경우가있는데, 이때도 멈춰주도록한다.
+//			{
+//				COMMAND_move = 0;
+//			}
+//			if (DOWNkey == true)//만약 수그리고있었다면
+//			{
+//				if (state == 1)	//수그리기의 원래 알고리즘인 state==1 일때만 수그리도록 한다
+//				{
+//					state = 3;
+//					h -= 12;
+//					y += 12;//원래대로 돌려놔주자
+//				}
+//			}
+//		}
+//
+//
+//		LRkey = false;				//한개를 땠으니 false
+//		LEFTkey = false;			//LEFTkey 땠으니 false
+//
+//		//std::cout << "LEFT 똄" << std::endl;
+//
+//		return;
+//	}
+//	if (wParam == VK_RIGHT)
+//	{
+//		if (LEFTkey == true)		//왼쪽키도 누르고있었다면 오른쪽키를 땟을때 왼쪽으로 몸을틀어야한다
+//		{
+//			dir = 1;
+//			if (state == 1)			//둘다눌럿을때의 로직은 state==1일때에만 발동이 된다. 
+//				COMMAND_move = 1;
+//		}
+//		else if (LEFTkey == false)	//왼쪽키를 누르고있지 않았다면 움직이는상태였을땐 멈춰줘야한다.
+//		{
+//			if (state == 4)
+//			{
+//				state = 1;
+//				COMMAND_move = 0;	//움직이는 방향은 그대로지만 움직이지는 않는다.
+//			}
+//			else if (state == 1)	//종종버그성 플레이로인해서 (점프키와 동시에 키를 누른후 바닥에 닿음과 동시에 땔때) 이경우가있는데, 이때도 멈춰주도록한다.
+//			{
+//				COMMAND_move = 0;
+//			}
+//			if (DOWNkey == true)//만약 수그리고있었다면
+//			{
+//				if (state == 1)	//수그리기의 원래 알고리즘인 state==1 일때만 수그리도록 한다
+//				{
+//					state = 3;
+//					h -= 12;
+//					y += 12;//원래대로 돌려놔주자
+//				}
+//			}
+//		}
+//
+//
+//
+//		LRkey = false;				//한개를 땠으니 false
+//		RIGHTkey = false;			//RIGHTkey 땠으니 false
+//		//std::cout << "RIGTH 뗌" << std::endl;
+//
+//		return;
+//	}
+//	if (wParam == VK_UP)
+//	{
+//		if (DOWNkey == true)
+//		{
+//			if (state == 5)			//둘다눌럿을때의 로직은 state==5일때에만 발동이 된다. 
+//				COMMAND_move = 4;
+//		}
+//		else if (DOWNkey == false)	
+//		{
+//			if (state == 8)
+//			{
+//				state = 5;
+//				COMMAND_move = 0;	//움직이는 방향은 그대로지만 움직이지는 않는다.
+//			}
+//		}
+//
+//		UPkey = false;
+//		UDkey = false;
+//		return;
+//	}
+//	return;
+//}
+//
+//
 //플레이어 움직임
 void PLAYER::move(int obj_t)
 {
@@ -586,17 +589,6 @@ void PLAYER::move(int obj_t)
 			state = 4;
 		}
 
-		//else {
-		//	if (COMMAND_move == 1)
-		//	{
-		//		x -= ROWSPEED;
-		//	}
-		//	else if (COMMAND_move == 2)
-		//	{
-		//		x += ROWSPEED;
-		//	}
-		//}
-		//가만히있을때는 움직일수 없는데 왜 움직였냐 여태
 	}
 	else if (state == 2 )	//점프상태일때도 진행방향으로 이동은해야함 
 	{
@@ -635,19 +627,6 @@ void PLAYER::move(int obj_t)
 			{
 				x += ROWSPEED;
 			}
-			//y -= 1;
-			//if (abs(y - savey) > 80) {
-			//	y -= 3;
-			//}
-			//else 
-			//{
-			//	y -= COLSPEED;
-			//}
-			//if (abs((y - savey)) >= 100)	//30픽셀만큼 점프했다면
-			//{
-			//	state = 7;			//다시 땅으로 떨어지게함
-			//	savex = x;			//이순간의 x좌표를 기억함(가속도를 받다가 멈춘것처럼 해줄예정)
-			//}
 			
 			/*
 			위의 쌩 초짜 코드를 지워버리고

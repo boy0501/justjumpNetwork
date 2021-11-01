@@ -1,3 +1,6 @@
+#pragma comment (lib, "WS2_32.LIB")
+#include <WS2tcpip.h>
+#include <iostream>
 #include <windows.h>
 #include <tchar.h>
 #include <random>
@@ -51,14 +54,102 @@ static int Fps = 0;
 static DWORD oldtime;
 
 static vector<shared_ptr<UI>> mUI;
-//extern int ROWSPEED;
 
-//extern int COLSPEED;
+//JOOYONG ZONE===============================================================================
+const char* SERVER_ADDR = "127.0.0.1";
+const short SERVER_PORT = 4000;
+const int BUFSIZE = 256;
+void err_display(int err_no)
+{
+	WCHAR* lpMsgBuf;
+	FormatMessage(
+		FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
+		NULL, err_no,
+		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+		(LPTSTR)&lpMsgBuf, 0, 0);
+	std::wcout << lpMsgBuf << std::endl;
+	while (true);
+	LocalFree(lpMsgBuf);
+}
+
+void CALLBACK send_callback(DWORD err, DWORD num_bytes, LPWSAOVERLAPPED send_over, DWORD flag);
+void CALLBACK recv_callback(DWORD err, DWORD num_bytes, LPWSAOVERLAPPED recv_over, DWORD flag);
+
+char g_recv_buf[BUFSIZE];
+bool g_client_shutdown = false;
+
+//WSABUF mybuf;
+SOCKET g_s_socket;
+WSABUF mybuf_r;
+char key[4];
+
+
+void do_recv()
+{
+	mybuf_r.buf = key;
+	mybuf_r.len = sizeof(key);
+
+	DWORD recv_flag = 0;
+	WSAOVERLAPPED* recv_over = new WSAOVERLAPPED;
+	ZeroMemory(recv_over, sizeof(*recv_over));
+	int ret = WSARecv(g_s_socket, &mybuf_r, 1, 0, &recv_flag, recv_over, recv_callback);
+	if (ret == SOCKET_ERROR) {
+		int err_num = WSAGetLastError();
+		if (WSA_IO_PENDING != err_num) {
+			cout << "Recv Error: ";
+			err_display(err_num);
+		}
+	}
+	cout << "recv" << endl;
+}
+
+void CALLBACK recv_callback(DWORD err, DWORD num_bytes, LPWSAOVERLAPPED recv_over, DWORD flag)
+{
+	delete recv_over;
+	std::cout << "recv_callback in " << key << std::endl;
+
+	do_recv();
+}
+
+
+
+WSABUF keyBuf;
+
+void do_send(unsigned int key)
+{
+	unsigned int key_move = key;
+
+	keyBuf.buf = (char*)&key_move;
+	keyBuf.len = sizeof(key_move);
+
+	WSAOVERLAPPED* send_over = new WSAOVERLAPPED;
+	ZeroMemory(send_over, sizeof(*send_over));
+
+	int ret = WSASend(g_s_socket, &keyBuf, 1, 0, 0, send_over, send_callback);
+	if (ret == SOCKET_ERROR) {
+		std::cout << "send error!" << std::endl;
+		int err_num = WSAGetLastError();
+		err_display(err_num);
+	}
+	//cout << key << endl;
+}
+
+
+void CALLBACK send_callback(DWORD err, DWORD num_bytes, LPWSAOVERLAPPED send_over, DWORD flag)
+{
+	delete send_over;
+}
+//==============================================================================================
+
+
+
 
 //한줄에 79자까지 입력가능한 메모장
 using namespace std;
 void update(float delta_time)
 {
+	
+
 	//빼줘야 할 Ui가 있다면 Ui 삭제
 	auto iter = mUI.begin();
 	while (iter != mUI.end())
@@ -79,12 +170,15 @@ void update(float delta_time)
 	//Sound업데이트 끝
 	if (map.getmapnum() == LOGINBG)
 		return;
+
+	
+
 	obj_t += 1;
 
 	if (map.getmapnum() != LOGINBG)	//로그인중일땐 캐릭터 상호작용 x 
 	{
 		
-		player.move(obj_t);
+		//player.move(obj_t); //플레이어 움직임
 		adjustPlayer(player, obj, map, ocount, g_hinst);
 		if (player.getCMD_die())
 		{
@@ -93,8 +187,9 @@ void update(float delta_time)
 			player.WhenPlayerDied = true;
 		}
 	}
-	map.movemap();
-
+	else 
+		map.movemap();	
+	
 	if (map.BlackTime())
 	{
 		if (loadbf.SourceConstantAlpha + 40 > 255)
@@ -171,6 +266,7 @@ void update(float delta_time)
 		}
 	}
 	if (obj_t >= 27000) obj_t = 0;
+
 }
 void render()
 {
@@ -210,17 +306,19 @@ void render()
 }
 void ProcessingLoop()
 {
+	SleepEx(100, true); //callback 호출 위함
 
 	auto newtime = timeGetTime();
 	deltatime = (newtime - oldtime) / 1000.f;
 	if (deltatime >= 0.016f)
 	{
+		
 		oldtime = newtime;
 		elapsedtime += deltatime;
 		Fps++;
 		if (elapsedtime > 1.0f)
 		{
-			cout << "FPS:" << Fps << endl;
+			//cout << "FPS:" << Fps << endl;
 			Fps = 0;
 			elapsedtime = 0;
 		}
@@ -228,11 +326,38 @@ void ProcessingLoop()
 		update(deltatime);
 		render();
 		ShowCaret(hWnd);
+
+		
 	}
+	
 }
 
 int WINAPI WinMain(HINSTANCE hinstance, HINSTANCE hPrevinstance, LPSTR lpszCmdParam, int nCmdShow)
 {
+	wcout.imbue(locale("korean"));
+	WSADATA WSAData;
+	WSAStartup(MAKEWORD(2, 2), &WSAData);
+	g_s_socket = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, 0, 0, WSA_FLAG_OVERLAPPED);
+	SOCKADDR_IN server_addr;
+	ZeroMemory(&server_addr, sizeof(server_addr));
+	server_addr.sin_family = AF_INET;
+	server_addr.sin_port = htons(SERVER_PORT);
+	inet_pton(AF_INET, SERVER_ADDR, &server_addr.sin_addr);
+	int ret = connect(g_s_socket, reinterpret_cast<sockaddr*>(&server_addr), sizeof(server_addr));
+	if (ret == SOCKET_ERROR)
+	{
+		int err_num = WSAGetLastError();
+		cout << "Connect Error: ";
+		err_display(err_num);
+	}
+	do_recv();
+
+	//int tcp_option = 1;
+	//setsockopt(g_s_socket, IPPROTO_TCP, TCP_NODELAY, reinterpret_cast<char*>(&tcp_option), sizeof(tcp_option));
+
+
+	
+
 	wcout.imbue(locale("korean"));
 	MSG Message;
 	WNDCLASSEX WndClass;
@@ -280,6 +405,10 @@ int WINAPI WinMain(HINSTANCE hinstance, HINSTANCE hPrevinstance, LPSTR lpszCmdPa
 			ProcessingLoop();
 		}
 	}
+
+	closesocket(g_s_socket);
+
+	WSACleanup();
 
 	return Message.wParam;
 
@@ -389,7 +518,10 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		if (player.getCMD_die() == 1)
 			break;
 		if (player.getGamemode() == 0)
-			player.PlayerSetting(wParam);
+		{
+			//player.PlayerSetting(wParam, sound);
+			do_send(wParam); //서버로 내 키입력을 보내자! (1차 테스트)
+		}
 		else if (player.getGamemode() == 1)
 			camera.CameraSetting(wParam);
 		break;
@@ -397,7 +529,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		if (player.getCMD_die() == 1)
 			break;
 		if (player.getGamemode() == 0)
-			player.PlayerWaiting(wParam);
+			break;
+			//player.PlayerWaiting(wParam);
 		else if (player.getGamemode() == 1)
 			camera.CameraSetting(wParam);
 		break;
@@ -483,7 +616,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 					nCaretPosx = 380 + mUI.back()->FindTextByNameTag("pass")->getFontLen().cx;
 				}
 			}
-			cout << map.mFontSize.cx << endl;
+			//cout << map.mFontSize.cx << endl;
 			SetCaretPos(nCaretPosx, nCaretPosy);
 			ShowCaret(hwnd);
 			break;

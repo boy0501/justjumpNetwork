@@ -1,5 +1,5 @@
 #pragma once
-#include <windows.h>
+//#include <windows.h>
 #include <string>
 #include"Sound.h"
 
@@ -124,9 +124,9 @@ public:
 
 
 	//방향키 눌렀을때 플레이어 세팅
-	void PlayerSetting(WPARAM);
+	//void PlayerSetting(WPARAM);
 	//방향키 땠을때 플레이어 세팅풀기
-	void PlayerWaiting(WPARAM);
+	//void PlayerWaiting(WPARAM);
 	//떨어지는 시점의 y좌표 기억
 	void fall2save();
 	//플레이어 무브
@@ -144,7 +144,7 @@ public:
 	//다쳤을때 피 다는 계산식 + 뒤지면초기화
 	void hurt();
 	//뒤지면 초기화
-	void die();
+	//void die(); //안쓰이고 있는 함수
 };
 
 
