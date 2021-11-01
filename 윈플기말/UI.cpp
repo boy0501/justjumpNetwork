@@ -152,6 +152,15 @@ void UI::addText(const std::string& text, const std::string& NameTag, const std:
 	mText.emplace_back(txt);
 
 }
+
+void UI::addText(const std::wstring& text, const std::string& NameTag, const std::wstring& fontName,
+	const COLORREF& fontColor, const int& FontHeight, const int& x, const int& y, const bool& isUserUi,
+	const int& StringBoxWidth, const int& StringBoxHeight, CAMERA& camera)
+{
+	auto txt = std::make_shared<Text>(text, NameTag, fontName, fontColor, FontHeight, x, y, isUserUi, StringBoxWidth, StringBoxHeight, camera);
+	mText.emplace_back(txt);
+
+}
 std::shared_ptr<Text> UI::FindTextByNameTag(std::string NameTag)
 {
 	for (const auto& txt : mText)

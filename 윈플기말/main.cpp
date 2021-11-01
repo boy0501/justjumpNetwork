@@ -411,6 +411,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 			player.setx(80);
 			player.sety(655);
 			player.mPlayername = ui->FindTextByNameTag("id")->getTextForString();
+			player.mPlayerwname = ui->FindTextByNameTag("id")->getText();
 			Sound::GetSelf()->Sound_Play(BGMSOUND, MAINMENUBGM, BGMVOL);
 			ui->closeUI();
 			mUI.emplace_back(map.mStartui);
@@ -419,7 +420,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 			//나중 로그인패킷까지 온다고 가정했을때, 로그인패킷 ok시에 ui를 만들어도 좋다.
 			auto gameui = make_shared<GameHUD>(1,player);
 			gameui->LoadUiBitmap(g_hinst, "img/NoNameUi.bmp", 400, 700, 199, 65, RGB(0, 255, 0), camera);
-			gameui->addText(player.mPlayername, "NickName", L"메이플스토리 light", RGB(255, 255, 255), 14, 475, 705, true, 100, 65, camera);
+			gameui->addText(player.mPlayerwname, "NickName", L"메이플스토리 light", RGB(255, 255, 255), 14, 475, 705, true, 100, 65, camera);
 			gameui->LoadHpUiBitmap(g_hinst, "img/Ui_HP.bmp", 421, 728, 100, 65, RGB(0, 0, 255), camera);
 			map.mGameUi = gameui;
 			//gameUi설정 끝 

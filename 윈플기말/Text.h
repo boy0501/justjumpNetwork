@@ -5,6 +5,8 @@ class Text
 {
 public:
 	Text(const std::string& text,const std::string& NameTag, const std::wstring& fontName,const COLORREF& fontColor,const int& FontHeight,const int& x, const int& y,const bool& IsUserUi,const int& StringBoxWidth,const int& StringBoxHeight, class CAMERA& camera);
+	Text(const std::wstring& text, const std::string& NameTag, const std::wstring& fontName, const COLORREF& fontColor, const int& FontHeight, const int& x, const int& y, const bool& isUserUi, const int& StringBoxWidth, const int& StringBoxHeight, CAMERA& camera);
+
 	~Text();
 
 
