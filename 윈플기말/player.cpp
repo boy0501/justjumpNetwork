@@ -1008,11 +1008,8 @@ void PLAYER::draw(HDC& mem1dc, HDC& pdc)
 	HFONT oldfont = (HFONT)SelectObject(mem1dc, hfont);
 	SetBkMode(mem1dc, TRANSPARENT);
 	SetTextColor(mem1dc, RGB(255, 108, 168));
-	//std::cout << id << std::endl;
-	auto tmp = std::wstring(mPlayername.begin(), mPlayername.end());
-	auto convert_wstr = tmp.c_str();
 	RECT rt{ x - 60,y + 25,x + 60,y + 65 };
-	DrawText(mem1dc, convert_wstr, lstrlenW(convert_wstr), &rt, DT_CENTER );
+	DrawText(mem1dc, mPlayerwname.c_str(), lstrlenW(mPlayerwname.c_str()), &rt, DT_CENTER );
 
 	SelectObject(mem1dc, oldfont);
 	DeleteObject(hfont);

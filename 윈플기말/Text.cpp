@@ -16,6 +16,22 @@ Text::Text(const std::string& text, const std::string& NameTag, const std::wstri
 
 }
 
+Text::Text(const std::wstring& text, const std::string& NameTag, const std::wstring& fontName, const COLORREF& fontColor, const int& FontHeight, const int& x, const int& y, const bool& isUserUi, const int& StringBoxWidth, const int& StringBoxHeight, CAMERA& camera)
+	:mText(text)
+	, mNameTag(NameTag)
+	, mFontName(fontName)
+	, mFontColor(fontColor)
+	, mFontHeight(FontHeight)
+	, mPosx(x)
+	, mPosy(y)
+	, mIsUserUi(isUserUi)
+	, mCamera(&camera)
+	, mStringBoxWidth(StringBoxWidth)
+	, mStringBoxHeight(StringBoxHeight)
+{
+
+}
+
 Text::~Text()
 {
 

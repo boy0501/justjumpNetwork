@@ -20,8 +20,9 @@
 #include "DieHUD.h"
 #include "Button.h"
 #include "Text.h"
-#ifdef _DEBUG
 #pragma comment(lib,"Winmm.lib")
+#pragma comment(lib,"imm32.lib")
+#ifdef _DEBUG
 #pragma comment(linker, "/entry:WinMainCRTStartup /subsystem:console")
 #endif
 
@@ -32,7 +33,7 @@ LPCTSTR lpszWinodwName = L"Just Jump";
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam);
 static PAINTSTRUCT ps;
-static HDC hdc, mem1dc, mem2dc, loaddc, playerdc, odc, pdc, ui_dc, hp_dc, die_dc, start_dc, help_dc, login_dc; // odc = ¿ÀºêÁ§Æ® dc, pdc = player dc,ui_Dc : ¾Æ·¡ ÀüÃ¼ÀûÀÎ ui hp_Dc: hpÅë¸¸ ³ª¿À´Â°Å dic_dc : »ç¸Á ui 
+static HDC hdc, mem1dc, mem2dc, loaddc, playerdc, odc, pdc, ui_dc, hp_dc, die_dc, start_dc, help_dc, login_dc; // odc = ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ® dc, pdc = player dc,ui_Dc : ï¿½Æ·ï¿½ ï¿½ï¿½Ã¼ï¿½ï¿½ï¿½ï¿½ ui hp_Dc: hpï¿½ë¸¸ ï¿½ï¿½ï¿½ï¿½ï¿½Â°ï¿½ dic_dc : ï¿½ï¿½ï¿½ ui 
 static RECT rectview;
 static HBITMAP hbit1, loadbit, oldload, oldbit1, hbitobj[100];
 static PLAYER player;
@@ -40,14 +41,15 @@ static MAP map;
 static CAMERA camera;
 static OBJECT obj[150];
 static BLENDFUNCTION loadbf;
+bool isComposit = false;
 
 HWND hWnd;
-static int nCaretPosx, nCaretPosy;	//ÆùÆ® x,yÅ©±â , Ä³·µ x y À§Ä¡
-static int obj_t = 0; //¿ÀºêÁ§Æ® ¾Ö´Ï¸ÞÀÌ¼ÇÀ» 1¹øÅ¸ÀÌ¸Ó¿¡ ³Ö±âÀ§ÇØ Ãß°¡ÇÑ º¯¼ö
-static int ocount;		//obj °³¼ö¸¦ ¼¼ÁÖ´Â º¯¼ö
-static int help_button = 0, start_button = 0; //Á¶ÀÛ¹ý ¿Â¿ÀÇÁ
-static bool occur_button = 0;	//»ç¸ÁÇßÀ»¶§ÀÇ buttonÀÌ È°¼ºÈ­µÇ¾ú´ÂÁö 
-static bool gamemode = 0;	//0ÀÌ¸é ±âº» 1ÀÌ¸é ÀÚÀ¯¸ðµå
+static int nCaretPosx, nCaretPosy;	//ï¿½ï¿½Æ® x,yÅ©ï¿½ï¿½ , Ä³ï¿½ï¿½ x y ï¿½ï¿½Ä¡
+static int obj_t = 0; //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ® ï¿½Ö´Ï¸ï¿½ï¿½Ì¼ï¿½ï¿½ï¿½ 1ï¿½ï¿½Å¸ï¿½Ì¸Ó¿ï¿½ ï¿½Ö±ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ß°ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+static int ocount;		//obj ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ö´ï¿½ ï¿½ï¿½ï¿½ï¿½
+static int help_button = 0, start_button = 0; //ï¿½ï¿½ï¿½Û¹ï¿½ ï¿½Â¿ï¿½ï¿½ï¿½
+static bool occur_button = 0;	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ buttonï¿½ï¿½ È°ï¿½ï¿½È­ï¿½Ç¾ï¿½ï¿½ï¿½ï¿½ï¿½ 
+static bool gamemode = 0;	//0ï¿½Ì¸ï¿½ ï¿½âº» 1ï¿½Ì¸ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 static float deltatime = 0;
 static float elapsedtime = 0;
 static int Fps = 0;
@@ -144,13 +146,13 @@ void CALLBACK send_callback(DWORD err, DWORD num_bytes, LPWSAOVERLAPPED send_ove
 
 
 
-//ÇÑÁÙ¿¡ 79ÀÚ±îÁö ÀÔ·Â°¡´ÉÇÑ ¸Þ¸ðÀå
+//ï¿½ï¿½ï¿½Ù¿ï¿½ 79ï¿½Ú±ï¿½ï¿½ï¿½ ï¿½Ô·Â°ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Þ¸ï¿½ï¿½ï¿½
 using namespace std;
 void update(float delta_time)
 {
 	
 
-	//»©Áà¾ß ÇÒ Ui°¡ ÀÖ´Ù¸é Ui »èÁ¦
+	//ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ Uiï¿½ï¿½ ï¿½Ö´Ù¸ï¿½ Ui ï¿½ï¿½ï¿½ï¿½
 	auto iter = mUI.begin();
 	while (iter != mUI.end())
 	{
@@ -163,11 +165,11 @@ void update(float delta_time)
 			++iter;
 		}
 	}
-	//UiClear ³¡
+	//UiClear ï¿½ï¿½
 
-	//Sound¾÷µ¥ÀÌÆ®
+	//Soundï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®
 	FMOD_System_Update(Sound::GetSelf()->System);
-	//Sound¾÷µ¥ÀÌÆ® ³¡
+	//Soundï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ® ï¿½ï¿½
 	if (map.getmapnum() == LOGINBG)
 		return;
 
@@ -175,10 +177,10 @@ void update(float delta_time)
 
 	obj_t += 1;
 
-	if (map.getmapnum() != LOGINBG)	//·Î±×ÀÎÁßÀÏ¶© Ä³¸¯ÅÍ »óÈ£ÀÛ¿ë x 
+	if (map.getmapnum() != LOGINBG)	//ï¿½Î±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¶ï¿½ Ä³ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½È£ï¿½Û¿ï¿½ x 
 	{
 		
-		//player.move(obj_t); //ÇÃ·¹ÀÌ¾î ¿òÁ÷ÀÓ
+		//player.move(obj_t); //ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		adjustPlayer(player, obj, map, ocount, g_hinst);
 		if (player.getCMD_die())
 		{
@@ -199,7 +201,7 @@ void update(float delta_time)
 		}
 	}
 	else {
-		//Ä³¸¯ÅÍ°¡ ·ÎµùÁßÀÏ¶© Ä«¸Þ¶ó ÀÌµ¿ ±ÝÁö , ÀÏ¹Ý¸ðµåÀÏ¶§¸¸ Ä«¸Þ¶ó ¿òÁ÷ÀÓ
+		//Ä³ï¿½ï¿½ï¿½Í°ï¿½ ï¿½Îµï¿½ï¿½ï¿½ï¿½Ï¶ï¿½ Ä«ï¿½Þ¶ï¿½ ï¿½Ìµï¿½ ï¿½ï¿½ï¿½ï¿½ , ï¿½Ï¹Ý¸ï¿½ï¿½ï¿½Ï¶ï¿½ï¿½ï¿½ Ä«ï¿½Þ¶ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		if (player.getGamemode() == 0)
 			adjustCamera(camera, player);
 	}
@@ -208,7 +210,7 @@ void update(float delta_time)
 	player.stealthtime();
 	player.spike_hurttime();
 
-	// ÀÌ°Å¸¦ µû·Î ³Ö´Â°Ô ³ªÀ»µí ¿ÀºêÁ§Æ® ¸â¹öÇÔ¼ö·Î´Ù°¡
+	// ï¿½Ì°Å¸ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ö´Â°ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ® ï¿½ï¿½ï¿½ï¿½Ô¼ï¿½ï¿½Î´Ù°ï¿½
 	for (int i = 0; i <= ocount; i++)
 	{
 		if (obj[i].getType() == 0)
@@ -306,7 +308,7 @@ void render()
 }
 void ProcessingLoop()
 {
-	SleepEx(100, true); //callback È£Ãâ À§ÇÔ
+	SleepEx(100, true); //callback È£ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 
 	auto newtime = timeGetTime();
 	deltatime = (newtime - oldtime) / 1000.f;
@@ -331,6 +333,101 @@ void ProcessingLoop()
 	}
 	
 }
+
+HIMC m_hIMC = NULL;   // IME ï¿½Úµï¿½
+wchar_t wszComp[256] = { 0, };
+wchar_t wsz1Comp[256] = { 0, };
+
+int GetText(HWND hWnd, UINT msg, WPARAM wparam, LPARAM lparam)
+{
+	int len;
+	switch (msg)
+	{
+	case WM_IME_COMPOSITION:
+		m_hIMC = ImmGetContext(hWnd);	// imeï¿½Úµï¿½ï¿½ï¿½ ï¿½ï¿½Â°ï¿½
+		if (lparam & GCS_RESULTSTR)
+		{
+			if ((len = ImmGetCompositionString(m_hIMC, GCS_RESULTSTR, NULL, 0)) > 0)
+			{
+				// ï¿½Ï¼ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ú°ï¿½ ï¿½Ö´ï¿½.
+				ImmGetCompositionString(m_hIMC, GCS_RESULTSTR, wszComp, len);
+
+				if (map.LoginInputFlag == false)
+				{
+					if (mUI.back()->FindTextByNameTag("id")->getTextLen() < 10)
+					{
+						mUI.back()->FindTextByNameTag("id")->changewChar(*wszComp);
+						isComposit = false;
+					}
+					mUI.back()->FindTextByNameTag("id")->UpdateFontSize(hWnd);
+					nCaretPosx = 380 + mUI.back()->FindTextByNameTag("id")->getFontLen().cx;
+				}
+				else {
+					if (mUI.back()->FindTextByNameTag("pass")->getTextLen() < 10)
+					{
+						mUI.back()->FindTextByNameTag("pass")->changewChar(*wszComp);
+						isComposit = false;
+					}
+					mUI.back()->FindTextByNameTag("pass")->UpdateFontSize(hWnd);
+					nCaretPosx = 380 + mUI.back()->FindTextByNameTag("pass")->getFontLen().cx;
+				}
+			}
+
+		}
+		else if (lparam & GCS_COMPSTR)
+		{
+			// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ú¸ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ì´ï¿½.
+
+			// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ì¸ï¿½ ï¿½ï¿½Â´ï¿½.
+			// strï¿½ï¿½  ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ú¸ï¿½ ï¿½ï¿½Â´ï¿½.
+			len = ImmGetCompositionString(m_hIMC, GCS_COMPSTR, NULL, 0);
+			ImmGetCompositionString(m_hIMC, GCS_COMPSTR, wsz1Comp, len);
+			wsz1Comp[len] = 0;
+			if (map.LoginInputFlag == false)
+			{
+				if (mUI.back()->FindTextByNameTag("id")->getTextLen() < 10)
+				{
+					if (!isComposit)
+					{
+						mUI.back()->FindTextByNameTag("id")->pushwChar(NULL);
+						isComposit = true;
+					}
+					mUI.back()->FindTextByNameTag("id")->changewChar(*wsz1Comp);
+				}
+				mUI.back()->FindTextByNameTag("id")->UpdateFontSize(hWnd);
+				nCaretPosx = 380 + mUI.back()->FindTextByNameTag("id")->getFontLen().cx;
+			}
+			else {
+				if (mUI.back()->FindTextByNameTag("pass")->getTextLen() < 10)
+				{
+					if (!isComposit)
+					{
+						mUI.back()->FindTextByNameTag("pass")->pushwChar(NULL);
+						isComposit = true;
+					}
+					mUI.back()->FindTextByNameTag("pass")->changewChar(*wsz1Comp);
+				}
+				mUI.back()->FindTextByNameTag("pass")->UpdateFontSize(hWnd);
+				nCaretPosx = 380 + mUI.back()->FindTextByNameTag("pass")->getFontLen().cx;
+			}
+
+			
+		}
+
+		ImmReleaseContext(hWnd, m_hIMC);	// IME ï¿½Úµï¿½ ï¿½ï¿½È¯!!
+		return 0;
+
+
+	case WM_CHAR:				// 1byte ï¿½ï¿½ï¿½ï¿½ (ex : ï¿½ï¿½ï¿½ï¿½)
+		return 1;
+	case WM_IME_NOTIFY:			// ï¿½ï¿½ï¿½ï¿½ï¿½Ô·ï¿½...
+		return 0;
+	case WM_KEYDOWN:			// Å°ï¿½Ù¿ï¿½..
+		return 1;
+	}
+	return 1;
+}
+
 
 int WINAPI WinMain(HINSTANCE hinstance, HINSTANCE hPrevinstance, LPSTR lpszCmdParam, int nCmdShow)
 {
@@ -396,7 +493,7 @@ int WINAPI WinMain(HINSTANCE hinstance, HINSTANCE hPrevinstance, LPSTR lpszCmdPa
 	{
 		if (PeekMessage(&Message, nullptr, 0, 0, PM_REMOVE))
 		{
-			//cout << "¸Þ¼¼ÁöÄÝ" << endl;
+			//cout << "ï¿½Þ¼ï¿½ï¿½ï¿½ï¿½ï¿½" << endl;
 			TranslateMessage(&Message);
 			DispatchMessage(&Message);
 		}
@@ -414,10 +511,13 @@ int WINAPI WinMain(HINSTANCE hinstance, HINSTANCE hPrevinstance, LPSTR lpszCmdPa
 
 
 }
-
 LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 {
-	
+	if (GetText(hwnd, iMessage, wParam, lParam) == 0)
+	{
+		return 0;
+	}
+
 	switch (iMessage)
 	{
 	case WM_CREATE: {
@@ -428,8 +528,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		map.CreateMap(g_hinst);
 		auto ui = make_shared<LoginHUD>(1);
 		ui->LoadUiBitmap(g_hinst, "img/idpassword.bmp", 340, 250, 332, 282, RGB(255, 0, 0));
-		ui->addText("kk", "id", L"¸ÞÀÌÇÃ½ºÅä¸® bold", RGB(255, 108, 168), 18, 380, 330,false,0,0,camera);
-		ui->addText("", "pass", L"¸ÞÀÌÇÃ½ºÅä¸® bold", RGB(255, 108, 168), 18, 380, 380,false,0,0,camera);
+		ui->addText("kk", "id", L"ï¿½ï¿½ï¿½ï¿½ï¿½Ã½ï¿½ï¿½ä¸® bold", RGB(255, 108, 168), 18, 380, 330,false,0,0,camera);
+		ui->addText("", "pass", L"ï¿½ï¿½ï¿½ï¿½ï¿½Ã½ï¿½ï¿½ä¸® bold", RGB(255, 108, 168), 18, 380, 380,false,0,0,camera);
 		ui->addButton([hwnd,ui]() {
 			map.setmapnum(9);
 			ocount = initObject(obj, map.getmapnum(), g_hinst);
@@ -440,23 +540,24 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 			player.setx(80);
 			player.sety(655);
 			player.mPlayername = ui->FindTextByNameTag("id")->getTextForString();
+			player.mPlayerwname = ui->FindTextByNameTag("id")->getText();
 			Sound::GetSelf()->Sound_Play(BGMSOUND, MAINMENUBGM, BGMVOL);
 			ui->closeUI();
 			mUI.emplace_back(map.mStartui);
 
-			//gameui´Â ·Î±×ÀÎÀ» ÇßÀ»¶§ UserID°¡ ÇÊ¿äÇÏ¹Ç·Î ·Î±×ÀÎ ¹öÆ°ÀÌ ´­·ÈÀ» ¶§ Ã³¸®ÇÑ´Ù.
-			//³ªÁß ·Î±×ÀÎÆÐÅ¶±îÁö ¿Â´Ù°í °¡Á¤ÇßÀ»¶§, ·Î±×ÀÎÆÐÅ¶ ok½Ã¿¡ ui¸¦ ¸¸µé¾îµµ ÁÁ´Ù.
+			//gameuiï¿½ï¿½ ï¿½Î±ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ UserIDï¿½ï¿½ ï¿½Ê¿ï¿½ï¿½Ï¹Ç·ï¿½ ï¿½Î±ï¿½ï¿½ï¿½ ï¿½ï¿½Æ°ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ Ã³ï¿½ï¿½ï¿½Ñ´ï¿½.
+			//ï¿½ï¿½ï¿½ï¿½ ï¿½Î±ï¿½ï¿½ï¿½ï¿½ï¿½Å¶ï¿½ï¿½ï¿½ï¿½ ï¿½Â´Ù°ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, ï¿½Î±ï¿½ï¿½ï¿½ï¿½ï¿½Å¶ okï¿½Ã¿ï¿½ uiï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½îµµ ï¿½ï¿½ï¿½ï¿½.
 			auto gameui = make_shared<GameHUD>(1,player);
 			gameui->LoadUiBitmap(g_hinst, "img/NoNameUi.bmp", 400, 700, 199, 65, RGB(0, 255, 0), camera);
-			gameui->addText(player.mPlayername, "NickName", L"¸ÞÀÌÇÃ½ºÅä¸® light", RGB(255, 255, 255), 14, 475, 705, true, 100, 65, camera);
+			gameui->addText(player.mPlayerwname, "NickName", L"ï¿½ï¿½ï¿½ï¿½ï¿½Ã½ï¿½ï¿½ä¸® light", RGB(255, 255, 255), 14, 475, 705, true, 100, 65, camera);
 			gameui->LoadHpUiBitmap(g_hinst, "img/Ui_HP.bmp", 421, 728, 100, 65, RGB(0, 0, 255), camera);
 			map.mGameUi = gameui;
-			//gameUi¼³Á¤ ³¡ 
+			//gameUiï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ 
 
 			HideCaret(hwnd);
 		}, g_hinst, "img/LoginButton", 365, 440, 278, 53, RGB(255, 0, 0));
 		auto startui = make_shared<StartHUD>(0);
-		//hbit = (HBITMAP)LoadImage(g_hinst, TEXT("img/NoNameUi.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION); //»ó´ë°æ·Î·Î º¯°æ
+		//hbit = (HBITMAP)LoadImage(g_hinst, TEXT("img/NoNameUi.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION); //ï¿½ï¿½ï¿½ï¿½Î·ï¿½ ï¿½ï¿½ï¿½ï¿½
 		startui->addButton([startui]() {
 			occur_button = 0;
 			map.setblack_t(50);
@@ -512,15 +613,15 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		Sound::GetSelf()->Sound_Play(BGMSOUND, LOGINBGM, BGMVOL);
 
 
-		break;
 	}
+	break;
 	case WM_KEYDOWN:
 		if (player.getCMD_die() == 1)
 			break;
 		if (player.getGamemode() == 0)
 		{
 			//player.PlayerSetting(wParam, sound);
-			do_send(wParam); //¼­¹ö·Î ³» Å°ÀÔ·ÂÀ» º¸³»ÀÚ! (1Â÷ Å×½ºÆ®)
+			do_send(wParam); //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ Å°ï¿½Ô·ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½! (1ï¿½ï¿½ ï¿½×½ï¿½Æ®)
 		}
 		else if (player.getGamemode() == 1)
 			camera.CameraSetting(wParam);
@@ -576,14 +677,15 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		
 		break;
 	case WM_CHAR:
-		if (map.getmapnum() == LOGINBG)
+	if (map.getmapnum() == LOGINBG)
 		{
-			//±²~ÀåÈ÷ map ¾ÈÀÇ ³»ºÎ ÇÔ¼ö·Î ³Ñ°Ü¼­ Å°º¸µåÀÔ·ÂÃ³¸® µû·Î ÇØÁÖ°í½ÍÀºµ¥,,, ³ªÁß¿¡ ±¸Á¶¸¦ µû·Î ¿Å±â±â À§ÇØ ÀÏ´Ü »©µÒ
-			//wParam 0x08 - ¹é½ºÆäÀÌ½º 
-			//0x09 - ÅÇ , 0x0A - Line Feed , 0x0D - ¿£ÅÍ, 0x1B - esc ÀÌ°Å»©°ï ³ª¸ÓÁö ´Ù ÀÔ·Â°¡´ÉÇÑ °Í. ³ªÁß¿¡ Ã¤ÆÃÃ¢ ¾µ¶§ »ç¿ëÇÏµµ·Ï 
+			//ï¿½ï¿½~ï¿½ï¿½ï¿½ï¿½ map ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ô¼ï¿½ï¿½ï¿½ ï¿½Ñ°Ü¼ï¿½ Å°ï¿½ï¿½ï¿½ï¿½ï¿½Ô·ï¿½Ã³ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ö°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½,,, ï¿½ï¿½ï¿½ß¿ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Å±ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ï´ï¿½ ï¿½ï¿½ï¿½ï¿½
+			//wParam 0x08 - ï¿½é½ºï¿½ï¿½ï¿½Ì½ï¿½ 
+			//0x09 - ï¿½ï¿½ , 0x0A - Line Feed , 0x0D - ï¿½ï¿½ï¿½ï¿½, 0x1B - esc ï¿½Ì°Å»ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½Ô·Â°ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½. ï¿½ï¿½ï¿½ß¿ï¿½ Ã¤ï¿½ï¿½Ã¢ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ïµï¿½ï¿½ï¿½ 
 			HideCaret(hwnd);
-			if (wParam == 0x08)
+			switch (wParam)
 			{
+			case 0x08:
 				if (map.LoginInputFlag == false)
 				{
 					if (mUI.back()->FindTextByNameTag("id")->getTextLen() > 0)
@@ -598,13 +700,16 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 					mUI.back()->FindTextByNameTag("pass")->UpdateFontSize(hwnd);
 					nCaretPosx = 380 + mUI.back()->FindTextByNameTag("pass")->getFontLen().cx;
 				}
-			}
-			else if ((wParam >= 'a' && wParam <= 'z') || (wParam >= '0' && wParam <= '9'))
-			{
+				break;
+			case 0x09:
+			case 0x0A:
+			case 0x0D:
+			case 0x1B:
+				break;
+			default:
 				if (map.LoginInputFlag == false)
 				{
-
-					if(mUI.back()->FindTextByNameTag("id")->getTextLen() < 10)
+					if (mUI.back()->FindTextByNameTag("id")->getTextLen() < 10)
 						mUI.back()->FindTextByNameTag("id")->pushChar(wParam);
 					mUI.back()->FindTextByNameTag("id")->UpdateFontSize(hwnd);
 					nCaretPosx = 380 + mUI.back()->FindTextByNameTag("id")->getFontLen().cx;
@@ -615,6 +720,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 					mUI.back()->FindTextByNameTag("pass")->UpdateFontSize(hwnd);
 					nCaretPosx = 380 + mUI.back()->FindTextByNameTag("pass")->getFontLen().cx;
 				}
+				isComposit = false;
+				break;
 			}
 			//cout << map.mFontSize.cx << endl;
 			SetCaretPos(nCaretPosx, nCaretPosy);

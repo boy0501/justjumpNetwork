@@ -43,6 +43,7 @@ public:
 	void LoadUiBitmap(HINSTANCE& g_hinst, std::string name, const int& x, const int& y, const int& w, const int& h, const COLORREF& cr);
 	void addButton(std::function<void()> click, const HINSTANCE& g_hinst, const std::string& fileName, const int& x, const int& y, const int& width, const int& height, const COLORREF& transparentcolor);
 	void addText(const std::string& text, const std::string& NameTag, const std::wstring& fontName, const COLORREF& fontColor, const int& FontHeight, const int& x, const int& y, const bool& isUserUi, const int& StringBoxWidth, const int& StringBoxHeight,class CAMERA& camera);
+	void addText(const std::wstring& text, const std::string& NameTag, const std::wstring& fontName,const COLORREF& fontColor, const int& FontHeight, const int& x, const int& y, const bool& isUserUi,	const int& StringBoxWidth, const int& StringBoxHeight, CAMERA& camera);
 	void closeUI();
 
 protected:
