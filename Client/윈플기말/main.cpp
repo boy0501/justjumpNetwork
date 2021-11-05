@@ -17,8 +17,11 @@
 #include "DieHUD.h"
 #include "Button.h"
 #include "Text.h"
+#include "Network.h"
+
 #pragma comment(lib,"Winmm.lib")
 #pragma comment(lib,"imm32.lib")
+#pragma comment(lib, "ws2_32")
 #ifdef _DEBUG
 #pragma comment(linker, "/entry:WinMainCRTStartup /subsystem:console")
 #endif
@@ -34,6 +37,8 @@ static HDC hdc, mem1dc, mem2dc, loaddc, playerdc, odc, pdc, ui_dc, hp_dc, die_dc
 static RECT rectview;
 static HBITMAP hbit1, loadbit, oldload, oldbit1, hbitobj[100];
 static PLAYER player;
+PLAYER others[2];
+
 static MAP map;
 static CAMERA camera;
 static OBJECT obj[150];
@@ -483,6 +488,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		loadbf.SourceConstantAlpha = 0;
 		Sound::GetSelf()->Sound_Play(BGMSOUND, LOGINBGM, BGMVOL);
 
+		Network::GetNetwork()->ConnectServer();
 
 	}
 	break;
@@ -633,7 +639,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 			if (hbitobj[i]) DeleteObject(hbitobj[i]);		
 		RemoveFontResourceA("font/Maplestory Bold.ttf");
 		RemoveFontResourceA("font/Maplestory Light.ttf");
-		delete Sound::GetSelf();
+		Sound::GetSelf()->~Sound();
 		PostQuitMessage(0);
 		return 0;
 	}
