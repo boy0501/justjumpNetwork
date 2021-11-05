@@ -162,6 +162,7 @@
     <ClCompile Include="LoginHUD.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Map.cpp" />
+    <ClCompile Include="Network.cpp" />
     <ClCompile Include="object.cpp" />
     <ClCompile Include="ObjectManager.cpp" />
     <ClCompile Include="player.cpp" />
@@ -171,6 +172,7 @@
     <ClCompile Include="UI.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Protocol\protocol.h" />
     <ClInclude Include="Button.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="DieHUD.h" />
@@ -178,6 +180,7 @@
     <ClInclude Include="Load.h" />
     <ClInclude Include="LoginHUD.h" />
     <ClInclude Include="Map.h" />
+    <ClInclude Include="Network.h" />
     <ClInclude Include="object.h" />
     <ClInclude Include="ObjectManager.h" />
     <ClInclude Include="player.h" />

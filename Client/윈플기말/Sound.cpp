@@ -2,6 +2,16 @@
 
 Sound* Sound::mSound = nullptr;
 
+Sound::Sound()
+{
+
+}
+
+Sound::~Sound()
+{
+	delete mSound;
+}
+
 int Sound::getindex()
 {
 	return index;

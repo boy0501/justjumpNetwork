@@ -22,8 +22,9 @@
 class Sound {
 	int index;
 	static class Sound* mSound;
-	Sound() {};
+	Sound();
 public:
+	~Sound();
 	int getindex();
 	static class Sound* GetSelf();
 
