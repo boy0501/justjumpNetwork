@@ -2,7 +2,10 @@
 #include <string>
 #include <WS2tcpip.h>
 #include <MSWSock.h>
+#include <array>
 #include "../Protocol/protocol.h"
+
+std::array<Player*, 3> CLIENTS;
 
 class Player
 {
@@ -40,5 +43,9 @@ public:
 
 	int do_recv();
 	void ProcessPacket(unsigned char* p);
+
+	//+
+	void move();
+	void initPos();
 };
 

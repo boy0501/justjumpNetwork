@@ -26,7 +26,7 @@ struct cs_packet_login {
 struct cs_packet_move {
 	unsigned char size;
 	char	type;
-	char	direction;			// 0 : up,  1: down, 2:left, 3:right
+	char	key;			// 38 : up,  40: down, 37:left, 39:right
 };
 
 struct cs_packet_test {
@@ -45,8 +45,12 @@ struct sc_packet_login_ok {
 struct sc_packet_move {
 	unsigned char size;
 	char type;
-	int		id;
-	short  x, y;
+	int id;
+	int x, y;
+	int state;
+	int hp;
+	int dir;
+	int stealth;
 };
 
 struct sc_packet_put_object {
