@@ -455,6 +455,18 @@ void Player::ProcessPacket(unsigned char* p)
 	}
 	}
 }
+int Player::do_send(int size, void* mess)
+{
+	char sendBuf[MAX_BUF_SIZE];
+	*sendBuf = (char)mess;
+	//WSASend(_socket, &ex_over->_wsa_buf, 1, 0, 0, &ex_over->_wsa_over, NULL);
+	int ret = send(c_socket, (char*)&sendBuf, size, 0);
+	if (ret == SOCKET_ERROR)
+	{
+		return SOCKET_ERROR;
+	}
+}
+
 int Player::do_recv()
 {
 	//Player* pl = CLIENTS[client_id];

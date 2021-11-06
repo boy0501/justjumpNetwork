@@ -69,6 +69,9 @@ using namespace std;
 
 UINT uResult;
 
+//
+Network net;
+
 void update(float delta_time)
 {
 
@@ -611,7 +614,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		if (player.getCMD_die() == 1)
 			break;
 		if (player.getGamemode() == 0)
-			player.PlayerSetting(wParam);
+			send(net.s_socket, reinterpret_cast<const char*>(wParam), sizeof(wParam), 0);
+			//player.PlayerSetting(wParam);
 		else if (player.getGamemode() == 1)
 			camera.CameraSetting(wParam);
 		break;

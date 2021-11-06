@@ -2,10 +2,8 @@
 #include <string>
 #include <WS2tcpip.h>
 #include <MSWSock.h>
-#include <array>
 #include "../Protocol/protocol.h"
 
-std::array<Player*, 3> CLIENTS;
 
 class Player
 {
@@ -47,5 +45,8 @@ public:
 	//+
 	void move();
 	void initPos();
+	int do_send(int size, void* mess);
+
 };
+
 
