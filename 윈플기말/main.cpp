@@ -20,6 +20,7 @@
 #include "DieHUD.h"
 #include "Button.h"
 #include "Text.h"
+#include "protocol.h"
 #pragma comment(lib,"Winmm.lib")
 #pragma comment(lib,"imm32.lib")
 #ifdef _DEBUG
@@ -77,7 +78,7 @@ void err_display(int err_no)
 void CALLBACK send_callback(DWORD err, DWORD num_bytes, LPWSAOVERLAPPED send_over, DWORD flag);
 void CALLBACK recv_callback(DWORD err, DWORD num_bytes, LPWSAOVERLAPPED recv_over, DWORD flag);
 
-char g_recv_buf[BUFSIZE];
+char g_recv_buf[32];
 bool g_client_shutdown = false;
 
 //WSABUF mybuf;
@@ -86,10 +87,12 @@ WSABUF mybuf_r;
 char key[4];
 
 
+
+
 void do_recv()
 {
-	mybuf_r.buf = key;
-	mybuf_r.len = sizeof(key);
+	mybuf_r.buf = g_recv_buf;
+	mybuf_r.len = sizeof(g_recv_buf);
 
 	DWORD recv_flag = 0;
 	WSAOVERLAPPED* recv_over = new WSAOVERLAPPED;
@@ -108,26 +111,27 @@ void do_recv()
 void CALLBACK recv_callback(DWORD err, DWORD num_bytes, LPWSAOVERLAPPED recv_over, DWORD flag)
 {
 	delete recv_over;
-	std::cout << "recv_callback in " << key << std::endl;
+
+	//std::cout << "key-> " << *(key) << std::endl;
 
 	do_recv();
 }
 
 
 
-WSABUF keyBuf;
+WSABUF csBuf;
 
 void do_send(unsigned int key)
 {
 	unsigned int key_move = key;
+	csBuf.buf = (char*)&key_move;
+	csBuf.len = sizeof(key_move);
 
-	keyBuf.buf = (char*)&key_move;
-	keyBuf.len = sizeof(key_move);
 
 	WSAOVERLAPPED* send_over = new WSAOVERLAPPED;
 	ZeroMemory(send_over, sizeof(*send_over));
 
-	int ret = WSASend(g_s_socket, &keyBuf, 1, 0, 0, send_over, send_callback);
+	int ret = WSASend(g_s_socket, &csBuf, 1, 0, 0, send_over, send_callback);
 	if (ret == SOCKET_ERROR) {
 		std::cout << "send error!" << std::endl;
 		int err_num = WSAGetLastError();
@@ -528,8 +532,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		map.CreateMap(g_hinst);
 		auto ui = make_shared<LoginHUD>(1);
 		ui->LoadUiBitmap(g_hinst, "img/idpassword.bmp", 340, 250, 332, 282, RGB(255, 0, 0));
-		ui->addText("kk", "id", L"�����ý��丮 bold", RGB(255, 108, 168), 18, 380, 330,false,0,0,camera);
-		ui->addText("", "pass", L"�����ý��丮 bold", RGB(255, 108, 168), 18, 380, 380,false,0,0,camera);
+		ui->addText("kk", "id", L"메이플스토리 bold", RGB(255, 108, 168), 18, 380, 330,false,0,0,camera);
+		ui->addText("", "pass", L"메이플스토리 bold", RGB(255, 108, 168), 18, 380, 380,false,0,0,camera);
 		ui->addButton([hwnd,ui]() {
 			map.setmapnum(9);
 			ocount = initObject(obj, map.getmapnum(), g_hinst);
@@ -549,7 +553,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 			//���� �α�����Ŷ���� �´ٰ� ����������, �α�����Ŷ ok�ÿ� ui�� ���� ����.
 			auto gameui = make_shared<GameHUD>(1,player);
 			gameui->LoadUiBitmap(g_hinst, "img/NoNameUi.bmp", 400, 700, 199, 65, RGB(0, 255, 0), camera);
-			gameui->addText(player.mPlayerwname, "NickName", L"�����ý��丮 light", RGB(255, 255, 255), 14, 475, 705, true, 100, 65, camera);
+			gameui->addText(player.mPlayerwname, "NickName", L"메이플스토리 light", RGB(255, 255, 255), 14, 475, 705, true, 100, 65, camera);
 			gameui->LoadHpUiBitmap(g_hinst, "img/Ui_HP.bmp", 421, 728, 100, 65, RGB(0, 0, 255), camera);
 			map.mGameUi = gameui;
 			//gameUi���� �� 
@@ -620,8 +624,9 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 			break;
 		if (player.getGamemode() == 0)
 		{
+			//int cur_state = player.getstate();
 			//player.PlayerSetting(wParam, sound);
-			do_send(wParam); //������ �� Ű�Է��� ������! (1�� �׽�Ʈ)
+			do_send(wParam);
 		}
 		else if (player.getGamemode() == 1)
 			camera.CameraSetting(wParam);

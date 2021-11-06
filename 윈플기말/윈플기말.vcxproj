@@ -181,6 +181,7 @@
     <ClInclude Include="object.h" />
     <ClInclude Include="ObjectManager.h" />
     <ClInclude Include="player.h" />
+    <ClInclude Include="protocol.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Sound.h" />
     <ClInclude Include="StartHUD.h" />
