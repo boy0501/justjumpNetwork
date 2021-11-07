@@ -100,6 +100,7 @@ int main()
 	for (int i = 0; i < 3; ++i,++Cnt_Player)
 	{
 		CLIENTS[i]->c_socket = mNet->AcceptClient(CLIENTS[i]->c_addr);
+		CLIENTS[i]->c_id = i;
 		send_login_ok(i);
 		hThread = CreateThread(NULL, 0, ClientInputThread, (LPVOID)i, 0, NULL);
 		if (hThread == NULL) closesocket(CLIENTS[i]->c_socket);
