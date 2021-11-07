@@ -12,11 +12,14 @@ const char CS_PACKET_MOVE = 2;
 const char CS_PACKET_TEST = 99;
 
 const char SC_PACKET_LOGIN_OK = 1;
-const char SC_PACKET_MOVE = 2;
+const char SC_PACKET_MOVE_PROCESS = 2;
 const char SC_PACKET_PUT_OBJECT = 3;
-const char SC_PACKET_REMOVE_OBJECT = 4;
+const char SC_PACKET_LOGOUT_OBJECT = 4;
+const char SC_PACKET_ROBBY = 5;
+const char SC_PACKET_EMPTY = 6;
 
 #pragma pack (push, 1)
+//---------------------client packet
 struct cs_packet_login {
 	unsigned char size;
 	char	type;
@@ -26,7 +29,7 @@ struct cs_packet_login {
 struct cs_packet_move {
 	unsigned char size;
 	char	type;
-	char	direction;			// 0 : up,  1: down, 2:left, 3:right
+	char	direction;			// 0 : up,  1: down, 2:left, 3:right, 4:jump
 };
 
 struct cs_packet_test {
@@ -34,7 +37,7 @@ struct cs_packet_test {
 	char type;
 	float zPos;
 };
-
+//-----------------------server packet
 struct sc_packet_login_ok {
 	unsigned char size;
 	char type;
@@ -42,12 +45,15 @@ struct sc_packet_login_ok {
 	short	x, y;
 };
 
-struct sc_packet_move {
+struct sc_packet_move_process {
 	unsigned char size;
 	char type;
 	int		id;
 	short  x, y;
-};
+	char state;
+	char hp;
+	char rank;
+}; 
 
 struct sc_packet_put_object {
 	unsigned char size;
@@ -58,9 +64,21 @@ struct sc_packet_put_object {
 	char	name[MAX_NAME_SIZE];
 };
 
-struct sc_packet_remove_object {
+struct sc_packet_logout_object {
 	unsigned char size;
 	char type;
 	int id;
+};
+
+struct sc_packet_robby {
+	unsigned char size;
+	char type;
+	int count;
+	float countdownTime;
+};
+
+struct sc_packet_empty {
+	unsigned char size;
+	char type;
 };
 #pragma pack(pop)
