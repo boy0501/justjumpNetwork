@@ -37,6 +37,7 @@ struct cs_packet_test {
 	char type;
 	float zPos;
 };
+
 //-----------------------server packet
 struct sc_packet_login_ok {
 	unsigned char size;
@@ -73,8 +74,9 @@ struct sc_packet_logout_object {
 struct sc_packet_robby {
 	unsigned char size;
 	char type;
-	int count;
-	float countdownTime;
+	char count_start; // 1: start
+	int player_cnt;
+	//float countdownTime;
 };
 
 struct sc_packet_empty {

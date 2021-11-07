@@ -18,6 +18,7 @@
 #include "Button.h"
 #include "Text.h"
 #include "Network.h"
+#include "../../Protocol/protocol.h"
 
 #pragma comment(lib,"Winmm.lib")
 #pragma comment(lib,"imm32.lib")
@@ -70,11 +71,14 @@ using namespace std;
 UINT uResult;
 
 //
-Network net;
-
+bool check = false;
 void update(float delta_time)
 {
+	if (Network::GetNetwork()->mPlayer->ready_to_go == true) {
+		check = true;
+	}
 
+	Network::GetNetwork()->C_Recv();
 	//빼줘야 할 Ui가 있다면 Ui 삭제
 	auto iter = mUI.begin();
 	while (iter != mUI.end())
@@ -496,6 +500,17 @@ void CALLBACK robby_waiting(HWND hwnd, UINT nMsg, UINT_PTR nIDEvent, DWORD dwTim
 
 int player_count = 0;
 
+void send_move_packet(char dr)
+{
+	cs_packet_move packet;
+	packet.size = sizeof(packet);
+	packet.type = CS_PACKET_MOVE;
+	packet.direction = dr;
+	
+	Network::GetNetwork()->C_Send(&packet, sizeof(packet));
+}
+
+
 LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 {
 	if (GetText(hwnd, iMessage, wParam, lParam) == 0)
@@ -510,6 +525,16 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		AddFontResourceA("font/Maplestory Light.ttf");
 		GetClientRect(hwnd, &rectview);
 		oldtime = timeGetTime();
+
+		Network::GetNetwork()->mPlayer = &player;
+		Network::GetNetwork()->ConnectServer();
+
+		cs_packet_login packet;
+		strcpy_s(packet.name, "kk");
+		packet.size = sizeof(cs_packet_login);
+		packet.type = CS_PACKET_LOGIN;
+		Network::GetNetwork()->C_Send(&packet, sizeof(packet));
+
 		map.CreateMap(g_hinst);
 		auto ui = make_shared<LoginHUD>(1);
 		ui->LoadUiBitmap(g_hinst, "img/idpassword.bmp", 340, 250, 332, 282, RGB(255, 0, 0));
@@ -517,16 +542,26 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		ui->addText("", "pass", L"메이플스토리 bold", RGB(255, 108, 168), 18, 380, 380,false,0,0,camera);
 		ui->addButton([hwnd,ui]() {
 			//로비========================================================================================
-			player_count++;
+			//player_count++;
 			//만약에 사람이 다 들어왔다면
+			
 
 			//타이머 시작(10초)
-			if (player_count == 1) {
+			/*if (player_count == 1) {
+
+			}*/
+			//타이머가 0초가 되면
+			//게임시작
+
+			
+			cout << Network::GetNetwork()->mPlayer->ready_to_go << endl;
+
+			
+			if(check == true)
+			{
 				SetTimer(hwnd, IDT_TIMER1, 1000, robby_waiting);
 
 			}
-			//타이머가 0초가 되면
-			//게임시작
 
 
 			map.setmapnum(9);
@@ -603,8 +638,6 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		loadbf.SourceConstantAlpha = 0;
 		Sound::GetSelf()->Sound_Play(BGMSOUND, LOGINBGM, BGMVOL);
 
-		Network::GetNetwork()->ConnectServer();
-
 	}
 	break;
 	case WM_TIMER:
@@ -614,7 +647,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		if (player.getCMD_die() == 1)
 			break;
 		if (player.getGamemode() == 0)
-			send(net.s_socket, reinterpret_cast<const char*>(wParam), sizeof(wParam), 0);
+			send_move_packet(wParam);
+			//send(net.s_socket, reinterpret_cast<const char*>(wParam), sizeof(wParam), 0);
 			//player.PlayerSetting(wParam);
 		else if (player.getGamemode() == 1)
 			camera.CameraSetting(wParam);

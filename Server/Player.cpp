@@ -1,5 +1,6 @@
 #include "Player.h"
 #include "Network.h"
+#include <iostream>
 
 int ROWSPEED = 3; 	//가로 이동속도
 int COLSPEED = 10;	//세로 이동속도
@@ -268,12 +269,13 @@ void Player::ProcessPacket(unsigned char* p)
 		//send_login_ok_packet(c_id);
 		break;
 	}
+	
 	//jpark
 	case CS_PACKET_MOVE: {
 		cs_packet_move* packet = reinterpret_cast<cs_packet_move*>(p);
 		
 
-		switch (packet->key) {
+		switch (packet->direction) {
 		case 37: //VK_LEFT
 			LEFTkey = true;
 			if (RIGHTkey == true)

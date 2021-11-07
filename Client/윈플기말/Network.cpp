@@ -3,7 +3,6 @@
 
 #include "../../Protocol/protocol.h"
 #include "player.h"
-
 Network* Network::mNetwork = nullptr;
 
 void error_display(int err_no)
@@ -61,6 +60,7 @@ void Network::ConnectServer()
 
 int Network::C_Recv()
 {
+	//std::cout << "recvÁß!" << std::endl;
 	int received;
 	char tmpbuf[MAX_BUF_SIZE];
 	char* ptr = tmpbuf;
@@ -98,6 +98,16 @@ void Network::ProcessPacket(unsigned char* p)
 		mPlayer->player_cid = packet->id;
 		//send_login_ok_packet(c_id);
 		break;
+	}
+	case SC_PACKET_ROBBY: {
+		sc_packet_robby* packet = reinterpret_cast<sc_packet_robby*>(p);
+		/*if ((int)(packet->count_start) == 1) {
+			mPlayer->ready_to_go = true;
+		}*/
+		if (packet->player_cnt == 1) {
+			mPlayer->ready_to_go = true;
+
+		}
 	}
 	}
 }

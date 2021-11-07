@@ -50,4 +50,5 @@ public:
 
 };
 
+//array<Player*, 3> CLIENTS;
 

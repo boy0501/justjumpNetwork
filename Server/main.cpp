@@ -24,6 +24,16 @@ void send_empty_packet(int c_id)
 	CLIENTS[c_id]->do_send(&packet, sizeof(packet));
 }
 
+void send_robby_full(int c_id, int player_cnt)
+{
+	sc_packet_robby packet;
+	packet.size = sizeof(sc_packet_robby);
+	packet.type = SC_PACKET_ROBBY;
+	packet.count_start = 1;
+	packet.player_cnt = player_cnt;
+	CLIENTS[c_id]->do_send(&packet, sizeof(packet));
+}
+
 //http://www.tipssoft.com/bulletin/board.php?bo_table=FAQ&wr_id=735 타임관련
 
 DWORD WINAPI GameLogicThread(LPVOID arg)
@@ -42,7 +52,7 @@ DWORD WINAPI GameLogicThread(LPVOID arg)
 			Fps++;
 			if (elapsed_time > 1.0f)
 			{
-				cout << "FPS:" << Fps << endl;
+				//cout << "FPS:" << Fps << endl;
 				Fps = 0;
 				elapsed_time = 0;
 			}
@@ -50,6 +60,7 @@ DWORD WINAPI GameLogicThread(LPVOID arg)
 			for (int i = 0; i < Cnt_Player; ++i)
 			{
 				send_empty_packet(i);
+				//send_robby_full(i);
 			}
 		}
 
@@ -61,6 +72,7 @@ DWORD WINAPI GameLogicThread(LPVOID arg)
 DWORD WINAPI ClientInputThread(LPVOID arg)
 {
 	int c_id = (int)arg;
+	//send_robby_full(c_id);
 	while (1)
 	{
 		int ret = CLIENTS[c_id]->do_recv();
@@ -85,6 +97,7 @@ void send_login_ok(int c_id)
 	CLIENTS[c_id]->do_send(&packet, sizeof(packet));
 }
 
+
 int main()
 {
 	wcout.imbue(locale("korean"));
@@ -103,6 +116,14 @@ int main()
 		send_login_ok(i);
 		hThread = CreateThread(NULL, 0, ClientInputThread, (LPVOID)i, 0, NULL);
 		if (hThread == NULL) closesocket(CLIENTS[i]->c_socket);
+
+		CLIENTS[i]->initPos();
+
+		cout << Cnt_Player << endl;
+		for (int j = 0; j < 2; ++j) {
+			send_robby_full(j, Cnt_Player);
+
+		}
 	}
 	while (1)
 	{
