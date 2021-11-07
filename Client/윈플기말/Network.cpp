@@ -109,7 +109,16 @@ void Network::ProcessPacket(unsigned char* p)
 
 		}
 	}
+	case SC_PACKET_MOVE_PROCESS: {
+		sc_packet_move_process* packet = reinterpret_cast<sc_packet_move_process*>(p);
+		int other_id = packet->id;
+		if (other_id == mPlayer->player_cid) {
+			mPlayer->move(0);
+		}
+		break;
 	}
+	}
+	
 }
 
 void Network::C_Send(void* packet, int bytes)

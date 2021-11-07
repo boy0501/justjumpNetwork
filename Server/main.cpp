@@ -34,9 +34,22 @@ void send_robby_full(int c_id, int player_cnt)
 	CLIENTS[c_id]->do_send(&packet, sizeof(packet));
 }
 
+void send_move_process(int c_id, int mover)
+{
+	sc_packet_move_process packet;
+	packet.size = sizeof(sc_packet_move_process);
+	packet.type = SC_PACKET_MOVE_PROCESS;
+	packet.id = mover;
+	packet.hp = CLIENTS[mover]->x;
+	packet.x = CLIENTS[mover]->y;
+	packet.state = CLIENTS[mover]->state;
+	packet.hp = CLIENTS[mover]->hp;
+	CLIENTS[c_id]->do_send(&packet, sizeof(packet));
+}
+
 //http://www.tipssoft.com/bulletin/board.php?bo_table=FAQ&wr_id=735 타임관련
 
-DWORD WINAPI GameLogicThread(LPVOID arg)
+DWORD WINAPI GameLogicThread(LPVOID arg) //게임로직 스레드
 {
 	QueryPerformanceFrequency(&Frequency);
 	QueryPerformanceCounter(&Endtime);
@@ -69,12 +82,15 @@ DWORD WINAPI GameLogicThread(LPVOID arg)
 	return 0;
 }
 
-DWORD WINAPI ClientInputThread(LPVOID arg)
+DWORD WINAPI ClientInputThread(LPVOID arg) //클라이언트 스레드
 {
 	int c_id = (int)arg;
-	//send_robby_full(c_id);
+	
 	while (1)
 	{
+		CLIENTS[c_id]->move();
+		//cout<< CLIENTS[c_id]->state << endl;
+		cout << CLIENTS[c_id]->x << ", " << CLIENTS[c_id]->y << endl;
 		int ret = CLIENTS[c_id]->do_recv();
 		if (ret == SOCKET_ERROR)
 		{
@@ -117,7 +133,6 @@ int main()
 		hThread = CreateThread(NULL, 0, ClientInputThread, (LPVOID)i, 0, NULL);
 		if (hThread == NULL) closesocket(CLIENTS[i]->c_socket);
 
-		CLIENTS[i]->initPos();
 
 		cout << Cnt_Player << endl;
 		for (int j = 0; j < 2; ++j) {
@@ -125,6 +140,8 @@ int main()
 
 		}
 	}
+	CLIENTS[0]->initPos();
+
 	while (1)
 	{
 		;

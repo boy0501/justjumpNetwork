@@ -656,8 +656,13 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 	case WM_KEYUP:
 		if (player.getCMD_die() == 1)
 			break;
-		if (player.getGamemode() == 0)
-			player.PlayerWaiting(wParam);
+		if (player.getGamemode() == 0) {
+			send_move_packet(wParam + 10); //내가 임의로 +10한 값을 보내줌
+			                               //keydown과 keyup을 구분하기 위함!
+
+			//player.PlayerWaiting(wParam);
+		}
+			
 		else if (player.getGamemode() == 1)
 			camera.CameraSetting(wParam);
 		break;

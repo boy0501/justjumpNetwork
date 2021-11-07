@@ -17,7 +17,24 @@ int diecount = 0;
 Player::Player()
 	:prev_size(0)
 {
-
+	// x y 는 캐릭터의 중심좌표이고 w,h 는 xy에서 좌우로 반틈씩만 간 좌표이다. 
+	x = 80; //100 캐릭터의 중심x좌표
+	y = 655; //3800 캐릭터의 중심y좌표
+	savey = 3700;	//처음 캐릭터의 중심좌표
+	w = 14; //캐릭터 width의 절반
+	h = 25;	//캐릭터 hegiht의 절반
+	charw = 31;	//캐릭터이펙트 width의 절반
+	charh = 25;	//캐릭터이펙트 height의 절반
+	hp = 100;	//캐릭터 hp는 100
+	state = 1; //캐릭터의 state
+	dir = 2;
+	adjustspd = 0;
+	stealth = 0;
+	spike_hurt = 0;
+	COMMAND_move = false;
+	COMMAND_hurt = false;
+	COMMAND_die = false;
+	COMMAND_ropehurt = false;
 }
 
 Player::~Player()
@@ -274,9 +291,11 @@ void Player::ProcessPacket(unsigned char* p)
 	case CS_PACKET_MOVE: {
 		cs_packet_move* packet = reinterpret_cast<cs_packet_move*>(p);
 		
+		std::cout << (int)packet->direction << std::endl;
 
-		switch (packet->direction) {
+		switch ((int)packet->direction) {
 		case 37: //VK_LEFT
+			std::cout << "left" << std::endl;
 			LEFTkey = true;
 			if (RIGHTkey == true)
 			{
@@ -451,8 +470,125 @@ void Player::ProcessPacket(unsigned char* p)
 				savey = y;
 			}
 			break;
-		}
 
+		case 47: //left keyUp
+			if (RIGHTkey == true)		//오른쪽키도 누르고있었다면 왼쪽키를 땟을때 오른쪽으로 몸을틀어야한다
+			{
+				dir = 2;
+				if (state == 1)			//둘다눌럿을때의 로직은 state==1일때에만 발동이 된다. 
+					COMMAND_move = 2;
+			}
+			else if (RIGHTkey == false)	//오른쪽키를 누르고있지 않았다면 움직이는상태였을땐 멈춰줘야한다.
+			{
+				if (state == 4)
+				{
+					state = 1;
+					COMMAND_move = 0;	//움직이는 방향은 그대로지만 움직이지는 않는다.
+				}
+				else if (state == 1)	//종종버그성 플레이로인해서 (점프키와 동시에 키를 누른후 바닥에 닿음과 동시에 땔때) 이경우가있는데, 이때도 멈춰주도록한다.
+				{
+					COMMAND_move = 0;
+				}
+				if (DOWNkey == true)//만약 수그리고있었다면
+				{
+					if (state == 1)	//수그리기의 원래 알고리즘인 state==1 일때만 수그리도록 한다
+					{
+						state = 3;
+						h -= 12;
+						y += 12;//원래대로 돌려놔주자
+					}
+				}
+			}
+
+
+			LRkey = false;				//한개를 땠으니 false
+			LEFTkey = false;			//LEFTkey 땠으니 false
+			break;
+		case 49: //right keyUp
+			if(LEFTkey == true)		//왼쪽키도 누르고있었다면 오른쪽키를 땟을때 왼쪽으로 몸을틀어야한다
+			{
+				dir = 1;
+				if (state == 1)			//둘다눌럿을때의 로직은 state==1일때에만 발동이 된다. 
+					COMMAND_move = 1;
+			}
+			else if (LEFTkey == false)	//왼쪽키를 누르고있지 않았다면 움직이는상태였을땐 멈춰줘야한다.
+			{
+				if (state == 4)
+				{
+					state = 1;
+					COMMAND_move = 0;	//움직이는 방향은 그대로지만 움직이지는 않는다.
+				}
+				else if (state == 1)	//종종버그성 플레이로인해서 (점프키와 동시에 키를 누른후 바닥에 닿음과 동시에 땔때) 이경우가있는데, 이때도 멈춰주도록한다.
+				{
+					COMMAND_move = 0;
+				}
+				if (DOWNkey == true)//만약 수그리고있었다면
+				{
+					if (state == 1)	//수그리기의 원래 알고리즘인 state==1 일때만 수그리도록 한다
+					{
+						state = 3;
+						h -= 12;
+						y += 12;//원래대로 돌려놔주자
+					}
+				}
+			}
+
+			LRkey = false;				//한개를 땠으니 false
+			RIGHTkey = false;			//RIGHTkey 땠으니 false
+			break;
+		case 48: //up keyUp
+			if (DOWNkey == true)
+			{
+				if (state == 5)			//둘다눌럿을때의 로직은 state==5일때에만 발동이 된다. 
+					COMMAND_move = 4;
+			}
+			else if (DOWNkey == false)
+			{
+				if (state == 8)
+				{
+					state = 5;
+					COMMAND_move = 0;	//움직이는 방향은 그대로지만 움직이지는 않는다.
+				}
+			}
+
+			UPkey = false;
+			UDkey = false;
+			break;
+		case 50: //down keyDown
+			if (UPkey == true)
+			{
+				if (state == 5)			//둘다눌럿을때의 로직은 state==1일때에만 발동이 된다. 
+					COMMAND_move = 3;
+			}
+			else if (UPkey == false)	//오른쪽키를 누르고있지 않았다면 움직이는상태였을땐 멈춰줘야한다.
+			{
+				if (state == 8)
+				{
+					state = 5;
+					COMMAND_move = 0;	//움직이는 방향은 그대로지만 움직이지는 않는다.
+				}
+				else if (state == 5)	//종종버그성 플레이로인해서 (점프키와 동시에 키를 누른후 바닥에 닿음과 동시에 땔때) 이경우가있는데, 이때도 멈춰주도록한다.
+				{
+					COMMAND_move = 0;
+				}
+			}
+			if (DOWNkey == true)
+			{
+				if (state == 3)
+				{
+					h += 12;
+					y -= 12;	//다시 키 늘려줌
+					state = 1;
+				}
+			}
+
+			UDkey = false;
+			DOWNkey = false;
+			break;
+		}
+		//case 42: //spacebar keyUp
+		//	
+		//	break;
 
 		
 	}
