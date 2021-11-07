@@ -4,6 +4,7 @@
 #include <MSWSock.h>
 #include "../Protocol/protocol.h"
 
+
 class Player
 {
 public:
@@ -41,5 +42,12 @@ public:
 	int do_recv();
 	void do_send(void* packet,int bytes);
 	void ProcessPacket(unsigned char* p);
+
+	//+
+	void move();
+	void initPos();
+	int do_send(int size, void* mess);
+
 };
+
 
