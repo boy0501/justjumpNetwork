@@ -39,6 +39,7 @@ public:
 	~Player();
 
 	int do_recv();
+	void do_send(void* packet,int bytes);
 	void ProcessPacket(unsigned char* p);
 };
 

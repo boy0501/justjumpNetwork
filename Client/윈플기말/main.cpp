@@ -18,6 +18,7 @@
 #include "Button.h"
 #include "Text.h"
 #include "Network.h"
+#include "../../Protocol/protocol.h"
 
 #pragma comment(lib,"Winmm.lib")
 #pragma comment(lib,"imm32.lib")
@@ -66,6 +67,7 @@ static vector<shared_ptr<UI>> mUI;
 using namespace std;
 void update(float delta_time)
 {
+	Network::GetNetwork()->C_Recv();
 	//빼줘야 할 Ui가 있다면 Ui 삭제
 	auto iter = mUI.begin();
 	while (iter != mUI.end())
@@ -402,6 +404,16 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		GetClientRect(hwnd, &rectview);
 		oldtime = timeGetTime();
 		map.CreateMap(g_hinst);
+
+		Network::GetNetwork()->mPlayer = &player;
+		Network::GetNetwork()->ConnectServer();
+		
+		cs_packet_login packet;
+		strcpy_s(packet.name, "kk");
+		packet.size = sizeof(cs_packet_login);
+		packet.type = CS_PACKET_LOGIN;
+		Network::GetNetwork()->C_Send(&packet, sizeof(packet));
+
 		auto ui = make_shared<LoginHUD>(1);
 		ui->LoadUiBitmap(g_hinst, "img/idpassword.bmp", 340, 250, 332, 282, RGB(255, 0, 0));
 		ui->addText("kk", "id", L"메이플스토리 bold", RGB(255, 108, 168), 18, 380, 330,false,0,0,camera);
@@ -488,7 +500,6 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		loadbf.SourceConstantAlpha = 0;
 		Sound::GetSelf()->Sound_Play(BGMSOUND, LOGINBGM, BGMVOL);
 
-		Network::GetNetwork()->ConnectServer();
 
 	}
 	break;

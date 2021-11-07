@@ -2,6 +2,7 @@
 #include "Network.h"
 
 Player::Player()
+	:prev_size(0)
 {
 
 }
@@ -34,7 +35,7 @@ int Player::do_recv()
 		return SOCKET_ERROR;
 	}
 	int remain_data = received + prev_size;
-	unsigned char* packet_start = reinterpret_cast<unsigned char*>(&ptr);
+	unsigned char* packet_start = reinterpret_cast<unsigned char*>(ptr);
 	int packet_size = packet_start[0];
 
 	while (packet_size <= remain_data)
@@ -51,4 +52,11 @@ int Player::do_recv()
 		memcpy(&buf, packet_start, remain_data);
 	}
 	return 0;
+}
+
+void Player::do_send(void* packet, int bytes)
+{
+	unsigned char buf[256];
+	memcpy(buf, packet, bytes);
+	send(c_socket, reinterpret_cast<char*>(buf), bytes, 0);
 }
