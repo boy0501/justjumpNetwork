@@ -65,8 +65,16 @@ static vector<shared_ptr<UI>> mUI;
 
 //한줄에 79자까지 입력가능한 메모장
 using namespace std;
+//float elapsedt;
+//int Nameunsigan= 10;
 void update(float delta_time)
 {
+	//elapsedt += delta_time;
+	//if (elapsedt > 1)
+	//{
+	//	Nameunsigan--;
+	//	
+	//}
 	Network::GetNetwork()->C_Recv();
 	//빼줘야 할 Ui가 있다면 Ui 삭제
 	auto iter = mUI.begin();
@@ -409,7 +417,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		Network::GetNetwork()->ConnectServer();
 		
 		cs_packet_login packet;
-		strcpy_s(packet.name, "kk");
+		strcpy_s(packet.username, "kk");
 		packet.size = sizeof(cs_packet_login);
 		packet.type = CS_PACKET_LOGIN;
 		Network::GetNetwork()->C_Send(&packet, sizeof(packet));
