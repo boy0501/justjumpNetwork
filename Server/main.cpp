@@ -2,27 +2,25 @@
 #include <array>
 
 #include "Network.h"
-#include "Player.h"
+#include "CLIENT/Client.h"
+#include "CLIENT/LoginClient.h"
+#include "CLIENT/LobbyClient.h"
 #include "../Protocol/protocol.h"
 
 #pragma comment(lib, "ws2_32")
 using namespace std;
 
-array<Player*, 3> CLIENTS;
+array<Client*, 3> CLIENTS;
 int Cnt_Player = 0;
 LARGE_INTEGER Frequency;
 LARGE_INTEGER BeginTime;
 LARGE_INTEGER Endtime;
 float elapsed_time;
+float change_time;
+bool do_once_change = true;
 int Fps = 0;
 
-void send_empty_packet(int c_id)
-{
-	sc_packet_empty packet;
-	packet.size = sizeof(sc_packet_empty);
-	packet.type = SC_PACKET_EMPTY;
-	CLIENTS[c_id]->do_send(&packet, sizeof(packet));
-}
+
 
 //http://www.tipssoft.com/bulletin/board.php?bo_table=FAQ&wr_id=735 타임관련
 
@@ -47,9 +45,26 @@ DWORD WINAPI GameLogicThread(LPVOID arg)
 				elapsed_time = 0;
 			}
 
+			//이런식으로 로그인에서 로비클라로 바꾼다. Scene Change같은 역할을 하는 것.
+			//현재 1번클라 접속하면 10초뒤에 로그인클라에서 로비클라로 보내는 역할을 한다.
+			//예상대로라면 로그인 버튼을 누르면 로그인 클라에서 로비클라로 보내면 되겠지.
+			if (Cnt_Player > 0)
+				change_time += deltatime;
+			if (change_time > 10 && do_once_change)
+			{
+				do_once_change = false;
+				auto p = CLIENTS[0];
+				LobbyClient* tmp = new LobbyClient();
+				*tmp = *reinterpret_cast<LobbyClient*>(p);
+				CLIENTS[0] = tmp;
+				delete p;
+			}
+			//
+
+
 			for (int i = 0; i < Cnt_Player; ++i)
 			{
-				send_empty_packet(i);
+				CLIENTS[i]->update(deltatime);
 			}
 		}
 
@@ -90,7 +105,7 @@ int main()
 	wcout.imbue(locale("korean"));
 	for (int i = 0; i < 3; ++i)
 	{
-		CLIENTS[i] = new Player();
+		CLIENTS[i] = new LoginClient();
 	}
 	auto mNet = Network::GetNetwork();
 	mNet->InitServer();
