@@ -18,7 +18,7 @@ void Player::ProcessPacket(unsigned char* p)
 	switch (packet_type) {
 	case CS_PACKET_LOGIN: {
 		cs_packet_login* packet = reinterpret_cast<cs_packet_login*>(p);
-		strcpy_s(playername, packet->name);
+		strcpy_s(playername, packet->username);
 		//send_login_ok_packet(c_id);
 		break;
 	}
@@ -26,6 +26,8 @@ void Player::ProcessPacket(unsigned char* p)
 }
 int Player::do_recv()
 {
+	//버그가 있음. player buf에 저장된걸
+	//새로받은 데이터랑 합쳐주지 않는 버그 존재.
 	int received;
 	char tmpbuf[MAX_BUF_SIZE];
 	char* ptr = tmpbuf;

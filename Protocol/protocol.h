@@ -23,13 +23,13 @@ const char SC_PACKET_EMPTY = 6;
 struct cs_packet_login {
 	unsigned char size;
 	char	type;
-	char	name[MAX_NAME_SIZE];
+	char	username[MAX_NAME_SIZE];
 };
 
 struct cs_packet_move {
 	unsigned char size;
 	char	type;
-	char	direction;			// 0 : up,  1: down, 2:left, 3:right, 4:jump
+	char	dir;			// 0 : up,  1: down, 2:left, 3:right, 4:jump
 };
 
 struct cs_packet_test {
@@ -60,8 +60,12 @@ struct sc_packet_put_object {
 	char type;
 	int id;
 	short x, y;
-	char object_type;
-	char	name[MAX_NAME_SIZE];
+	char	username[MAX_NAME_SIZE];
+	char state;
+	char w, h;
+	char hp;
+	char dir;
+	bool stealth;
 };
 
 struct sc_packet_logout_object {
