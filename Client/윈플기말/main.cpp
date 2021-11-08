@@ -414,7 +414,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		map.CreateMap(g_hinst);
 
 		Network::GetNetwork()->mPlayer = &player;
-		Network::GetNetwork()->ConnectServer();
+		Network::GetNetwork()->ConnectServer("127.0.0.1");
 		
 		cs_packet_login packet;
 		strcpy_s(packet.username, "kk");

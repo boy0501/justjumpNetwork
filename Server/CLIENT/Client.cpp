@@ -1,18 +1,23 @@
-#include "Player.h"
-#include "Network.h"
+#include "Client.h"
+#include "../CLIENT/LoginClient.h"
 
-Player::Player()
+Client::Client()
 	:prev_size(0)
 {
 
 }
 
-Player::~Player()
+Client::~Client()
 {
 
 }
 
-void Player::ProcessPacket(unsigned char* p)
+void Client::update(float delta_time)
+{
+
+}
+
+void Client::ProcessPacket(unsigned char* p)
 {
 	unsigned char packet_type = p[1];
 	switch (packet_type) {
@@ -24,7 +29,7 @@ void Player::ProcessPacket(unsigned char* p)
 	}
 	}
 }
-int Player::do_recv()
+int Client::do_recv()
 {
 	//버그가 있음. player buf에 저장된걸
 	//새로받은 데이터랑 합쳐주지 않는 버그 존재.
@@ -56,7 +61,7 @@ int Player::do_recv()
 	return 0;
 }
 
-void Player::do_send(void* packet, int bytes)
+void Client::do_send(void* packet, int bytes)
 {
 	unsigned char buf[256];
 	memcpy(buf, packet, bytes);

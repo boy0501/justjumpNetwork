@@ -19,7 +19,7 @@ public:
 	static class Network* mNetwork;
 	static class Network* GetNetwork();
 	int prev_size;
-	void ConnectServer();
+	void ConnectServer(const char* server_ip);
 	void C_Send(void* packet, int bytes);
 	int C_Recv();
 	void ProcessPacket(unsigned char* p);

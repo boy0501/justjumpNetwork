@@ -32,7 +32,7 @@ void Sound::Sound_Setup()
 {
 	index = 0;
 	char string[100];
-	FMOD_System_Create(&System, FMOD_VERSION);
+	FMOD_System_Create(&System);
 	FMOD_System_Init(System, 10, FMOD_INIT_NORMAL, NULL);
 
 	for (int i = 0; i < 6; ++i)
