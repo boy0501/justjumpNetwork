@@ -53,10 +53,21 @@ DWORD WINAPI GameLogicThread(LPVOID arg)
 			if (change_time > 10 && do_once_change)
 			{
 				do_once_change = false;
-				auto p = CLIENTS[0];
+				// 1. CLIENT에 들어있는 클래스명으로 캐스팅을 한 후, p에 집어넣는다(다운캐스팅) 
+				// 이유 : delete 할 때 할당한 만큼 해제해줘야하기 때문.
+				auto p = reinterpret_cast<LoginClient*>(CLIENTS[0]);
+				// 2. 새롭게 들어갈 클래스를 할당한다.
 				LobbyClient* tmp = new LobbyClient();
+				// 3. 새롭게 들어갈 클래스에 원래 p의 정보를 넣는다.
+				// 이유: 로그인-> 로비로 가더라도, 플레이어의 정보가 다시 쓰여지면 안되고 유지되어야함.
+				// 플레이어의 정보는 부모클래스인 Client에 다 저장되어있음.
 				*tmp = *reinterpret_cast<LobbyClient*>(p);
+				//4. LobbyClient에서만 사용하는 변수들 다시 초기화
+				//함수화를 해도 괜찮을 것 같다.
+				tmp->elapsedtime = 0;
+				//5. CLIENTS에 바꿀 class를 연결
 				CLIENTS[0] = tmp;
+				//6. 원래 CLIENT에 할당되어있던 메모리를 해제
 				delete p;
 			}
 			//
