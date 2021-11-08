@@ -23,8 +23,8 @@ Player::Player()
 	savey = 3700;	//처음 캐릭터의 중심좌표
 	w = 14; //캐릭터 width의 절반
 	h = 25;	//캐릭터 hegiht의 절반
-	charw = 31;	//캐릭터이펙트 width의 절반
-	charh = 25;	//캐릭터이펙트 height의 절반
+	//charw = 31;	//캐릭터이펙트 width의 절반
+	//charh = 25;	//캐릭터이펙트 height의 절반
 	hp = 100;	//캐릭터 hp는 100
 	state = 1; //캐릭터의 state
 	dir = 2;

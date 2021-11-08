@@ -50,10 +50,12 @@ struct sc_packet_move_process {
 	unsigned char size;
 	char type;
 	int		id;
-	short  x, y;
+	short  x, y, h;
 	char state;
-	char hp;
-	char rank;
+	char dir;
+	char stealth;
+	//char hp;
+	//char rank;
 }; 
 
 struct sc_packet_put_object {

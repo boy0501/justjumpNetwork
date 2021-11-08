@@ -4,6 +4,7 @@
 #include "Network.h"
 #include "Player.h"
 #include "../Protocol/protocol.h"
+#include <time.h>
 
 #pragma comment(lib, "ws2_32")
 using namespace std;
@@ -40,10 +41,12 @@ void send_move_process(int c_id, int mover)
 	packet.size = sizeof(sc_packet_move_process);
 	packet.type = SC_PACKET_MOVE_PROCESS;
 	packet.id = mover;
-	packet.hp = CLIENTS[mover]->x;
-	packet.x = CLIENTS[mover]->y;
+	packet.x = CLIENTS[mover]->x;
+	packet.y = CLIENTS[mover]->y;
+	packet.h = CLIENTS[mover]->h;
 	packet.state = CLIENTS[mover]->state;
-	packet.hp = CLIENTS[mover]->hp;
+	packet.stealth = CLIENTS[mover]->hp;
+	packet.dir = CLIENTS[mover]->dir;
 	CLIENTS[c_id]->do_send(&packet, sizeof(packet));
 }
 
@@ -73,7 +76,6 @@ DWORD WINAPI GameLogicThread(LPVOID arg) //게임로직 스레드
 			for (int i = 0; i < Cnt_Player; ++i)
 			{
 				send_empty_packet(i);
-				//send_robby_full(i);
 			}
 		}
 
@@ -99,6 +101,14 @@ DWORD WINAPI ClientInputThread(LPVOID arg) //클라이언트 스레드
 			closesocket(CLIENTS[c_id]->c_socket);
 			return 0;
 		}
+
+		//움직인 클라에 대해서 다른 클라들에게 브로드캐스팅
+		for (int i = 0; i < Cnt_Player; ++i)
+		{
+			send_move_process(i, c_id);
+
+		}
+
 	}
 }
 
@@ -114,8 +124,11 @@ void send_login_ok(int c_id)
 }
 
 
+
+int count_time = 5;
 int main()
 {
+	
 	wcout.imbue(locale("korean"));
 	for (int i = 0; i < 3; ++i)
 	{
@@ -136,11 +149,15 @@ int main()
 
 
 		cout << Cnt_Player << endl;
-		for (int j = 0; j < 2; ++j) {
+		if (Cnt_Player == 1) {
+			
+		}
+		/*for (int j = 0; j < 2; ++j) {
 			send_robby_full(j, Cnt_Player);
 
-		}
+		}*/
 	}
+	SetTimer(NULL, 1, 1000, NULL);
 	CLIENTS[0]->initPos();
 
 	while (1)

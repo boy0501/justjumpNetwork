@@ -35,12 +35,11 @@ LPCTSTR lpszWinodwName = L"Just Jump";
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam);
 static PAINTSTRUCT ps;
-static HDC hdc, mem1dc, mem2dc, loaddc, playerdc, odc, pdc, ui_dc, hp_dc, die_dc, start_dc, help_dc, login_dc; // odc = 오브젝트 dc, pdc = player dc,ui_Dc : 아래 전체적인 ui hp_Dc: hp통만 나오는거 dic_dc : 사망 ui 
+static HDC mem2dc, loaddc, playerdc, odc, ui_dc, hp_dc, die_dc, start_dc, help_dc, login_dc; // odc = 오브젝트 dc, pdc = player dc,ui_Dc : 아래 전체적인 ui hp_Dc: hp통만 나오는거 dic_dc : 사망 ui 
 static RECT rectview;
 static HBITMAP hbit1, loadbit, oldload, oldbit1, hbitobj[100];
 static PLAYER player;
 PLAYER others[2];
-
 
 static MAP map;
 static CAMERA camera;
@@ -78,7 +77,7 @@ void update(float delta_time)
 		check = true;
 	}
 
-	Network::GetNetwork()->C_Recv();
+	Network::GetNetwork()->C_Recv(); //recv한 것 처리
 	//빼줘야 할 Ui가 있다면 Ui 삭제
 	auto iter = mUI.begin();
 	while (iter != mUI.end())
@@ -194,39 +193,41 @@ void update(float delta_time)
 }
 void render()
 {
-	hdc = GetDC(hWnd);
+	//Network::GetNetwork()->C_Recv(); //recv한 것 처리
 
-	mem1dc = CreateCompatibleDC(hdc);
+	player.hdc = GetDC(hWnd);
+
+	player.mem1dc = CreateCompatibleDC(player.hdc);
 	if (hbit1 == NULL)
 	{
-		hbit1 = CreateCompatibleBitmap(hdc, rectview.right, rectview.bottom);
+		hbit1 = CreateCompatibleBitmap(player.hdc, rectview.right, rectview.bottom);
 	}
 	
 	
-	SelectObject(mem1dc, hbit1);
+	SelectObject(player.mem1dc, hbit1);
 	
-	FillRect(mem1dc, &rectview, (HBRUSH)COLOR_BACKGROUND);
+	FillRect(player.mem1dc, &rectview, (HBRUSH)COLOR_BACKGROUND);
 	
 	if (0 >= map.getblack_t())
 	{
-		map.DrawBK(mem1dc, mem2dc, rectview);
+		map.DrawBK(player.mem1dc, mem2dc, rectview);
 	
 	}	
 	for (int i = 0; i <= ocount; i++)
-		obj[i].DrawObj(mem1dc, odc);
-	player.draw(mem1dc, pdc);	
+		obj[i].DrawObj(player.mem1dc, odc);
+	//player.draw(mem1dc, pdc);	
 	for (const auto& ui : mUI)
-		ui->draw(mem1dc);
+		ui->draw(player.mem1dc);
 
-	if (map.getblack_t() > 0) map.DrawLoadBK(mem1dc, mem2dc, loadbf);
-
-
-	BitBlt(hdc, 0, 0, 1024, 768, mem1dc, camera.getx(), camera.gety(), SRCCOPY);
+	if (map.getblack_t() > 0) map.DrawLoadBK(player.mem1dc, mem2dc, loadbf);
 
 
+	BitBlt(player.hdc, 0, 0, 1024, 768, player.mem1dc, camera.getx(), camera.gety(), SRCCOPY);
 
-	DeleteObject(mem1dc);
-	ReleaseDC(hWnd, hdc);
+
+
+	DeleteObject(player.mem1dc);
+	ReleaseDC(hWnd, player.hdc);
 }
 void ProcessingLoop()
 {
@@ -509,7 +510,6 @@ void send_move_packet(char dr)
 	
 	Network::GetNetwork()->C_Send(&packet, sizeof(packet));
 }
-
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 {

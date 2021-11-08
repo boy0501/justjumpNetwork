@@ -4,6 +4,7 @@
 #include"Sound.h"
 
 class PLAYER {
+public:
 	int x, y, w, h;		// x y 는 캐릭터의 중심좌표이고 w,h 는 xy에서 좌우로 반틈씩만 간 좌표이다.
 	int charw, charh;	//캐릭터 전체 사이즈이다. 
 	int hp;				//플레이어의 hp이다.
@@ -24,6 +25,7 @@ class PLAYER {
 	HBITMAP hbitex;		//점프,숙이기 줄타기 비트맵
 	int bx, by, bw, bh; //비트맵의 스프라이트위치를 바꾸기위한 좌표 변수
 public:
+	HDC hdc, pdc, mem1dc;
 	int ready_players = 0;
 	bool ready_to_go = false;
 	int player_cid = 0;
