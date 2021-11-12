@@ -10,6 +10,7 @@
 
 #define LOGINBG 1
 #define STARTBG 9
+#define FinalBG 13
 class MAP {
 	int mapnum = 1;	//1은 로그인화면, 9는 게임시작전화면, 13은 게임 끝 화면
 	int black_t = 0;
@@ -20,6 +21,7 @@ public:
 	std::shared_ptr<class UI> mStartui;
 	std::shared_ptr<class UI> mGameUi;
 	std::shared_ptr<class UI> mDieUi;
+	
 	~MAP();
 	//맵번호를 읽음 10~
 	int getmapnum();

@@ -106,11 +106,11 @@ HBITMAP LoadLogin(HINSTANCE& g_hinst, int num)
 HBITMAP LoadExit(HINSTANCE& g_hinst, int num)
 {
 	if(num==0)
-		return (HBITMAP)LoadImage(g_hinst, TEXT("Exit1.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
+		return (HBITMAP)LoadImage(g_hinst, TEXT("img/Exit1.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
 	else if(num==1)
-		return (HBITMAP)LoadImage(g_hinst, TEXT("Exit2.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
+		return (HBITMAP)LoadImage(g_hinst, TEXT("img/Exit2.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
 	else if(num==2)
-		return (HBITMAP)LoadImage(g_hinst, TEXT("Exit3.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
+		return (HBITMAP)LoadImage(g_hinst, TEXT("img/Exit3.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
 	return NULL;
 }
 

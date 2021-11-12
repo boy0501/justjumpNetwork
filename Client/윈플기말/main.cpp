@@ -34,7 +34,7 @@ LPCTSTR lpszWinodwName = L"Just Jump";
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam);
 static PAINTSTRUCT ps;
-static HDC hdc, mem1dc, mem2dc, loaddc, playerdc, odc, pdc, ui_dc, hp_dc, die_dc, start_dc, help_dc, login_dc; // odc = 오브젝트 dc, pdc = player dc,ui_Dc : 아래 전체적인 ui hp_Dc: hp통만 나오는거 dic_dc : 사망 ui 
+static HDC hdc, mem1dc, mem2dc, loaddc, playerdc, odc, pdc, ui_dc, hp_dc, die_dc, start_dc, help_dc, login_dc, exit_dc; // odc = 오브젝트 dc, pdc = player dc, ui_Dc : 아래 전체적인 ui, hp_dc: hp통만 나오는거, die_dc : 사망 ui 
 static RECT rectview;
 static HBITMAP hbit1, loadbit, oldload, oldbit1, hbitobj[100];
 static PLAYER player;
@@ -94,6 +94,7 @@ void update(float delta_time)
 	//Sound업데이트
 	FMOD_System_Update(Sound::GetSelf()->System);
 	//Sound업데이트 끝
+
 	if (map.getmapnum() == LOGINBG)
 		return;
 	obj_t += 1;
@@ -111,6 +112,8 @@ void update(float delta_time)
 		}
 	}
 	map.movemap();
+
+
 
 	if (map.BlackTime())
 	{
@@ -241,6 +244,7 @@ void ProcessingLoop()
 			Fps = 0;
 			elapsedtime = 0;
 		}
+
 		HideCaret(hWnd);
 		update(deltatime);
 		render();
@@ -393,6 +397,8 @@ int WINAPI WinMain(HINSTANCE hinstance, HINSTANCE hPrevinstance, LPSTR lpszCmdPa
 		}
 	}
 
+	
+
 	return Message.wParam;
 
 
@@ -404,9 +410,12 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		return 0;
 	}
 
+
 	switch (iMessage)
 	{
-	case WM_CREATE: {
+	case WM_CREATE: 
+		
+	{
 		AddFontResourceA("font/Maplestory Bold.ttf");
 		AddFontResourceA("font/Maplestory Light.ttf");
 		GetClientRect(hwnd, &rectview);
@@ -422,10 +431,13 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		packet.type = CS_PACKET_LOGIN;
 		Network::GetNetwork()->C_Send(&packet, sizeof(packet));
 
+		//로그인ui
 		auto ui = make_shared<LoginHUD>(1);
 		ui->LoadUiBitmap(g_hinst, "img/idpassword.bmp", 340, 250, 332, 282, RGB(255, 0, 0));
 		ui->addText("kk", "id", L"메이플스토리 bold", RGB(255, 108, 168), 18, 380, 330,false,0,0,camera);
 		ui->addText("", "pass", L"메이플스토리 bold", RGB(255, 108, 168), 18, 380, 380,false,0,0,camera);
+		
+
 		ui->addButton([hwnd,ui]() {
 			map.setmapnum(9);
 			ocount = initObject(obj, map.getmapnum(), g_hinst);
@@ -447,15 +459,21 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 			gameui->LoadUiBitmap(g_hinst, "img/NoNameUi.bmp", 400, 700, 199, 65, RGB(0, 255, 0), camera);
 			gameui->addText(player.mPlayerwname, "NickName", L"메이플스토리 light", RGB(255, 255, 255), 14, 475, 705, true, 100, 65, camera);
 			gameui->LoadHpUiBitmap(g_hinst, "img/Ui_HP.bmp", 421, 728, 100, 65, RGB(0, 0, 255), camera);
+			
 			map.mGameUi = gameui;
 			//gameUi설정 끝 
 
 			HideCaret(hwnd);
 		}, g_hinst, "img/LoginButton", 365, 440, 278, 53, RGB(255, 0, 0));
+
+		//auto gameui = make_shared <GameHUD>(0, player);
+		//gameui->drawExit();
+
+		//시작버튼 ui
 		auto startui = make_shared<StartHUD>(0);
 		//hbit = (HBITMAP)LoadImage(g_hinst, TEXT("img/NoNameUi.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION); //상대경로로 변경
 		startui->addButton([startui]() {
-			occur_button = 0;
+			//occur_button = 0;
 			map.setblack_t(50);
 			map.setmapnum(map.getmapnum() + 1);
 			for (int j = 0; j < ocount; j++)
@@ -474,10 +492,28 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 			camera.sety(3232); 
 			startui->closeUI();
 			mUI.emplace_back(map.mGameUi);
+		
 		}, g_hinst, "img/start", 292, 490, 138, 82, RGB(255, 0, 0));
-		startui->addButton([startui]() {}, g_hinst, "img/help", 215, 300, 400, 200, RGB(60, 60, 60));
+
+		//help ui
+		startui->addButton([startui]() {
+
+			}, g_hinst, "img/help", 215, 300, 400, 200, RGB(60, 60, 60));
 		map.mStartui = startui;
 		
+
+
+		//exit test ui-------------------------------------
+		startui->addButton([startui]() {
+			
+		}, g_hinst, "img/Exit", 400, 300, 138, 82, RGB(255, 0, 0));// g_hinst, "img/help", 215, 300, 400, 200, RGB(60, 60, 60));
+		map.mStartui = startui;
+		//--------------------------------------------------
+		
+
+		
+
+		//dead ui
 		auto dieui = make_shared<DieHUD>(1,player,camera);
 		
 		dieui->addButton([dieui]() {
@@ -619,6 +655,9 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 			ShowCaret(hwnd);
 			break;
 		}
+
+
+
 		if (wParam == 'r')
 		{
 			player.setx(obj[ocount - 1].getX() + 10);
@@ -635,6 +674,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 			break;
 		}
 		break;
+
 	case WM_SETFOCUS:
 		if (map.getmapnum() == LOGINBG)
 		{
@@ -642,6 +682,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 			SetCaretPos(nCaretPosx, nCaretPosy);
 			ShowCaret(hwnd);
 		}
+		
 		return 0;
 	case WM_KILLFOCUS:
 		DestroyCaret();

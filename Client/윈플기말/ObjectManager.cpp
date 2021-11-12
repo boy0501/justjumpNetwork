@@ -336,11 +336,17 @@ void adjustPlayer(PLAYER& player, OBJECT* obj, MAP& m, int& ocount, HINSTANCE g_
 						/*m.CreateBlack(g_hinst);*/
 						m.setmapnum(m.getmapnum() + 1);
 						player.initPos();
-						if (m.getmapnum() == 13) m.CreateMap(g_hinst);
+						if (m.getmapnum() == 13) {
+
+							m.CreateMap(g_hinst);
+						}
+						
 						for (int j = 0; j < ocount; j++)
 							obj[j].ResetObject();
 						ocount = initObject(obj, m.getmapnum(), g_hinst);
 						m.CreateMap(g_hinst);
+
+						
 						Sound::GetSelf()->setindex(m.getmapnum()-9);
 						Sound::GetSelf()->Sound_Play(BGMSOUND, Sound::GetSelf()->getindex(), BGMVOL);
 						Sound::GetSelf()->Sound_Play(EFFECTSOUND, PORTALEF, EFVOL);

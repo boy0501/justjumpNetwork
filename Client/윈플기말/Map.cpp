@@ -9,6 +9,7 @@ MAP::~MAP()
 	mStartui.reset();
 	mDieUi.reset();
 	mGameUi.reset();
+	
 }
 
 
@@ -82,6 +83,10 @@ void MAP :: DrawBK(HDC& mem1dc, HDC& mem2dc, RECT& rectview)
 		TextOut(mem1dc, 700, 3400, count, lstrlenW(count));
 		SelectObject(mem1dc, oldfont);
 		DeleteObject(hfont);
+
+		//BitBlt(mem1dc, 292, 490, 138, 82, mem2dc, 0, 0, SRCCOPY);
+
+		
 	}
 
 

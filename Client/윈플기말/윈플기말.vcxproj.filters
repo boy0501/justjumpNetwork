@@ -69,9 +69,6 @@
     <ClCompile Include="LoginHUD.cpp">
       <Filter>소스 파일\HUD</Filter>
     </ClCompile>
-    <ClCompile Include="ExitGameHUD.cpp">
-      <Filter>소스 파일\HUD</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="player.h">
@@ -123,9 +120,6 @@
       <Filter>헤더 파일\HUD</Filter>
     </ClInclude>
     <ClInclude Include="StartHUD.h">
-      <Filter>헤더 파일\HUD</Filter>
-    </ClInclude>
-    <ClInclude Include="ExitGameHUD.h">
       <Filter>헤더 파일\HUD</Filter>
     </ClInclude>
   </ItemGroup>

@@ -6,6 +6,8 @@
 #include "object.h"
 #include "Camera.h"
 #include "Map.h"
+//#include"UI.h"
+//#include"GameHUD.h"
 using namespace std;
 //땅바닥과 플레이어 충돌체크 1이면 부닥침
 bool collp2w(PLAYER, OBJECT);
