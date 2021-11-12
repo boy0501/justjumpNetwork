@@ -503,6 +503,12 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		
 
 
+		//auto gameui = make_shared<GameHUD>(1, player);
+		//gameui->addButton([gameui]() {}
+		//	, NULL, "img/Exit", 315, 3400, 138, 82, RGB(255, 0, 0));
+		//map.mGameUi = gameui;
+		
+
 		//exit test ui-------------------------------------
 		startui->addButton([startui]() {
 			
@@ -510,7 +516,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		map.mStartui = startui;
 		//--------------------------------------------------
 		
-
+	
 		
 
 		//dead ui

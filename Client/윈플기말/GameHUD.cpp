@@ -15,14 +15,15 @@ GameHUD::~GameHUD()
 
 
 
-void GameHUD::draw(HDC& mem1dc )
+void GameHUD::draw(HDC& mem1dc)
 {
 	drawByUserUi(mem1dc );
 	drawHP(mem1dc);
 	UI::draw(mem1dc);
 	//if(m.getmapnum() == 11)
-	drawExit();
+	//drawExit();
 	
+	//std::cout << "called" << std::endl;
 }
 
 
@@ -66,19 +67,22 @@ void GameHUD::drawHP(HDC& mem1dc)
 
 void GameHUD::drawExit()
 {
-
+	
+	
 	//int m;
 	//MAP map;
 	//m = map.getmapnum();
 	//if (m.getmapnum() == 11) {
 		this->addButton([this]() {
-			}
+		}
 		, NULL, "img/Exit", 315, 3400, 138, 82, RGB(255, 0, 0));
 	//}
+	
 	//	//printf("print\n");
 	////}
 	//
 	//std::cout << m.getmapnum() << std::endl;
+	
 }
 
 void GameHUD::LoadHpUiBitmap(HINSTANCE& g_hinst, std::string name, const int& x, const int& y, const int& w, const int& h, const COLORREF& cr,CAMERA& camera)

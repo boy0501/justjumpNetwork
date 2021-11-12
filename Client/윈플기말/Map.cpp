@@ -24,6 +24,7 @@ void MAP::setmapnum(int i) { mapnum = i; }
 void MAP::setblack_t(int i) { black_t = i; }
 
 
+
 void MAP::CreateMap(HINSTANCE g_hinst)
 {
 	hbitbk = LoadBK(hbitbk,g_hinst, mapnum);
@@ -84,6 +85,11 @@ void MAP :: DrawBK(HDC& mem1dc, HDC& mem2dc, RECT& rectview)
 		SelectObject(mem1dc, oldfont);
 		DeleteObject(hfont);
 
+		
+		//auto gameui = std::make_shared<GameHUD>(0,NULL);
+		//GameHUD &gameui.addButton([gameui]() {}, NULL, "img/Exit", 315, 3400, 138, 82, RGB(255, 0, 0));
+
+		//gameui.drawExit();
 		//BitBlt(mem1dc, 292, 490, 138, 82, mem2dc, 0, 0, SRCCOPY);
 
 		

@@ -337,7 +337,7 @@ void adjustPlayer(PLAYER& player, OBJECT* obj, MAP& m, int& ocount, HINSTANCE g_
 						m.setmapnum(m.getmapnum() + 1);
 						player.initPos();
 						if (m.getmapnum() == 13) {
-
+							
 							m.CreateMap(g_hinst);
 						}
 						
