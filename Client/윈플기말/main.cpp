@@ -34,9 +34,9 @@ LPCTSTR lpszWinodwName = L"Just Jump";
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam);
 static PAINTSTRUCT ps;
-static HDC hdc, mem1dc, mem2dc, loaddc, playerdc, odc, pdc, ui_dc, hp_dc, die_dc, start_dc, help_dc, login_dc; // odc = 오브젝트 dc, pdc = player dc,ui_Dc : 아래 전체적인 ui hp_Dc: hp통만 나오는거 dic_dc : 사망 ui 
-static RECT rectview;
-static HBITMAP hbit1, loadbit, oldload, oldbit1, hbitobj[100];
+static HDC /*hdc, mem1dc,*/ mem2dc, loaddc, playerdc, odc, /*pdc,*/ ui_dc, hp_dc, die_dc, start_dc, help_dc, login_dc; // odc = 오브젝트 dc, pdc = player dc,ui_Dc : 아래 전체적인 ui hp_Dc: hp통만 나오는거 dic_dc : 사망 ui 
+/*static RECT rectview;*/
+static HBITMAP /*hbit1,*/ loadbit, oldload, oldbit1, hbitobj[100];
 static PLAYER player;
 PLAYER others[2];
 
@@ -46,9 +46,9 @@ static OBJECT obj[150];
 static BLENDFUNCTION loadbf;
 bool isComposit = false;
 
-HWND hWnd;
+/*HWND hWnd;*/
 static int nCaretPosx, nCaretPosy;	//폰트 x,y크기 , 캐럿 x y 위치
-static int obj_t = 0; //오브젝트 애니메이션을 1번타이머에 넣기위해 추가한 변수
+/*static int obj_t = 0;*/ //오브젝트 애니메이션을 1번타이머에 넣기위해 추가한 변수
 static int ocount;		//obj 개수를 세주는 변수
 static int help_button = 0, start_button = 0; //조작법 온오프
 static bool occur_button = 0;	//사망했을때의 button이 활성화되었는지 
@@ -211,7 +211,8 @@ void render()
 	}	
 	for (int i = 0; i <= ocount; i++)
 		obj[i].DrawObj(mem1dc, odc);
-	player.draw(mem1dc, pdc);	
+	player.draw(mem1dc, pdc, Network::GetNetwork()->net_x, Network::GetNetwork()->net_y, Network::GetNetwork()->net_h,
+		Network::GetNetwork()->net_stealth, Network::GetNetwork()->net_state, Network::GetNetwork()->net_dir);
 	for (const auto& ui : mUI)
 		ui->draw(mem1dc);
 
@@ -397,6 +398,17 @@ int WINAPI WinMain(HINSTANCE hinstance, HINSTANCE hPrevinstance, LPSTR lpszCmdPa
 
 
 }
+
+void send_move_packet(char dr)
+{
+	cs_packet_move packet;
+	packet.size = sizeof(packet);
+	packet.type = CS_PACKET_MOVE;
+	packet.dir = dr;
+
+	Network::GetNetwork()->C_Send(&packet, sizeof(packet));
+}
+
 LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 {
 	if (GetText(hwnd, iMessage, wParam, lParam) == 0)
@@ -514,16 +526,20 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 	case WM_KEYDOWN:
 		if (player.getCMD_die() == 1)
 			break;
-		if (player.getGamemode() == 0)
-			player.PlayerSetting(wParam);
+		if (player.getGamemode() == 0) {
+			//player.PlayerSetting(wParam);
+			send_move_packet(wParam);
+		}	
 		else if (player.getGamemode() == 1)
 			camera.CameraSetting(wParam);
 		break;
 	case WM_KEYUP:
 		if (player.getCMD_die() == 1)
 			break;
-		if (player.getGamemode() == 0)
-			player.PlayerWaiting(wParam);
+		if (player.getGamemode() == 0) {
+			//player.PlayerWaiting(wParam);
+			send_move_packet(wParam + 10);
+		}
 		else if (player.getGamemode() == 1)
 			camera.CameraSetting(wParam);
 		break;

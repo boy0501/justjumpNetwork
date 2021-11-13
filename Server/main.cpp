@@ -20,7 +20,20 @@ float change_time;
 bool do_once_change = true;
 int Fps = 0;
 
-
+void send_move_process(int c_id, int mover)
+{
+	sc_packet_move_process packet;
+	packet.size = sizeof(sc_packet_move_process);
+	packet.type = SC_PACKET_MOVE_PROCESS;
+	packet.id = mover;
+	packet.x = CLIENTS[mover]->x;
+	packet.y = CLIENTS[mover]->y;
+	packet.h = CLIENTS[mover]->h;
+	packet.state = CLIENTS[mover]->state;
+	packet.stealth = CLIENTS[mover]->hp;
+	packet.dir = CLIENTS[mover]->dir;
+	CLIENTS[c_id]->do_send(&packet, sizeof(packet));
+}
 
 //http://www.tipssoft.com/bulletin/board.php?bo_table=FAQ&wr_id=735 타임관련
 
@@ -76,7 +89,10 @@ DWORD WINAPI GameLogicThread(LPVOID arg)
 			for (int i = 0; i < Cnt_Player; ++i)
 			{
 				CLIENTS[i]->update(deltatime);
+
 			}
+			CLIENTS[0]->move();
+
 		}
 
 		
@@ -89,6 +105,9 @@ DWORD WINAPI ClientInputThread(LPVOID arg)
 	int c_id = (int)arg;
 	while (1)
 	{
+		
+
+		//cout << CLIENTS[c_id]->x << ", " << CLIENTS[c_id]->y << endl;
 		int ret = CLIENTS[c_id]->do_recv();
 		if (ret == SOCKET_ERROR)
 		{
@@ -96,6 +115,12 @@ DWORD WINAPI ClientInputThread(LPVOID arg)
 			error_display(err_no);
 			closesocket(CLIENTS[c_id]->c_socket);
 			return 0;
+		}
+
+		for (int i = 0; i < Cnt_Player; ++i)
+		{
+			send_move_process(i, c_id);
+
 		}
 	}
 }
@@ -131,6 +156,7 @@ int main()
 		hThread = CreateThread(NULL, 0, ClientInputThread, (LPVOID)i, 0, NULL);
 		if (hThread == NULL) closesocket(CLIENTS[i]->c_socket);
 	}
+	CLIENTS[0]->initPos();
 	while (1)
 	{
 		;
