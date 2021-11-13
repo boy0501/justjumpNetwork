@@ -35,9 +35,9 @@ LPCTSTR lpszWinodwName = L"Just Jump";
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam);
 static PAINTSTRUCT ps;
-static HDC mem2dc, loaddc, playerdc, odc, ui_dc, hp_dc, die_dc, start_dc, help_dc, login_dc; // odc = 오브젝트 dc, pdc = player dc,ui_Dc : 아래 전체적인 ui hp_Dc: hp통만 나오는거 dic_dc : 사망 ui 
-static RECT rectview;
-static HBITMAP hbit1, loadbit, oldload, oldbit1, hbitobj[100];
+static HDC /*mem1dc*/mem2dc, /*hdc, pdc,*/ loaddc, playerdc, odc, ui_dc, hp_dc, die_dc, start_dc, help_dc, login_dc; // odc = 오브젝트 dc, pdc = player dc,ui_Dc : 아래 전체적인 ui hp_Dc: hp통만 나오는거 dic_dc : 사망 ui 
+//static RECT rectview;
+static HBITMAP /*hbit1*/loadbit, oldload, oldbit1, hbitobj[100];
 static PLAYER player;
 PLAYER others[2];
 
@@ -47,9 +47,9 @@ static OBJECT obj[150];
 static BLENDFUNCTION loadbf;
 bool isComposit = false;
 
-HWND hWnd;
+//HWND hWnd;
 static int nCaretPosx, nCaretPosy;	//폰트 x,y크기 , 캐럿 x y 위치
-static int obj_t = 0; //오브젝트 애니메이션을 1번타이머에 넣기위해 추가한 변수
+//static int obj_t = 0; //오브젝트 애니메이션을 1번타이머에 넣기위해 추가한 변수
 static int ocount;		//obj 개수를 세주는 변수
 static int help_button = 0, start_button = 0; //조작법 온오프
 static bool occur_button = 0;	//사망했을때의 button이 활성화되었는지 
@@ -103,7 +103,14 @@ void update(float delta_time)
 	if (map.getmapnum() != LOGINBG)	//로그인중일땐 캐릭터 상호작용 x 
 	{
 		
-		player.move(obj_t);
+		//player.move(obj_t);
+		/*if (Network::GetNetwork()->net_state == 4) {
+			if (obj_t % 5 == 0)
+			{
+				player.BitMove();
+			}
+		}*/
+
 		adjustPlayer(player, obj, map, ocount, g_hinst);
 		if (player.getCMD_die())
 		{
@@ -193,41 +200,44 @@ void update(float delta_time)
 }
 void render()
 {
-	//Network::GetNetwork()->C_Recv(); //recv한 것 처리
+	
 
-	player.hdc = GetDC(hWnd);
+	hdc = GetDC(hWnd);
 
-	player.mem1dc = CreateCompatibleDC(player.hdc);
+	mem1dc = CreateCompatibleDC(hdc);
 	if (hbit1 == NULL)
 	{
-		hbit1 = CreateCompatibleBitmap(player.hdc, rectview.right, rectview.bottom);
+		hbit1 = CreateCompatibleBitmap(hdc, rectview.right, rectview.bottom);
 	}
-	
-	
-	SelectObject(player.mem1dc, hbit1);
-	
-	FillRect(player.mem1dc, &rectview, (HBRUSH)COLOR_BACKGROUND);
-	
+
+
+	SelectObject(mem1dc, hbit1);
+
+	FillRect(mem1dc, &rectview, (HBRUSH)COLOR_BACKGROUND);
+
 	if (0 >= map.getblack_t())
 	{
-		map.DrawBK(player.mem1dc, mem2dc, rectview);
-	
-	}	
+		map.DrawBK(mem1dc, mem2dc, rectview);
+
+	}
 	for (int i = 0; i <= ocount; i++)
-		obj[i].DrawObj(player.mem1dc, odc);
-	//player.draw(mem1dc, pdc);	
+		obj[i].DrawObj(mem1dc, odc);
+	//Network::GetNetwork()->C_Recv(); //recv한 것 처리
+
+	player.draw(mem1dc, pdc, Network::GetNetwork()->net_x, Network::GetNetwork()->net_y, Network::GetNetwork()->net_h,
+		Network::GetNetwork()->net_stealth, Network::GetNetwork()->net_state, Network::GetNetwork()->net_dir);;
 	for (const auto& ui : mUI)
-		ui->draw(player.mem1dc);
+		ui->draw(mem1dc);
 
-	if (map.getblack_t() > 0) map.DrawLoadBK(player.mem1dc, mem2dc, loadbf);
-
-
-	BitBlt(player.hdc, 0, 0, 1024, 768, player.mem1dc, camera.getx(), camera.gety(), SRCCOPY);
+	if (map.getblack_t() > 0) map.DrawLoadBK(mem1dc, mem2dc, loadbf);
 
 
+	BitBlt(hdc, 0, 0, 1024, 768, mem1dc, camera.getx(), camera.gety(), SRCCOPY);
 
-	DeleteObject(player.mem1dc);
-	ReleaseDC(hWnd, player.hdc);
+
+
+	DeleteObject(mem1dc);
+	ReleaseDC(hWnd, hdc);
 }
 void ProcessingLoop()
 {
@@ -247,6 +257,7 @@ void ProcessingLoop()
 		}
 		HideCaret(hWnd);
 		update(deltatime);
+		//Network::GetNetwork()->C_Recv(); //recv한 것 처리
 		render();
 		ShowCaret(hWnd);
 	}

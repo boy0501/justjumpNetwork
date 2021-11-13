@@ -51,9 +51,9 @@ struct sc_packet_move_process {
 	char type;
 	int		id;
 	short  x, y, h;
-	char state;
-	char dir;
-	char stealth;
+	short state;
+	short dir;
+	short stealth;
 	//char hp;
 	//char rank;
 }; 

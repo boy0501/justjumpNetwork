@@ -57,7 +57,7 @@ DWORD WINAPI GameLogicThread(LPVOID arg) //게임로직 스레드
 	QueryPerformanceFrequency(&Frequency);
 	QueryPerformanceCounter(&Endtime);
 	while (1) {
-
+		
 		QueryPerformanceCounter(&BeginTime);
 		auto elapsed = BeginTime.QuadPart - Endtime.QuadPart;
 		auto deltatime = (double)elapsed / (double)Frequency.QuadPart;
@@ -76,9 +76,9 @@ DWORD WINAPI GameLogicThread(LPVOID arg) //게임로직 스레드
 			for (int i = 0; i < Cnt_Player; ++i)
 			{
 				send_empty_packet(i);
+				
 			}
 		}
-
 		
 	}
 	return 0;
@@ -91,6 +91,7 @@ DWORD WINAPI ClientInputThread(LPVOID arg) //클라이언트 스레드
 	while (1)
 	{
 		CLIENTS[c_id]->move();
+
 		//cout<< CLIENTS[c_id]->state << endl;
 		cout << CLIENTS[c_id]->x << ", " << CLIENTS[c_id]->y << endl;
 		int ret = CLIENTS[c_id]->do_recv();

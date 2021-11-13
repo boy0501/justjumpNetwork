@@ -25,7 +25,7 @@ public:
 	HBITMAP hbitex;		//점프,숙이기 줄타기 비트맵
 	int bx, by, bw, bh; //비트맵의 스프라이트위치를 바꾸기위한 좌표 변수
 public:
-	HDC hdc, pdc, mem1dc;
+	//HDC hdc, pdc, mem1dc;
 	int ready_players = 0;
 	bool ready_to_go = false;
 	int player_cid = 0;
@@ -143,7 +143,7 @@ public:
 	//애니메이션
 	void BitMove();		 
 	//플레이어 그림
-	void draw(HDC&, HDC&); 
+	void draw(HDC&, HDC&, int x, int y, int h, int stealth, int state, int dir); 
 	//피격시 무적시간
 	void stealthtime();
 	//가시한테 찔렸을때 강제이동값
