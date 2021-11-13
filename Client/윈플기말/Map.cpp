@@ -85,8 +85,8 @@ void MAP :: DrawBK(HDC& mem1dc, HDC& mem2dc, RECT& rectview)
 		SelectObject(mem1dc, oldfont);
 		DeleteObject(hfont);
 
-		
-		//auto gameui = std::make_shared<GameHUD>(0,NULL);
+
+	
 		//GameHUD &gameui.addButton([gameui]() {}, NULL, "img/Exit", 315, 3400, 138, 82, RGB(255, 0, 0));
 
 		//gameui.drawExit();

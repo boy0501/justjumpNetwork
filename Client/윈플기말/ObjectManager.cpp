@@ -335,10 +335,12 @@ void adjustPlayer(PLAYER& player, OBJECT* obj, MAP& m, int& ocount, HINSTANCE g_
 						m.setblack_t(50);
 						/*m.CreateBlack(g_hinst);*/
 						m.setmapnum(m.getmapnum() + 1);
+						//saveMapNum = m.getmapnum();
 						player.initPos();
 						if (m.getmapnum() == 13) {
 							
 							m.CreateMap(g_hinst);
+							
 						}
 						
 						for (int j = 0; j < ocount; j++)

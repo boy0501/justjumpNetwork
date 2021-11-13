@@ -1,6 +1,7 @@
 #include "GameHUD.h"
 #include "player.h"
 #include "Camera.h"
+#include"ObjectManager.h"
 GameHUD::GameHUD(const int& cnt,PLAYER& player) 
 	:UI(cnt)
 	,mPlayer(&player)
@@ -20,16 +21,15 @@ void GameHUD::draw(HDC& mem1dc)
 	drawByUserUi(mem1dc );
 	drawHP(mem1dc);
 	UI::draw(mem1dc);
-	//if(m.getmapnum() == 11)
-	drawExit();
-	
-	//std::cout << "called" << std::endl;
+	//getDrawExit();
+	getMapNum();
+	//std::cout <<  << std::endl;
 }
 
 
 void GameHUD::update(float deltatime)
 {
-
+	
 }
 
 void GameHUD::drawHP(HDC& mem1dc)
@@ -65,14 +65,23 @@ void GameHUD::drawHP(HDC& mem1dc)
 	
 }
 
-void GameHUD::drawExit()
+int GameHUD::getMapNum()
 {
 	
+	cout << mapNum << endl;
+	//mapNum = m.getmapnum();
+	//return mapNum;
+	return mapNum;
+}
+void GameHUD::setDrawExit()
+{
+	//getMapNum(mapNum);
+
 	
 	//int m;
 	//MAP map;
 	//m = map.getmapnum();
-	//if (m.getmapnum() == 11) {
+	//if (getMapNum(mapNum) == 11) {
 	if (try_once == false) {
 		this->addButton([this]() {
 			}
@@ -80,12 +89,18 @@ void GameHUD::drawExit()
 		try_once = true;
 	}
 	//}
+	//std::cout << getMapNum(mapNum) << std::endl;
+	
 	
 	//	//printf("print\n");
 	////}
 	//
-	//std::cout << m.getmapnum() << std::endl;
 	
+}
+
+void GameHUD::getDrawExit()
+{
+	return setDrawExit();
 }
 
 void GameHUD::LoadHpUiBitmap(HINSTANCE& g_hinst, std::string name, const int& x, const int& y, const int& w, const int& h, const COLORREF& cr,CAMERA& camera)

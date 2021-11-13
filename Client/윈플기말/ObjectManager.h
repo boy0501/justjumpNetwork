@@ -18,3 +18,5 @@ void adjustPlayer(PLAYER&, OBJECT*, MAP&, int&, HINSTANCE);
 int initObject(OBJECT*, int, HINSTANCE);
 //카메라 무빙워크
 void adjustCamera(CAMERA&,PLAYER);
+
+//int saveMapNum = 0;

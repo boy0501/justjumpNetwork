@@ -40,6 +40,10 @@ static HBITMAP hbit1, loadbit, oldload, oldbit1, hbitobj[100];
 static PLAYER player;
 PLAYER others[2];
 
+//static GameHUD gamehud;
+auto gamehud = make_shared < GameHUD > (0, player);
+static int mapnumForExit;
+
 static MAP map;
 static CAMERA camera;
 static OBJECT obj[150];
@@ -99,6 +103,14 @@ void update(float delta_time)
 		return;
 	obj_t += 1;
 
+
+	if (map.getmapnum() == 11)
+	{
+		mapnumForExit = map.getmapnum();
+		gamehud->getMapNum();
+		
+	cout << gamehud->getMapNum() << endl;
+	}
 	if (map.getmapnum() != LOGINBG)	//로그인중일땐 캐릭터 상호작용 x 
 	{
 		

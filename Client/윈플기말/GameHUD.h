@@ -1,6 +1,7 @@
 #pragma once
 #include "UI.h"
 #include "Map.h"
+
 class GameHUD :public UI
 {
 public:
@@ -12,10 +13,17 @@ public:
 	
 	void LoadHpUiBitmap(HINSTANCE& g_hinst, std::string name, const int& x, const int& y, const int& w, const int& h, const COLORREF& cr, class CAMERA& camera);
 	void drawHP(HDC& mem1dc);
-	void drawExit();
+
+	int getMapNum();
+
+	void setDrawExit();
+	void getDrawExit();
+	
 private:
 	class PLAYER* mPlayer;
 	HBITMAP mHpBitmap;
 	bool try_once = false;
+	
+	int mapNum=11;
 };
 
