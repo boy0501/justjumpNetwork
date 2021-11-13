@@ -2,10 +2,9 @@
 #include <string>
 #include <WS2tcpip.h>
 #include <MSWSock.h>
-#include "../Protocol/protocol.h"
+#include "../../Protocol/protocol.h"
 
-
-class Player
+class Client
 {
 public:
 	int x, y, w, h;		// x y 는 캐릭터의 중심좌표이고 w,h 는 xy에서 좌우로 반틈씩만 간 좌표이다.
@@ -36,19 +35,12 @@ public:
 
 	unsigned char* buf[MAX_BUF_SIZE];
 	SOCKADDR_IN c_addr;
-	Player();
-	~Player();
+	Client();
+	virtual ~Client() noexcept;
+	virtual void update(float delta_time);
 
 	int do_recv();
-	void do_send(void* packet,int bytes);
+	void do_send(void* packet, int bytes);
 	void ProcessPacket(unsigned char* p);
-
-	//+
-	void move();
-	void initPos();
-	int do_send(int size, void* mess);
-
 };
-
-//array<Player*, 3> CLIENTS;
 

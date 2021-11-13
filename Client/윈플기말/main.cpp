@@ -27,7 +27,6 @@
 #pragma comment(linker, "/entry:WinMainCRTStartup /subsystem:console")
 #endif
 
-#define IDT_TIMER1 1
 
 HINSTANCE g_hinst;
 LPCTSTR lpszClass = L"Just Jump";
@@ -35,9 +34,9 @@ LPCTSTR lpszWinodwName = L"Just Jump";
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam);
 static PAINTSTRUCT ps;
-static HDC /*mem1dc*/mem2dc, /*hdc, pdc,*/ loaddc, playerdc, odc, ui_dc, hp_dc, die_dc, start_dc, help_dc, login_dc; // odc = 오브젝트 dc, pdc = player dc,ui_Dc : 아래 전체적인 ui hp_Dc: hp통만 나오는거 dic_dc : 사망 ui 
-//static RECT rectview;
-static HBITMAP /*hbit1*/loadbit, oldload, oldbit1, hbitobj[100];
+static HDC hdc, mem1dc, mem2dc, loaddc, playerdc, odc, pdc, ui_dc, hp_dc, die_dc, start_dc, help_dc, login_dc; // odc = 오브젝트 dc, pdc = player dc,ui_Dc : 아래 전체적인 ui hp_Dc: hp통만 나오는거 dic_dc : 사망 ui 
+static RECT rectview;
+static HBITMAP hbit1, loadbit, oldload, oldbit1, hbitobj[100];
 static PLAYER player;
 PLAYER others[2];
 
@@ -47,9 +46,9 @@ static OBJECT obj[150];
 static BLENDFUNCTION loadbf;
 bool isComposit = false;
 
-//HWND hWnd;
+HWND hWnd;
 static int nCaretPosx, nCaretPosy;	//폰트 x,y크기 , 캐럿 x y 위치
-//static int obj_t = 0; //오브젝트 애니메이션을 1번타이머에 넣기위해 추가한 변수
+static int obj_t = 0; //오브젝트 애니메이션을 1번타이머에 넣기위해 추가한 변수
 static int ocount;		//obj 개수를 세주는 변수
 static int help_button = 0, start_button = 0; //조작법 온오프
 static bool occur_button = 0;	//사망했을때의 button이 활성화되었는지 
@@ -66,18 +65,17 @@ static vector<shared_ptr<UI>> mUI;
 
 //한줄에 79자까지 입력가능한 메모장
 using namespace std;
-
-UINT uResult;
-
-//
-bool check = false;
+//float elapsedt;
+//int Nameunsigan= 10;
 void update(float delta_time)
 {
-	if (Network::GetNetwork()->mPlayer->ready_to_go == true) {
-		check = true;
-	}
-
-	Network::GetNetwork()->C_Recv(); //recv한 것 처리
+	//elapsedt += delta_time;
+	//if (elapsedt > 1)
+	//{
+	//	Nameunsigan--;
+	//	
+	//}
+	Network::GetNetwork()->C_Recv();
 	//빼줘야 할 Ui가 있다면 Ui 삭제
 	auto iter = mUI.begin();
 	while (iter != mUI.end())
@@ -103,14 +101,7 @@ void update(float delta_time)
 	if (map.getmapnum() != LOGINBG)	//로그인중일땐 캐릭터 상호작용 x 
 	{
 		
-		//player.move(obj_t);
-		/*if (Network::GetNetwork()->net_state == 4) {
-			if (obj_t % 5 == 0)
-			{
-				player.BitMove();
-			}
-		}*/
-
+		player.move(obj_t);
 		adjustPlayer(player, obj, map, ocount, g_hinst);
 		if (player.getCMD_die())
 		{
@@ -200,8 +191,6 @@ void update(float delta_time)
 }
 void render()
 {
-	
-
 	hdc = GetDC(hWnd);
 
 	mem1dc = CreateCompatibleDC(hdc);
@@ -209,23 +198,20 @@ void render()
 	{
 		hbit1 = CreateCompatibleBitmap(hdc, rectview.right, rectview.bottom);
 	}
-
-
+	
+	
 	SelectObject(mem1dc, hbit1);
-
+	
 	FillRect(mem1dc, &rectview, (HBRUSH)COLOR_BACKGROUND);
-
+	
 	if (0 >= map.getblack_t())
 	{
 		map.DrawBK(mem1dc, mem2dc, rectview);
-
-	}
+	
+	}	
 	for (int i = 0; i <= ocount; i++)
 		obj[i].DrawObj(mem1dc, odc);
-	//Network::GetNetwork()->C_Recv(); //recv한 것 처리
-
-	player.draw(mem1dc, pdc, Network::GetNetwork()->net_x, Network::GetNetwork()->net_y, Network::GetNetwork()->net_h,
-		Network::GetNetwork()->net_stealth, Network::GetNetwork()->net_state, Network::GetNetwork()->net_dir);;
+	player.draw(mem1dc, pdc);	
 	for (const auto& ui : mUI)
 		ui->draw(mem1dc);
 
@@ -257,7 +243,6 @@ void ProcessingLoop()
 		}
 		HideCaret(hWnd);
 		update(deltatime);
-		//Network::GetNetwork()->C_Recv(); //recv한 것 처리
 		render();
 		ShowCaret(hWnd);
 	}
@@ -412,116 +397,6 @@ int WINAPI WinMain(HINSTANCE hinstance, HINSTANCE hPrevinstance, LPSTR lpszCmdPa
 
 
 }
-int g_count = 0;
-std::shared_ptr<StartHUD> startui;
-string robby_timer = "11";
-int init_x = 300;
-bool bRobby_full = false;
-void CALLBACK robby_waiting(HWND hwnd, UINT nMsg, UINT_PTR nIDEvent, DWORD dwTime)
-{
-	
-	if (g_count >= 0 && g_count < 1) {
-		robby_timer = "10";
-		init_x += 20;
-	}
-	else if (g_count == 1)
-	{
-		robby_timer = "9";
-		init_x += 20;
-	}
-	else if (g_count == 2)
-	{
-		robby_timer = "8";
-		init_x += 20;
-	}
-	else if (g_count == 3)
-	{
-		robby_timer = "7";
-		init_x += 20;
-	}
-	else if (g_count == 4)
-	{
-		robby_timer = "6";
-		init_x += 20;
-	}
-	else if (g_count == 5)
-	{
-		robby_timer = "5";
-		init_x += 20;
-	}
-	else if (g_count == 6)
-	{
-		robby_timer = "4";
-		init_x += 20;
-	}
-	else if (g_count == 7)
-	{
-		robby_timer = "3";
-		init_x += 20;
-	}
-	else if (g_count == 8)
-	{
-		robby_timer = "2";
-		init_x += 20;
-	}
-	else if (g_count == 9)
-	{
-		robby_timer = "1";
-		init_x += 20;
-	}
-	else if (g_count == 10) {
-		robby_timer = "0";
-		init_x += 20;
-		bRobby_full = true;
-		KillTimer(hwnd, IDT_TIMER1);
-	}
-	if (nIDEvent == 1)
-	{
-		g_count++;
-	}
-	cout << g_count << endl;
-	cout << robby_timer << endl;
-	startui->addText(robby_timer, "test", L"메이플스토리 bold", RGB(255, 255, 255), 18, init_x, 200, false, 0, 0, camera);
-
-	if (bRobby_full == true)
-	{
-		//타이머 제거
-		KillTimer(hwnd, IDT_TIMER1);
-
-		occur_button = 0;
-		map.setblack_t(50);
-		map.setmapnum(map.getmapnum() + 1);
-		for (int j = 0; j < ocount; j++)
-			obj[j].ResetObject();
-		ocount = initObject(obj, map.getmapnum(), g_hinst);
-
-		map.CreateMap(g_hinst);
-		LoadBK(hbit1, g_hinst, 0);
-		//hbit1 = (HBITMAP)LoadImage(g_hinst, TEXT("img/bk.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
-		Sound::GetSelf()->setindex(Sound::GetSelf()->getindex() + 1);
-		Sound::GetSelf()->Sound_Play(EFFECTSOUND, PORTALEF, EFVOL);
-		Sound::GetSelf()->Sound_Play(BGMSOUND, FIRSTMAPBGM, BGMVOL);
-		player.initPos();
-		player.sethp(5);
-		camera.setx(0);
-		camera.sety(3232);
-		startui->closeUI();
-		mUI.emplace_back(map.mGameUi);
-	}
-}
-
-int player_count = 0;
-
-void send_move_packet(char dr)
-{
-	cs_packet_move packet;
-	packet.size = sizeof(packet);
-	packet.type = CS_PACKET_MOVE;
-	packet.direction = dr;
-	
-	Network::GetNetwork()->C_Send(&packet, sizeof(packet));
-}
-
 LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 {
 	if (GetText(hwnd, iMessage, wParam, lParam) == 0)
@@ -536,45 +411,22 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		AddFontResourceA("font/Maplestory Light.ttf");
 		GetClientRect(hwnd, &rectview);
 		oldtime = timeGetTime();
+		map.CreateMap(g_hinst);
 
 		Network::GetNetwork()->mPlayer = &player;
-		Network::GetNetwork()->ConnectServer();
-
+		Network::GetNetwork()->ConnectServer("127.0.0.1");
+		
 		cs_packet_login packet;
-		strcpy_s(packet.name, "kk");
+		strcpy_s(packet.username, "kk");
 		packet.size = sizeof(cs_packet_login);
 		packet.type = CS_PACKET_LOGIN;
 		Network::GetNetwork()->C_Send(&packet, sizeof(packet));
 
-		map.CreateMap(g_hinst);
 		auto ui = make_shared<LoginHUD>(1);
 		ui->LoadUiBitmap(g_hinst, "img/idpassword.bmp", 340, 250, 332, 282, RGB(255, 0, 0));
 		ui->addText("kk", "id", L"메이플스토리 bold", RGB(255, 108, 168), 18, 380, 330,false,0,0,camera);
 		ui->addText("", "pass", L"메이플스토리 bold", RGB(255, 108, 168), 18, 380, 380,false,0,0,camera);
 		ui->addButton([hwnd,ui]() {
-			//로비========================================================================================
-			//player_count++;
-			//만약에 사람이 다 들어왔다면
-			
-
-			//타이머 시작(10초)
-			/*if (player_count == 1) {
-
-			}*/
-			//타이머가 0초가 되면
-			//게임시작
-
-			
-			cout << Network::GetNetwork()->mPlayer->ready_to_go << endl;
-
-			
-			if(check == true)
-			{
-				SetTimer(hwnd, IDT_TIMER1, 1000, robby_waiting);
-
-			}
-
-
 			map.setmapnum(9);
 			ocount = initObject(obj, map.getmapnum(), g_hinst);
 			map.CreateMap(g_hinst);
@@ -586,12 +438,6 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 			player.mPlayername = ui->FindTextByNameTag("id")->getTextForString();
 			player.mPlayerwname = ui->FindTextByNameTag("id")->getText();
 			Sound::GetSelf()->Sound_Play(BGMSOUND, MAINMENUBGM, BGMVOL);
-			
-			//jpark
-			//TextOut(mem1dc, mPosx, mPosy, mText.c_str(), lstrlenW(mText.c_str()));
-
-			//TextOut(mem1dc, 100, 100, TEXT("HELLO WORLD"), 11);
-			//cout << "로비 서버 들어옴" << endl;
 			ui->closeUI();
 			mUI.emplace_back(map.mStartui);
 
@@ -606,17 +452,30 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 
 			HideCaret(hwnd);
 		}, g_hinst, "img/LoginButton", 365, 440, 278, 53, RGB(255, 0, 0));
-		//auto startui = make_shared<StartHUD>(0);
-		startui = make_shared<StartHUD>(0);
-
+		auto startui = make_shared<StartHUD>(0);
 		//hbit = (HBITMAP)LoadImage(g_hinst, TEXT("img/NoNameUi.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION); //상대경로로 변경
-		
+		startui->addButton([startui]() {
+			occur_button = 0;
+			map.setblack_t(50);
+			map.setmapnum(map.getmapnum() + 1);
+			for (int j = 0; j < ocount; j++)
+				obj[j].ResetObject();
+			ocount = initObject(obj, map.getmapnum(), g_hinst);
 
-		startui->addButton([hwnd]() {
-			startui->addText("5252 Game start Soon~", "test", L"메이플스토리 bold", RGB(255, 0, 0), 18, 400, 400, false, 0, 0, camera);
-
+			map.CreateMap(g_hinst);
+			LoadBK(hbit1, g_hinst, 0);
+			//hbit1 = (HBITMAP)LoadImage(g_hinst, TEXT("img/bk.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
+			Sound::GetSelf()->setindex(Sound::GetSelf()->getindex() + 1);
+			Sound::GetSelf()->Sound_Play(EFFECTSOUND, PORTALEF, EFVOL);
+			Sound::GetSelf()->Sound_Play(BGMSOUND, FIRSTMAPBGM, BGMVOL);
+			player.initPos();
+			player.sethp(5);
+			camera.setx(0);
+			camera.sety(3232); 
+			startui->closeUI();
+			mUI.emplace_back(map.mGameUi);
 		}, g_hinst, "img/start", 292, 490, 138, 82, RGB(255, 0, 0));
-		startui->addButton([]() {}, g_hinst, "img/help", 215, 300, 400, 200, RGB(60, 60, 60));
+		startui->addButton([startui]() {}, g_hinst, "img/help", 215, 300, 400, 200, RGB(60, 60, 60));
 		map.mStartui = startui;
 		
 		auto dieui = make_shared<DieHUD>(1,player,camera);
@@ -649,31 +508,22 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		loadbf.SourceConstantAlpha = 0;
 		Sound::GetSelf()->Sound_Play(BGMSOUND, LOGINBGM, BGMVOL);
 
+
 	}
 	break;
-	case WM_TIMER:
-		break;
-
 	case WM_KEYDOWN:
 		if (player.getCMD_die() == 1)
 			break;
 		if (player.getGamemode() == 0)
-			send_move_packet(wParam);
-			//send(net.s_socket, reinterpret_cast<const char*>(wParam), sizeof(wParam), 0);
-			//player.PlayerSetting(wParam);
+			player.PlayerSetting(wParam);
 		else if (player.getGamemode() == 1)
 			camera.CameraSetting(wParam);
 		break;
 	case WM_KEYUP:
 		if (player.getCMD_die() == 1)
 			break;
-		if (player.getGamemode() == 0) {
-			send_move_packet(wParam + 10); //내가 임의로 +10한 값을 보내줌
-			                               //keydown과 keyup을 구분하기 위함!
-
-			//player.PlayerWaiting(wParam);
-		}
-			
+		if (player.getGamemode() == 0)
+			player.PlayerWaiting(wParam);
 		else if (player.getGamemode() == 1)
 			camera.CameraSetting(wParam);
 		break;

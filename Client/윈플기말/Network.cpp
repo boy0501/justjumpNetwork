@@ -26,10 +26,6 @@ Network::Network()
 {
 	WSAStartup(MAKEWORD(2, 2), &WSAData);
 	s_socket = socket(AF_INET, SOCK_STREAM, 0);
-	ZeroMemory(&server_addr, sizeof(server_addr));
-	server_addr.sin_family = AF_INET;
-	server_addr.sin_port = htons(SERVER_PORT);
-	server_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
 
 }
 
@@ -50,8 +46,12 @@ Network* Network::GetNetwork()
 }
 
 
-void Network::ConnectServer()
+void Network::ConnectServer(const char* server_ip)
 {
+	ZeroMemory(&server_addr, sizeof(server_addr));
+	server_addr.sin_family = AF_INET;
+	server_addr.sin_port = htons(SERVER_PORT);
+	server_addr.sin_addr.s_addr = inet_addr(server_ip);
 	int ret = connect(s_socket, (SOCKADDR*)(&server_addr), sizeof(server_addr));
 	if (SOCKET_ERROR == ret)
 	{

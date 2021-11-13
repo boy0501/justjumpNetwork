@@ -1,6 +1,6 @@
 #include <iostream>
 #include "Network.h"
-#include "Player.h"
+#include "CLIENT/Client.h"
 #include "../Protocol/protocol.h"
 
 Network* Network::mNetwork = nullptr;
