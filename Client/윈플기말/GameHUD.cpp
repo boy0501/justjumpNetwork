@@ -21,7 +21,7 @@ void GameHUD::draw(HDC& mem1dc)
 	drawHP(mem1dc);
 	UI::draw(mem1dc);
 	//if(m.getmapnum() == 11)
-	//drawExit();
+	drawExit();
 	
 	//std::cout << "called" << std::endl;
 }
@@ -73,9 +73,12 @@ void GameHUD::drawExit()
 	//MAP map;
 	//m = map.getmapnum();
 	//if (m.getmapnum() == 11) {
+	if (try_once == false) {
 		this->addButton([this]() {
-		}
-		, NULL, "img/Exit", 315, 3400, 138, 82, RGB(255, 0, 0));
+			}
+		, NULL, "img/Exit", 315, 300, 138, 82, RGB(255, 0, 0));
+		try_once = true;
+	}
 	//}
 	
 	//	//printf("print\n");

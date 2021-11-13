@@ -16,6 +16,6 @@ public:
 private:
 	class PLAYER* mPlayer;
 	HBITMAP mHpBitmap;
-	
+	bool try_once = false;
 };
 

@@ -240,7 +240,7 @@ void ProcessingLoop()
 		Fps++;
 		if (elapsedtime > 1.0f)
 		{
-			//cout << "FPS:" << Fps << endl;
+			cout << "FPS:" << Fps << endl;
 			Fps = 0;
 			elapsedtime = 0;
 		}
