@@ -15,6 +15,7 @@
 #include "GameHUD.h"
 #include "StartHUD.h"
 #include "DieHUD.h"
+#include "ExitHUD.h"
 #include "Button.h"
 #include "Text.h"
 #include "Network.h"
@@ -41,7 +42,7 @@ static PLAYER player;
 PLAYER others[2];
 
 //static GameHUD gamehud;
-auto gamehud = make_shared < GameHUD > (0, player);
+auto gamehud = make_shared < GameHUD > (0,player);
 static int mapnumForExit;
 
 static MAP map;
@@ -104,12 +105,20 @@ void update(float delta_time)
 	obj_t += 1;
 
 
-	if (map.getmapnum() == 11)
+	if (map.getmapnum() == 11)// gamehud->getMapNum())
 	{
-		mapnumForExit = map.getmapnum();
-		gamehud->getMapNum();
-		
-	cout << gamehud->getMapNum() << endl;
+		//auto gamehud = make_shared < GameHUD >(0, player);
+		//auto gamehud = make_shared < GameHUD >(1, player);
+		gamehud->setMapNum(11);
+		////gamehud->drawExit(mem1dc);
+		////mapnumForExit = map.getmapnum();
+		//gamehud->addButton([gamehud]() {
+		//				}
+		//			, NULL, "img/Exit", 315, 300, 138, 82, RGB(255, 0, 0));
+		//map.mGameUi = gamehud;
+		////gamehud->drawE(mem1dc);
+		////cout << gamehud->getMapNum() << endl;
+		gamehud->drawExit(mem1dc);
 	}
 	if (map.getmapnum() != LOGINBG)	//로그인중일땐 캐릭터 상호작용 x 
 	{
@@ -227,9 +236,16 @@ void render()
 	for (int i = 0; i <= ocount; i++)
 		obj[i].DrawObj(mem1dc, odc);
 	player.draw(mem1dc, pdc);	
-	for (const auto& ui : mUI)
+	for (const auto& ui : mUI) {
 		ui->draw(mem1dc);
+		
+	}
 
+	if (map.getmapnum() == 13)
+		for (const auto& ui : mUI) {
+			ui->drawExit(mem1dc);
+
+		}
 	if (map.getblack_t() > 0) map.DrawLoadBK(mem1dc, mem2dc, loadbf);
 
 
@@ -524,11 +540,11 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		//exit test ui-------------------------------------
 		startui->addButton([startui]() {
 			
-		}, g_hinst, "img/Exit", 400, 300, 138, 82, RGB(255, 0, 0));// g_hinst, "img/help", 215, 300, 400, 200, RGB(60, 60, 60));
+		}, g_hinst, "img/Exit", 800, 400, 138, 82, RGB(255, 0, 0));// g_hinst, "img/help", 215, 300, 400, 200, RGB(60, 60, 60));
 		map.mStartui = startui;
 		//--------------------------------------------------
 		
-	
+		
 		
 
 		//dead ui

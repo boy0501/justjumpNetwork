@@ -1,12 +1,12 @@
 #include "GameHUD.h"
 #include "player.h"
 #include "Camera.h"
-#include"ObjectManager.h"
+#include"Button.h"
 GameHUD::GameHUD(const int& cnt,PLAYER& player) 
 	:UI(cnt)
 	,mPlayer(&player)
 {
-
+	//mapNum = 0;
 }
 
 GameHUD::~GameHUD()
@@ -21,9 +21,43 @@ void GameHUD::draw(HDC& mem1dc)
 	drawByUserUi(mem1dc );
 	drawHP(mem1dc);
 	UI::draw(mem1dc);
-	//getDrawExit();
-	getMapNum();
-	//std::cout <<  << std::endl;
+	//drawExit(mem1dc);
+	//getMapNum();
+	//std::cout <<mapNum  << std::endl;
+	//setMapNum(mapNum);
+
+	//if (mapNum == 11)
+	//{
+	//	drawExit(mem1dc);
+	//}
+
+	//if (getMapNum() == 11) {
+ //   if (try_once == false) {
+	//		this->addButton([this]() {
+	//			}
+	//		, NULL, "img/Exit", 315, 300, 138, 82, RGB(255, 0, 0));
+	//		try_once = true;
+	//	}
+	//}
+	//	
+	
+	//getMapNum();
+}
+
+void GameHUD::drawExit(HDC& mem1dc)
+{
+	drawByUserUi(mem1dc);
+	//drawByScreenUi(mem1dc);
+	UI::drawExit(mem1dc);
+	
+
+		if (try_once == false) {
+			this->addButton([this]() {
+				}
+			, NULL, "img/Exit", 315, 500, 138, 82, RGB(255, 0, 0));
+			try_once = true;
+		}
+
 }
 
 
@@ -65,43 +99,17 @@ void GameHUD::drawHP(HDC& mem1dc)
 	
 }
 
+void GameHUD::setMapNum(int m)
+{
+	mapNum = m;
+}
+
 int GameHUD::getMapNum()
 {
 	
-	cout << mapNum << endl;
-	//mapNum = m.getmapnum();
-	//return mapNum;
 	return mapNum;
 }
-void GameHUD::setDrawExit()
-{
-	//getMapNum(mapNum);
 
-	
-	//int m;
-	//MAP map;
-	//m = map.getmapnum();
-	//if (getMapNum(mapNum) == 11) {
-	if (try_once == false) {
-		this->addButton([this]() {
-			}
-		, NULL, "img/Exit", 315, 300, 138, 82, RGB(255, 0, 0));
-		try_once = true;
-	}
-	//}
-	//std::cout << getMapNum(mapNum) << std::endl;
-	
-	
-	//	//printf("print\n");
-	////}
-	//
-	
-}
-
-void GameHUD::getDrawExit()
-{
-	return setDrawExit();
-}
 
 void GameHUD::LoadHpUiBitmap(HINSTANCE& g_hinst, std::string name, const int& x, const int& y, const int& w, const int& h, const COLORREF& cr,CAMERA& camera)
 {
