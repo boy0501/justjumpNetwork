@@ -143,7 +143,7 @@ public:
 	//애니메이션
 	void BitMove();		 
 	//플레이어 그림
-	void draw(HDC&, HDC&, int x, int y, int h, int stealth, int state, int dir); 
+	void draw(HDC&, HDC&, int x, int y, int h, int stealth, int state, int dir, int bx); 
 	//피격시 무적시간
 	void stealthtime();
 	//가시한테 찔렸을때 강제이동값

@@ -119,14 +119,23 @@ void Network::ProcessPacket(unsigned char* p)
 		sc_packet_move_process* packet = reinterpret_cast<sc_packet_move_process*>(p);
 		
 		//std::cout << packet->x << "," << packet->y << std::endl;
-		//std::cout << packet->stealth << std::endl;
+		std::cout << (int)packet->bx << std::endl;
 
-		net_x = packet->x;
+		mPlayer->x = packet->x;
+		mPlayer->y = packet->y;
+		mPlayer->h = packet->h;
+		mPlayer->state = packet->state;
+		mPlayer->stealth = packet->stealth;
+		mPlayer->dir = packet->dir;
+		mPlayer->bx = packet->bx;
+
+		/*net_x = packet->x;
 		net_y = packet->y;
 		net_h = packet->h;
 		net_state = packet->state;
 		net_stealth = packet->stealth;
 		net_dir = packet->dir;
+		net_bx = packet->bx;*/
 		//mPlayer->move(obj_t, packet->x, packet->y, packet->state, packet->dir);
 		//mPlayer->draw(mem1dc, pdc, packet->x, packet->y, packet->h, packet->stealth, packet->state, packet->dir);
 		//player drawÇÔ¼ö===========================================================================

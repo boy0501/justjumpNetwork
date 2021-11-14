@@ -56,6 +56,7 @@ struct sc_packet_move_process {
 	short stealth;
 	//char hp;
 	//char rank;
+	short bx; //애니메이션 위해 -> bitmove()
 }; 
 
 struct sc_packet_put_object {

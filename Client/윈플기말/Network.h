@@ -35,5 +35,6 @@ public:
 	int net_state;
 	int net_stealth;
 	int net_dir;
+	int net_bx;
 };
 

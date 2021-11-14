@@ -2,6 +2,7 @@
 #include "../CLIENT/LoginClient.h"
 #include <iostream>
 
+
 int ROWSPEED = 3; 	
 int COLSPEED = 10;	
 int ROPESPEED = 2;
@@ -34,6 +35,16 @@ Client::Client()
 	COMMAND_hurt = false;
 	COMMAND_die = false;
 	COMMAND_ropehurt = false;
+
+	//
+	//bx = 0;
+}
+void Client::initBitPos()
+{
+	bx = 0;
+	by = 0;
+	bw = 0;
+	bh = 0;
 }
 
 Client::~Client()
@@ -58,11 +69,27 @@ void Client::initPos()
 	COMMAND_die = false;
 }
 
-void Client::move()
+//비트맵을 바꿔주는함수 (애니메이션)
+void Client::BitMove()
 {
-	std::cout << "move호출" << std::endl;
+	bx += 1; //인덱스 형식으로 바꿈
+	if (state == 4)
+	{
+		if (bx >= 5) bx = 1;
+	}
+	if (state == 5 || state == 8)
+	{
+
+		if (bx >= 2) bx = 0;
+	}
+}
+
+void Client::move(int obj_t)
+{
+	//std::cout << "move호출" << std::endl;
 	if (state == 1)
 	{
+		//std::cout << "state1" << std::endl;
 		adjustspd = 0;		
 		if (LRkey == true)
 		{
@@ -81,6 +108,7 @@ void Client::move()
 	}
 	else if (state == 2)	
 	{
+		//std::cout << "state2" << std::endl;
 		if (COMMAND_hurt == true)	
 		{
 			if (COMMAND_move == 1)
@@ -122,29 +150,31 @@ void Client::move()
 				falldy -= GroundAccel;	
 			if (falldy < 0)	
 			{
+				std::cout << "state7로 change" << std::endl;
 				state = 7;	
 			}
 			y -= falldy;
+			std::cout << "y = " << y << std::endl;
 		}
 
 
 	}
 	else if (state == 3)
 	{
-
+		//std::cout << "state3" << std::endl;
 	}
 	else if (state == 4)
 	{
-
+		//std::cout << "state4" << std::endl;
 		if (LRkey == true)
 		{
 
 		}
 		else {
-			/*if (obj_t % 5 == 0)
+			if (obj_t % 5 == 0)
 			{
 				BitMove();
-			}*/
+			}
 
 			if (COMMAND_move == 1)
 			{
@@ -158,7 +188,7 @@ void Client::move()
 	}
 	else if (state == 5)
 	{
-
+		//std::cout << "state5" << std::endl;
 		savey = y;	
 		if (UDkey == true)
 		{
@@ -179,6 +209,7 @@ void Client::move()
 	}
 	else if (state == 6)
 	{
+		//std::cout << "state6" << std::endl;
 		ROWSPEED *= 3;
 		stealth = 100;		
 		savey = y;			
@@ -188,7 +219,9 @@ void Client::move()
 	}
 	else if (state == 7)
 	{
-		y += COLSPEED;					
+		//std::cout << "state7들어옴" << std::endl;
+		y += COLSPEED;
+		//std::cout << y << std::endl;
 		if (adjustspd < 1000)			
 			adjustspd++;
 		if (LEFTkey == true)			
@@ -242,9 +275,10 @@ void Client::move()
 	}
 	else if (state == 8)
 	{
+		//std::cout << "state8" << std::endl;
 		savey = y;	
-		//if (obj_t % 10 == 0)
-		//	BitMove();
+		if (obj_t % 10 == 0)
+			BitMove();
 		if (UDkey == true)
 		{
 
@@ -265,7 +299,7 @@ void Client::move()
 }
 void Client::update(float delta_time)
 {
-
+	
 }
 
 void Client::ProcessPacket(unsigned char* p)
@@ -286,7 +320,7 @@ void Client::ProcessPacket(unsigned char* p)
 
 		switch ((int)packet->dir) {
 		case 37: //VK_LEFT
-			std::cout << "left" << std::endl;
+			//std::cout << "left" << std::endl;
 			LEFTkey = true;
 			if (RIGHTkey == true)
 			{
@@ -433,6 +467,7 @@ void Client::ProcessPacket(unsigned char* p)
 			}
 			break;
 		case 32: //VK_SPACE
+			//std::cout << "space bar " << std::endl;
 			if (DOWNkey == true)
 			{
 				return;

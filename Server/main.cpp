@@ -6,6 +6,7 @@
 #include "CLIENT/LoginClient.h"
 #include "CLIENT/LobbyClient.h"
 #include "../Protocol/protocol.h"
+#include <time.h>
 
 #pragma comment(lib, "ws2_32")
 using namespace std;
@@ -20,6 +21,9 @@ float change_time;
 bool do_once_change = true;
 int Fps = 0;
 
+static int obj_t = 0;
+
+
 void send_move_process(int c_id, int mover)
 {
 	sc_packet_move_process packet;
@@ -30,8 +34,9 @@ void send_move_process(int c_id, int mover)
 	packet.y = CLIENTS[mover]->y;
 	packet.h = CLIENTS[mover]->h;
 	packet.state = CLIENTS[mover]->state;
-	packet.stealth = CLIENTS[mover]->hp;
+	packet.stealth = CLIENTS[mover]->stealth;
 	packet.dir = CLIENTS[mover]->dir;
+	packet.bx = CLIENTS[mover]->bx;
 	CLIENTS[c_id]->do_send(&packet, sizeof(packet));
 }
 
@@ -41,8 +46,11 @@ DWORD WINAPI GameLogicThread(LPVOID arg)
 {
 	QueryPerformanceFrequency(&Frequency);
 	QueryPerformanceCounter(&Endtime);
-	while (1) {
 
+	//time_t current_time = time(NULL);
+	while (1) {
+		//time_t frame_time = time(NULL) - current_time;
+		//cout << "frame_time = "<<frame_time << endl;
 		QueryPerformanceCounter(&BeginTime);
 		auto elapsed = BeginTime.QuadPart - Endtime.QuadPart;
 		auto deltatime = (double)elapsed / (double)Frequency.QuadPart;
@@ -53,16 +61,19 @@ DWORD WINAPI GameLogicThread(LPVOID arg)
 			Fps++;
 			if (elapsed_time > 1.0f)
 			{
-				cout << "FPS:" << Fps << endl;
+				//cout << "FPS:" << Fps << endl;
 				Fps = 0;
 				elapsed_time = 0;
 			}
-
+			
 			//이런식으로 로그인에서 로비클라로 바꾼다. Scene Change같은 역할을 하는 것.
 			//현재 1번클라 접속하면 10초뒤에 로그인클라에서 로비클라로 보내는 역할을 한다.
 			//예상대로라면 로그인 버튼을 누르면 로그인 클라에서 로비클라로 보내면 되겠지.
-			if (Cnt_Player > 0)
+			if (Cnt_Player > 0) {
 				change_time += deltatime;
+				//cout << change_time << endl;
+				
+			}
 			if (change_time > 10 && do_once_change)
 			{
 				do_once_change = false;
@@ -85,16 +96,20 @@ DWORD WINAPI GameLogicThread(LPVOID arg)
 			}
 			//
 
-
+			obj_t++;
 			for (int i = 0; i < Cnt_Player; ++i)
 			{
 				CLIENTS[i]->update(deltatime);
 
+				CLIENTS[i]->move(obj_t);
 			}
-			CLIENTS[0]->move();
 
 		}
-
+		
+		//현재 문제
+		//1. 이동시 뚝뚝 끊긴다.
+		//2. 점프 시 obj와 충돌처리가 되어야 함.
+		//3. initpos?
 		
 	}
 	return 0;
@@ -106,8 +121,7 @@ DWORD WINAPI ClientInputThread(LPVOID arg)
 	while (1)
 	{
 		
-
-		//cout << CLIENTS[c_id]->x << ", " << CLIENTS[c_id]->y << endl;
+		cout << CLIENTS[c_id]->bx << endl;
 		int ret = CLIENTS[c_id]->do_recv();
 		if (ret == SOCKET_ERROR)
 		{
@@ -152,11 +166,15 @@ int main()
 	{
 		CLIENTS[i]->c_socket = mNet->AcceptClient(CLIENTS[i]->c_addr);
 		CLIENTS[i]->c_id = i;
+		//CLIENTS[i]->initPos(); //플레이어 정보 초기화
+		CLIENTS[i]->initBitPos();
 		send_login_ok(i);
 		hThread = CreateThread(NULL, 0, ClientInputThread, (LPVOID)i, 0, NULL);
 		if (hThread == NULL) closesocket(CLIENTS[i]->c_socket);
 	}
-	CLIENTS[0]->initPos();
+	//CLIENTS[0]->initPos(); //플레이어 정보 초기화
+	//CLIENTS[0]->bx = 0;
+	//CLIENTS[0]->initBitPos();
 	while (1)
 	{
 		;

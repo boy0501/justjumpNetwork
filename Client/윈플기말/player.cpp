@@ -571,7 +571,7 @@ void PLAYER::PlayerWaiting(WPARAM wParam)
 void PLAYER::move(int obj_t)
 {
 	//std::cout << "move 함수 불림" << std::endl;
-	if (state == 1)
+ 	if (state == 1)
 	{
 		adjustspd = 0;		//수직낙하 한 후는 1상태가 되므로 여기서 초기화시켜줌
 		if (LRkey == true)
@@ -837,7 +837,7 @@ void PLAYER::BitMove()
 }
 
 //플레이어를 그려줌
-void PLAYER::draw(HDC& mem1dc, HDC& pdc, int x, int y, int h, int stealth, int state, int dir)
+void PLAYER::draw(HDC& mem1dc, HDC& pdc, int x, int y, int h, int stealth, int state, int dir, int bx)
 {
 	//std::cout << x << ", " << y << std::endl;
 	BLENDFUNCTION bf;

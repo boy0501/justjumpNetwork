@@ -96,12 +96,12 @@ void update(float delta_time)
 	//Sound업데이트 끝
 	if (map.getmapnum() == LOGINBG)
 		return;
-	obj_t += 1;
+	//obj_t += 1;
 
 	if (map.getmapnum() != LOGINBG)	//로그인중일땐 캐릭터 상호작용 x 
 	{
 		
-		player.move(obj_t);
+		//player.move(obj_t);
 		adjustPlayer(player, obj, map, ocount, g_hinst);
 		if (player.getCMD_die())
 		{
@@ -211,8 +211,11 @@ void render()
 	}	
 	for (int i = 0; i <= ocount; i++)
 		obj[i].DrawObj(mem1dc, odc);
-	player.draw(mem1dc, pdc, Network::GetNetwork()->net_x, Network::GetNetwork()->net_y, Network::GetNetwork()->net_h,
-		Network::GetNetwork()->net_stealth, Network::GetNetwork()->net_state, Network::GetNetwork()->net_dir);
+	//player.draw(mem1dc, pdc, Network::GetNetwork()->net_x, Network::GetNetwork()->net_y, Network::GetNetwork()->net_h,
+	//	Network::GetNetwork()->net_stealth, Network::GetNetwork()->net_state, Network::GetNetwork()->net_dir,
+	//	Network::GetNetwork()->net_bx);
+	player.draw(mem1dc, pdc, player.x, player.y, player.h, player.stealth, player.state, player.dir, player.bx);
+	//cout << player.x << endl;
 	for (const auto& ui : mUI)
 		ui->draw(mem1dc);
 
@@ -445,8 +448,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 			LoadBK(hbit1, g_hinst, 9);
 			camera.setx(0);
 			camera.sety(0);
-			player.setx(80);
-			player.sety(655);
+			//player.setx(80);
+			//player.sety(655);
 			player.mPlayername = ui->FindTextByNameTag("id")->getTextForString();
 			player.mPlayerwname = ui->FindTextByNameTag("id")->getText();
 			Sound::GetSelf()->Sound_Play(BGMSOUND, MAINMENUBGM, BGMVOL);
@@ -502,7 +505,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 
 		mUI.emplace_back(ui);
 		player.setBit(g_hinst);
-		player.initBitPos();
+		//player.initBitPos();
 		mUI.back()->FindTextByNameTag("id")->UpdateFontSize(hwnd);
 		nCaretPosx = 380 + mUI.back()->FindTextByNameTag("id")->getFontLen().cx;
 		nCaretPosy = 330;
