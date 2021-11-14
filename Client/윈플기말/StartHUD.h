@@ -9,5 +9,6 @@ public:
 
 	virtual void draw(HDC& mem1dc);
 	virtual void update(float deltatime);
+
 };
 
