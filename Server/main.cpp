@@ -87,8 +87,13 @@ DWORD WINAPI GameLogicThread(LPVOID arg)
 				//함수화를 해도 괜찮을 것 같다.
 				willbe_changed->elapsedtime = 0;
 				willbe_changed->mMap = mainMap;
+				willbe_changed->mStageNum = 0;
+				willbe_changed->x = 80;
+				willbe_changed->y = 655;
+				willbe_changed->w = 14;
+				willbe_changed->h = 25;
+				willbe_changed->state = 7;
 				//5. CLIENTS에 바꿀 class를 연결
-				CLIENTS[0] = nullptr;
 				CLIENTS[0] = willbe_changed;
 				//6. 원래 CLIENT에 할당되어있던 메모리를 해제
 				delete p;

@@ -17,4 +17,5 @@ public:
 	std::vector<class Object*> mObj;
 	bool collp2o(class Object* Obj);
 	void adjustPlayer();
+	void move(float delta_time);
 };

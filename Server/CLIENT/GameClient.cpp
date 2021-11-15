@@ -30,6 +30,7 @@ void GameClient::update(float delta_time)
 		std::cout << "게임클라" << std::endl;
 	}
 	adjustPlayer();
+	move(delta_time);
 	//send packet
 	sc_packet_empty packet;
 	packet.size = sizeof(sc_packet_empty);
@@ -39,6 +40,15 @@ void GameClient::update(float delta_time)
 	Client::update(delta_time);
 }
 
+
+void GameClient::move(float delta_time)
+{
+	std::cout << "x :" << x << "y :" << y << std::endl;
+	if (state != 1)
+	{
+		y = y + 100 * delta_time;
+	}
+}
 
 //오브젝트와 플레이어 충돌체크 1이면 부닥침
 //----------------------------------------
@@ -135,6 +145,7 @@ void GameClient::adjustPlayer()
 	{
 		if (collp2o(obj))
 		{
+			//std::cout << "부딪힘" << std::endl;
 			check_coll++;	//하나라도 부딪혔으면 coll이 올라감
 			if (obj->type < 101 && obj->type > 0)			//근데 그게 땅바닥이였다?
 			{
