@@ -11,10 +11,6 @@ GameClient::GameClient()
 
 }
 
-GameClient::GameClient(const GameClient& rhs)
-{
-	std::cout << "called" << std::endl;
-}
 
 GameClient::~GameClient()
 {
@@ -29,8 +25,10 @@ void GameClient::update(float delta_time)
 		elapsedtime = 0;
 		std::cout << "게임클라" << std::endl;
 	}
+
 	adjustPlayer();
 	move(delta_time);
+
 	//send packet
 	sc_packet_empty packet;
 	packet.size = sizeof(sc_packet_empty);
@@ -44,7 +42,7 @@ void GameClient::update(float delta_time)
 void GameClient::move(float delta_time)
 {
 	std::cout << "x :" << x << "y :" << y << std::endl;
-	if (state != 1)
+	if (state != 1)	//임시
 	{
 		y = y + 100 * delta_time;
 	}
