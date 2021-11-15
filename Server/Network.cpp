@@ -32,7 +32,6 @@ Network::~Network()
 {
 	closesocket(s_socket);
 	WSACleanup();
-	delete mNetwork;
 }
 
 Network* Network::GetNetwork()
