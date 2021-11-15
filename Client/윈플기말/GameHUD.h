@@ -1,5 +1,6 @@
 #pragma once
 #include "UI.h"
+#include "Map.h"
 
 class GameHUD :public UI
 {
@@ -9,11 +10,20 @@ public:
 
 	virtual void draw(HDC& mem1dc);
 	virtual void update(float deltatime);
-	
+	void drawExit(HDC& mem1dc);
+
 	void LoadHpUiBitmap(HINSTANCE& g_hinst, std::string name, const int& x, const int& y, const int& w, const int& h, const COLORREF& cr, class CAMERA& camera);
 	void drawHP(HDC& mem1dc);
+
+	void setMapNum(int);
+	int getMapNum();
+
+	
 private:
 	class PLAYER* mPlayer;
 	HBITMAP mHpBitmap;
+	bool try_once = false;
+	
+	int mapNum=0;
 };
 

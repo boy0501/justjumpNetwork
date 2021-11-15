@@ -1,6 +1,6 @@
 #include <iostream>
 #include "Network.h"
-#include "Player.h"
+#include "CLIENT/Client.h"
 #include "../Protocol/protocol.h"
 
 Network* Network::mNetwork = nullptr;
@@ -32,7 +32,6 @@ Network::~Network()
 {
 	closesocket(s_socket);
 	WSACleanup();
-	delete mNetwork;
 }
 
 Network* Network::GetNetwork()

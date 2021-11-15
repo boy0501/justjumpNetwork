@@ -2,11 +2,19 @@
 #include <string>
 #include <WS2tcpip.h>
 #include <MSWSock.h>
-#include "../Protocol/protocol.h"
+#include "../../Protocol/protocol.h"
 
-class Player
+class Client
 {
 public:
+
+	bool LEFTkey = 0;//왼쪽키 눌렀는지 1이면 누름 0이면 안누름
+	bool RIGHTkey = 0;//오른쪽키 눌렀는지 1이면 누름 0이면 안누름
+	bool UPkey = 0;	//위쪽키 눌렀는지 1이면 누름 0이면 안누름
+	bool DOWNkey = 0;//아래쪽키 눌렀는지 1이면 누름 0이면 안누름
+	bool LRkey = 0;//왼쪽오른쪽키 동시에 눌렀는지 1이면눌림 0이면 안눌림
+	bool UDkey = 0;
+
 	int x, y, w, h;		// x y 는 캐릭터의 중심좌표이고 w,h 는 xy에서 좌우로 반틈씩만 간 좌표이다.
 	int charw, charh;	//캐릭터 전체 사이즈이다. 
 	int hp;				//플레이어의 hp이다.
@@ -28,6 +36,8 @@ public:
 	float GroundAccel = 0.5;	//중력가속도
 	std::wstring mPlayerwname;	//플레이어이름 wchar방식
 	char playername[20];
+	int mStageNum = 0;
+
 
 	SOCKET c_socket;
 	int c_id;
@@ -35,11 +45,12 @@ public:
 
 	unsigned char* buf[MAX_BUF_SIZE];
 	SOCKADDR_IN c_addr;
-	Player();
-	~Player();
+	Client();
+	virtual ~Client() noexcept;
+	virtual void update(float delta_time);
 
 	int do_recv();
-	void do_send(void* packet,int bytes);
+	void do_send(void* packet, int bytes);
 	void ProcessPacket(unsigned char* p);
 };
 
