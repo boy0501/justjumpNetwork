@@ -102,6 +102,18 @@ HBITMAP LoadLogin(HINSTANCE& g_hinst, int num)
 	return NULL;
 }
 
+//게임 종료 버튼
+HBITMAP LoadExit(HINSTANCE& g_hinst, int num)
+{
+	if(num==0)
+		return (HBITMAP)LoadImage(g_hinst, TEXT("img/Exit1.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
+	else if(num==1)
+		return (HBITMAP)LoadImage(g_hinst, TEXT("img/Exit2.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
+	else if(num==2)
+		return (HBITMAP)LoadImage(g_hinst, TEXT("img/Exit3.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
+	return NULL;
+}
+
 
 //조작법 Ui 상태변화
 HBITMAP LoadHelpChange(HINSTANCE g_hinst, int i)

@@ -1,11 +1,12 @@
 #include "GameHUD.h"
 #include "player.h"
 #include "Camera.h"
+#include"Button.h"
 GameHUD::GameHUD(const int& cnt,PLAYER& player) 
 	:UI(cnt)
 	,mPlayer(&player)
 {
-
+	//mapNum = 0;
 }
 
 GameHUD::~GameHUD()
@@ -17,17 +18,53 @@ GameHUD::~GameHUD()
 
 void GameHUD::draw(HDC& mem1dc)
 {
-	drawByUserUi(mem1dc);
+	drawByUserUi(mem1dc );
 	drawHP(mem1dc);
 	UI::draw(mem1dc);
+	//drawExit(mem1dc);
+	//getMapNum();
+	//std::cout <<mapNum  << std::endl;
+	//setMapNum(mapNum);
+
+	//if (mapNum == 11)
+	//{
+	//	drawExit(mem1dc);
+	//}
+
+	//if (getMapNum() == 11) {
+ //   if (try_once == false) {
+	//		this->addButton([this]() {
+	//			}
+	//		, NULL, "img/Exit", 315, 300, 138, 82, RGB(255, 0, 0));
+	//		try_once = true;
+	//	}
+	//}
+	//	
+	
+	//getMapNum();
+}
+
+void GameHUD::drawExit(HDC& mem1dc)
+{
+	drawByUserUi(mem1dc);
+	//drawByScreenUi(mem1dc);
+	UI::drawExit(mem1dc);
+	
+
+		if (try_once == false) {
+			this->addButton([this]() {
+				}
+			, NULL, "img/Exit", 315, 500, 138, 82, RGB(255, 0, 0));
+			try_once = true;
+		}
+
 }
 
 
 void GameHUD::update(float deltatime)
 {
-
+	
 }
-
 
 void GameHUD::drawHP(HDC& mem1dc)
 {
@@ -58,7 +95,21 @@ void GameHUD::drawHP(HDC& mem1dc)
 	SelectObject(mem1dc, oldfont);
 	DeleteObject(hfont);
 	DeleteObject(mem2dc);
+
+	
 }
+
+void GameHUD::setMapNum(int m)
+{
+	mapNum = m;
+}
+
+int GameHUD::getMapNum()
+{
+	
+	return mapNum;
+}
+
 
 void GameHUD::LoadHpUiBitmap(HINSTANCE& g_hinst, std::string name, const int& x, const int& y, const int& w, const int& h, const COLORREF& cr,CAMERA& camera)
 {

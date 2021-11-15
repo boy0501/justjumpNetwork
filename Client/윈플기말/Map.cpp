@@ -9,6 +9,7 @@ MAP::~MAP()
 	mStartui.reset();
 	mDieUi.reset();
 	mGameUi.reset();
+	
 }
 
 
@@ -21,6 +22,7 @@ int MAP::getblack_t() { return black_t; }
 void MAP::setmapnum(int i) { mapnum = i; }
 
 void MAP::setblack_t(int i) { black_t = i; }
+
 
 
 void MAP::CreateMap(HINSTANCE g_hinst)
@@ -82,6 +84,15 @@ void MAP :: DrawBK(HDC& mem1dc, HDC& mem2dc, RECT& rectview)
 		TextOut(mem1dc, 700, 3400, count, lstrlenW(count));
 		SelectObject(mem1dc, oldfont);
 		DeleteObject(hfont);
+
+
+	
+		//GameHUD &gameui.addButton([gameui]() {}, NULL, "img/Exit", 315, 3400, 138, 82, RGB(255, 0, 0));
+
+		//gameui.drawExit();
+		//BitBlt(mem1dc, 292, 490, 138, 82, mem2dc, 0, 0, SRCCOPY);
+
+		
 	}
 
 

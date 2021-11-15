@@ -157,6 +157,7 @@
     <ClCompile Include="Button.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="DieHUD.cpp" />
+    <ClCompile Include="ExitHUD.cpp" />
     <ClCompile Include="GameHUD.cpp" />
     <ClCompile Include="Load.cpp" />
     <ClCompile Include="LoginHUD.cpp" />
@@ -176,6 +177,7 @@
     <ClInclude Include="Button.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="DieHUD.h" />
+    <ClInclude Include="ExitHUD.h" />
     <ClInclude Include="GameHUD.h" />
     <ClInclude Include="Load.h" />
     <ClInclude Include="LoginHUD.h" />

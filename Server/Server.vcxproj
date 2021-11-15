@@ -142,15 +142,21 @@
     <ClCompile Include="CLIENT\Client.cpp" />
     <ClCompile Include="CLIENT\LoginClient.cpp" />
     <ClCompile Include="CLIENT\LobbyClient.cpp" />
+    <ClCompile Include="CLIENT\GameClient.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Map.cpp" />
     <ClCompile Include="Network.cpp" />
+    <ClCompile Include="Object.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Protocol\protocol.h" />
     <ClInclude Include="CLIENT\Client.h" />
     <ClInclude Include="CLIENT\LoginClient.h" />
     <ClInclude Include="CLIENT\LobbyClient.h" />
+    <ClInclude Include="CLIENT\GameClient.h" />
+    <ClInclude Include="Map.h" />
     <ClInclude Include="Network.h" />
+    <ClInclude Include="Object.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

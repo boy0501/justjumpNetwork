@@ -11,6 +11,8 @@ HBITMAP LoadHP(HBITMAP, HINSTANCE);
 HBITMAP LoadStart(HBITMAP , HINSTANCE,int);
 //로그인버튼
 HBITMAP LoadLogin(HINSTANCE& g_hinst, int num);
+//종료 버튼
+HBITMAP LoadExit(HINSTANCE& g_hinst, int num);   
 //조작법
 HBITMAP LoadHelp(HBITMAP, HINSTANCE, int);
 
