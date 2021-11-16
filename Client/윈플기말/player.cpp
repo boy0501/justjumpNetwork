@@ -2,6 +2,7 @@
 #include "player.h"
 #include "Load.h"
 #include <iostream>
+
 int ROWSPEED = 3; 	//가로 이동속도
 int COLSPEED = 10;	//세로 이동속도
 int ROPESPEED = 2;
@@ -236,6 +237,8 @@ int PLAYER::getspike_hurt()
 //플레이어 상태 변경
 void PLAYER::PlayerSetting(WPARAM wParam)
 {
+	//std::cout << x << ", " << y << std::endl;
+	//std::cout << dir << std::endl;
 	if (wParam == VK_LEFT)
 	{
 		
@@ -567,8 +570,8 @@ void PLAYER::PlayerWaiting(WPARAM wParam)
 //플레이어 움직임
 void PLAYER::move(int obj_t)
 {
-
-	if (state == 1)
+	//std::cout << "move 함수 불림" << std::endl;
+ 	if (state == 1)
 	{
 		adjustspd = 0;		//수직낙하 한 후는 1상태가 되므로 여기서 초기화시켜줌
 		if (LRkey == true)
@@ -834,8 +837,9 @@ void PLAYER::BitMove()
 }
 
 //플레이어를 그려줌
-void PLAYER::draw(HDC& mem1dc, HDC& pdc)
+void PLAYER::draw(HDC& mem1dc, HDC& pdc, int x, int y, int h, int stealth, int state, int dir, int bx)
 {
+	//std::cout << x << ", " << y << std::endl;
 	BLENDFUNCTION bf;
 	bf.AlphaFormat = 0;
 	bf.BlendFlags = 0;
@@ -1030,7 +1034,7 @@ void PLAYER::draw(HDC& mem1dc, HDC& pdc)
 	SetBkMode(mem1dc, TRANSPARENT);
 	SetTextColor(mem1dc, RGB(255, 108, 168));
 	RECT rt{ x - 60,y + 25,x + 60,y + 65 };
-	DrawText(mem1dc, mPlayerwname.c_str(), lstrlenW(mPlayerwname.c_str()), &rt, DT_CENTER );
+	DrawText(mem1dc, mPlayerwname.c_str(), lstrlenW(mPlayerwname.c_str()), &rt, DT_CENTER);
 
 	SelectObject(mem1dc, oldfont);
 	DeleteObject(hfont);
