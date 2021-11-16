@@ -1,6 +1,8 @@
 #include <iostream>
 
 #include "LobbyClient.h"
+#include "../Map.h"
+#include "../Object.h"
 
 
 LobbyClient::LobbyClient()

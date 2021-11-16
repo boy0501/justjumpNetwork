@@ -6,7 +6,6 @@
 LoginClient::LoginClient()
 	:elapsedtime(0)
 {
-
 }
 
 LoginClient::~LoginClient()
