@@ -107,16 +107,6 @@ void GameHUD::drawHP(HDC& mem1dc)
 	
 }
 
-void GameHUD::setMapNum(int m)
-{
-	mapNum = m;
-}
-
-int GameHUD::getMapNum()
-{
-	
-	return mapNum;
-}
 
 
 void GameHUD::LoadHpUiBitmap(HINSTANCE& g_hinst, std::string name, const int& x, const int& y, const int& w, const int& h, const COLORREF& cr,CAMERA& camera)
