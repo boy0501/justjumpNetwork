@@ -490,6 +490,11 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		}, g_hinst, "img/start", 292, 490, 138, 82, RGB(255, 0, 0));
 		startui->addButton([startui]() {}, g_hinst, "img/help", 215, 300, 400, 200, RGB(60, 60, 60));
 		map.mStartui = startui;
+
+		startui->addButton([startui]() {
+
+			}, g_hinst, "img/Exit", 800, 400, 138, 82, RGB(255, 0, 0));// g_hinst, "img/help", 215, 300, 400, 200, RGB(60, 60, 60));
+		map.mStartui = startui;
 		
 		auto dieui = make_shared<DieHUD>(1,player,camera);
 		
