@@ -107,10 +107,7 @@ void UI::draw(HDC& mem1dc)
 	{
 		txt->draw(mem1dc);
 	}
-	for (const auto& button : mButtons)
-	{
-		button->drawByScreenButton(mem1dc);
-	}
+
 }
 void UI::drawExit(HDC& mem1dc)
 {

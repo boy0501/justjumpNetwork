@@ -3,6 +3,8 @@
 
 #include "../../Protocol/protocol.h"
 #include "player.h"
+#include "Camera.h"
+static CAMERA camera;
 
 Network* Network::mNetwork = nullptr;
 
@@ -61,6 +63,7 @@ void Network::ConnectServer(const char* server_ip)
 
 int Network::C_Recv()
 {
+	//std::cout << "recvÁß!" << std::endl;
 	int received;
 	char tmpbuf[MAX_BUF_SIZE];
 	char* ptr = tmpbuf;
@@ -89,6 +92,7 @@ int Network::C_Recv()
 	return 0;
 }
 
+
 void Network::ProcessPacket(unsigned char* p)
 {
 	unsigned char packet_type = p[1];
@@ -99,7 +103,37 @@ void Network::ProcessPacket(unsigned char* p)
 		//send_login_ok_packet(c_id);
 		break;
 	}
+	case SC_PACKET_ROBBY: {
+		sc_packet_robby* packet = reinterpret_cast<sc_packet_robby*>(p);
+		/*if ((int)(packet->count_start) == 1) {
+			mPlayer->ready_to_go = true;
+		}*/
+		if (packet->player_cnt == 1) {
+			mPlayer->ready_to_go = true;
+
+		}
+		break;
 	}
+	case SC_PACKET_MOVE_PROCESS: 
+	{
+		sc_packet_move_process* packet = reinterpret_cast<sc_packet_move_process*>(p);
+		
+		//std::cout << packet->x << "," << packet->y << std::endl;
+		std::cout << (int)packet->bx << std::endl;
+
+		mPlayer->x = packet->x;
+		mPlayer->y = packet->y;
+		mPlayer->h = packet->h;
+		mPlayer->state = packet->state;
+		mPlayer->stealth = packet->stealth;
+		mPlayer->dir = packet->dir;
+		mPlayer->bx = packet->bx;
+
+		break;
+	}
+
+	}
+	
 }
 
 void Network::C_Send(void* packet, int bytes)

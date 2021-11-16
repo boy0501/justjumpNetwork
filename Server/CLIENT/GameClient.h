@@ -15,5 +15,10 @@ public:
 	class Map* mMap;		//obj를 관리하는 Map을 가리키는 포인터
 	bool collp2o(class Object* Obj);
 	void adjustPlayer();
-	void move(float delta_time);
+	
+	int obj_t; // for 애니메이션
+	void move(int obj_t, float deltatime);
+	void BitMove();
+	void initPos();
+	void initBitPos();
 };

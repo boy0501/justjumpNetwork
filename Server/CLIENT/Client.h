@@ -7,7 +7,6 @@
 class Client
 {
 public:
-
 	bool LEFTkey = 0;//왼쪽키 눌렀는지 1이면 누름 0이면 안누름
 	bool RIGHTkey = 0;//오른쪽키 눌렀는지 1이면 누름 0이면 안누름
 	bool UPkey = 0;	//위쪽키 눌렀는지 1이면 누름 0이면 안누름
@@ -38,6 +37,18 @@ public:
 	char playername[20];
 	int mStageNum = 0;
 
+	int ROWSPEED = 150;
+	int COLSPEED = 10;
+	int ROPESPEED = 2;
+	//bool LEFTkey = 0;
+	//bool RIGHTkey = 0;
+	//bool UPkey = 0;
+	//bool DOWNkey = 0;
+	//bool LRkey = 0;
+	//bool UDkey = 0;
+	int jumpcount = 0;
+	int diecount = 0;
+
 
 	SOCKET c_socket;
 	int c_id;
@@ -52,5 +63,6 @@ public:
 	int do_recv();
 	void do_send(void* packet, int bytes);
 	void ProcessPacket(unsigned char* p);
-};
 
+	//+	
+};
