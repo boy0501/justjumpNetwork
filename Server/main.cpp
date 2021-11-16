@@ -27,6 +27,7 @@ float change_time;
 bool do_once_change = true;
 int Fps = 0;
 
+int robby_cnt = 0;
 
 void send_move_process(int c_id, int mover)
 {
@@ -70,11 +71,16 @@ DWORD WINAPI GameLogicThread(LPVOID arg)
 				elapsed_time = 0;
 			}
 
+
 			//이런식으로 로그인에서 로비클라로 바꾼다. Scene Change같은 역할을 하는 것.
 			//현재 1번클라 접속하면 10초뒤에 로그인클라에서 로비클라로 보내는 역할을 한다.
 			//예상대로라면 로그인 버튼을 누르면 로그인 클라에서 로비클라로 보내면 되겠지.
-			if (Cnt_Player > 0)
+			if (Cnt_Player > 0) {
 				change_time += deltatime;
+				//cout << Cnt_Player << endl;
+
+
+			}
 			if (change_time > 3 && do_once_change)
 			{
 				do_once_change = false;

@@ -413,6 +413,16 @@ void send_move_packet(char dr)
 	//cout << "send패킷 보냄" << endl;
 }
 
+void send_robby_in_packet()
+{
+	cs_packet_robby packet;
+	packet.size = sizeof(packet);
+	packet.type = CS_PACKET_ROBBY;
+	packet.is_in = 1;
+
+	Network::GetNetwork()->C_Send(&packet, sizeof(packet));
+}
+
 LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 {
 	if (GetText(hwnd, iMessage, wParam, lParam) == 0)
@@ -449,6 +459,12 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 			LoadBK(hbit1, g_hinst, 9);
 			camera.setx(0);
 			camera.sety(0);
+
+			//로비 카운트 start===================================================
+			send_robby_in_packet();
+
+			//====================================================================
+
 			//player.setx(80);
 			//player.sety(655);
 			player.mPlayername = ui->FindTextByNameTag("id")->getTextForString();
