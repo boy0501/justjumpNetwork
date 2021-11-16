@@ -2,8 +2,10 @@
 #include "Network.h"
 
 #include "../../Protocol/protocol.h"
+#include "Load.h"
 #include "player.h"
 #include "Camera.h"
+#include "Map.h"
 static CAMERA camera;
 
 Network* Network::mNetwork = nullptr;
@@ -99,7 +101,19 @@ void Network::ProcessPacket(unsigned char* p)
 	switch (packet_type) {
 	case SC_PACKET_LOGIN_OK: {
 		sc_packet_login_ok* packet = reinterpret_cast<sc_packet_login_ok*>(p);
+		mPlayer->stage = packet->stage;
 		mPlayer->player_cid = packet->id;
+
+		mMap->setmapnum(9);
+		mOcount = initObject(obj, mMap->getmapnum(), g_hinst);
+		map.CreateMap(g_hinst);
+		LoadBK(hbit1, g_hinst, 9);
+		camera.setx(0);
+		camera.sety(0);
+		//player.setx(80);
+		//player.sety(655);
+		Sound::GetSelf()->Sound_Play(BGMSOUND, MAINMENUBGM, BGMVOL);
+
 		//send_login_ok_packet(c_id);
 		break;
 	}

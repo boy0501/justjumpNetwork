@@ -28,7 +28,6 @@
 #endif
 
 
-HINSTANCE g_hinst;
 LPCTSTR lpszClass = L"Just Jump";
 LPCTSTR lpszWinodwName = L"Just Jump";
 
@@ -430,30 +429,28 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		map.CreateMap(g_hinst);
 
 		Network::GetNetwork()->mPlayer = &player;
+		Network::GetNetwork()->mMap = &map;
+		Network::GetNetwork()->mOcount = ocount;
 		Network::GetNetwork()->ConnectServer("127.0.0.1");
 		
-		cs_packet_login packet;
-		strcpy_s(packet.username, "kk");
-		packet.size = sizeof(cs_packet_login);
-		packet.type = CS_PACKET_LOGIN;
-		Network::GetNetwork()->C_Send(&packet, sizeof(packet));
 
 		auto ui = make_shared<LoginHUD>(1);
 		ui->LoadUiBitmap(g_hinst, "img/idpassword.bmp", 340, 250, 332, 282, RGB(255, 0, 0));
 		ui->addText("kk", "id", L"메이플스토리 bold", RGB(255, 108, 168), 18, 380, 330,false,0,0,camera);
 		ui->addText("", "pass", L"메이플스토리 bold", RGB(255, 108, 168), 18, 380, 380,false,0,0,camera);
 		ui->addButton([hwnd,ui]() {
-			map.setmapnum(9);
-			ocount = initObject(obj, map.getmapnum(), g_hinst);
-			map.CreateMap(g_hinst);
-			LoadBK(hbit1, g_hinst, 9);
-			camera.setx(0);
-			camera.sety(0);
-			//player.setx(80);
-			//player.sety(655);
+
+			//
+
+			cs_packet_login packet;
+			strcpy_s(packet.username, 20, ui->FindTextByNameTag("id")->getTextForString().c_str());
+			packet.size = sizeof(cs_packet_login);
+			packet.type = CS_PACKET_LOGIN;
+			Network::GetNetwork()->C_Send(&packet, sizeof(packet));
+
+
 			player.mPlayername = ui->FindTextByNameTag("id")->getTextForString();
 			player.mPlayerwname = ui->FindTextByNameTag("id")->getText();
-			Sound::GetSelf()->Sound_Play(BGMSOUND, MAINMENUBGM, BGMVOL);
 			ui->closeUI();
 			mUI.emplace_back(map.mStartui);
 

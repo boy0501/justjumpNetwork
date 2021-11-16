@@ -9,6 +9,7 @@ const int  MAX_USER = 10;
 
 const char CS_PACKET_LOGIN = 1;
 const char CS_PACKET_MOVE = 2;
+const char CS_PACKET_SCENE_CHANGE = 3;
 const char CS_PACKET_TEST = 99;
 
 const char SC_PACKET_LOGIN_OK = 1;
@@ -17,6 +18,7 @@ const char SC_PACKET_PUT_OBJECT = 3;
 const char SC_PACKET_LOGOUT_OBJECT = 4;
 const char SC_PACKET_ROBBY = 5;
 const char SC_PACKET_EMPTY = 6;
+const char SC_PACKET_SCENE_CHANGE_OK = 7;
 
 #pragma pack (push, 1)
 //---------------------client packet
@@ -38,12 +40,18 @@ struct cs_packet_test {
 	float zPos;
 };
 
+struct cs_packet_scene_change {
+	unsigned char size;
+	char type;
+	char stage;
+};
 //-----------------------server packet
 struct sc_packet_login_ok {
 	unsigned char size;
 	char type;
 	int		id;
 	short	x, y;
+	char stage;
 };
 
 struct sc_packet_move_process {
@@ -89,5 +97,15 @@ struct sc_packet_robby {
 struct sc_packet_empty {
 	unsigned char size;
 	char type;
+};
+
+struct sc_packet_scene_change_ok {
+	unsigned char size;
+	char type;
+	char stage;
+	short  x, y, h;
+	short state;
+	short dir;
+	short stealth;
 };
 #pragma pack(pop)
