@@ -16,7 +16,6 @@
 #pragma comment(lib, "ws2_32")
 using namespace std;
 
-array<Client*, 3> CLIENTS;
 Map* mainMap;
 int Cnt_Player = 0;
 LARGE_INTEGER Frequency;
@@ -27,7 +26,8 @@ float change_time;
 bool do_once_change = true;
 int Fps = 0;
 
-int robby_cnt = 0;
+
+
 
 void send_move_process(int c_id, int mover)
 {
@@ -45,6 +45,16 @@ void send_move_process(int c_id, int mover)
 	CLIENTS[c_id]->do_send(&packet, sizeof(packet));
 }
 
+void send_robby_timer(int c_id, int sec)
+{
+	sc_packet_robby packet;
+	packet.size = sizeof(sc_packet_robby);
+	packet.type = SC_PACKET_ROBBY;
+	packet.countdown = sec;
+
+	CLIENTS[c_id]->do_send(&packet, sizeof(packet));
+}
+
 
 //http://www.tipssoft.com/bulletin/board.php?bo_table=FAQ&wr_id=735 타임관련
 
@@ -52,10 +62,8 @@ DWORD WINAPI GameLogicThread(LPVOID arg)
 {
 	QueryPerformanceFrequency(&Frequency);
 	QueryPerformanceCounter(&Endtime);
-	//time_t current_time = time(NULL);
 	while (1) {
-		//time_t frame_time = time(NULL) - current_time;
-		//cout << "frame_time = "<<frame_time << endl;
+		
 		QueryPerformanceCounter(&BeginTime);
 		auto elapsed = BeginTime.QuadPart - Endtime.QuadPart;
 		auto deltatime = (double)elapsed / (double)Frequency.QuadPart;
@@ -69,6 +77,15 @@ DWORD WINAPI GameLogicThread(LPVOID arg)
 				//cout << "FPS:" << Fps << endl;
 				Fps = 0;
 				elapsed_time = 0;
+				if (LobbyClient::GetLobbyClient()->robby_cnt == 1)
+				{
+					LobbyClient::GetLobbyClient()->robby_timer--;
+					if (LobbyClient::GetLobbyClient()->robby_timer < 0) {
+						LobbyClient::GetLobbyClient()->robby_timer = 0;
+					}
+					send_robby_timer(0, LobbyClient::GetLobbyClient()->robby_timer);
+					cout << LobbyClient::GetLobbyClient()->robby_timer << endl;
+				}
 			}
 
 
@@ -79,6 +96,16 @@ DWORD WINAPI GameLogicThread(LPVOID arg)
 				change_time += deltatime;
 				//cout << Cnt_Player << endl;
 
+
+				
+				//CLIENTS[0]->do_recv();
+				//time_t current_time = time(NULL);
+
+				//if (CLIENTS[0]->robby_cnt == 0) {
+				//	//타이머 10초 시작(클라에 1초마다 초 보내주기)
+				//	time_t frame_time = time(NULL) - current_time;
+				//	cout << "frame_time = "<<frame_time << endl;
+				//}
 
 			}
 			if (change_time > 3 && do_once_change)
@@ -136,6 +163,7 @@ DWORD WINAPI GameLogicThread(LPVOID arg)
 			for (int i = 0; i < Cnt_Player; ++i)
 			{
 				CLIENTS[i]->update(deltatime);
+				
 			}
 
 			//현재 문제

@@ -19,6 +19,7 @@
 #include "Text.h"
 #include "Network.h"
 #include "../../Protocol/protocol.h"
+#include <string>
 
 #pragma comment(lib,"Winmm.lib")
 #pragma comment(lib,"imm32.lib")
@@ -67,6 +68,11 @@ static vector<shared_ptr<UI>> mUI;
 using namespace std;
 //float elapsedt;
 //int Nameunsigan= 10;
+void robby_waiting();
+bool bRobby_full = false;
+
+std::shared_ptr<StartHUD> startui;
+
 void update(float delta_time)
 {
 	//elapsedt += delta_time;
@@ -76,6 +82,31 @@ void update(float delta_time)
 	//	
 	//}
 	Network::GetNetwork()->C_Recv();
+	robby_waiting();
+
+	if (bRobby_full == true) {
+		occur_button = 0;
+		map.setblack_t(50);
+		map.setmapnum(map.getmapnum() + 1);
+		for (int j = 0; j < ocount; j++)
+			obj[j].ResetObject();
+		ocount = initObject(obj, map.getmapnum(), g_hinst);
+
+		map.CreateMap(g_hinst);
+		LoadBK(hbit1, g_hinst, 0);
+		//hbit1 = (HBITMAP)LoadImage(g_hinst, TEXT("img/bk.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
+		Sound::GetSelf()->setindex(Sound::GetSelf()->getindex() + 1);
+		Sound::GetSelf()->Sound_Play(EFFECTSOUND, PORTALEF, EFVOL);
+		Sound::GetSelf()->Sound_Play(BGMSOUND, FIRSTMAPBGM, BGMVOL);
+		player.initPos();
+		player.sethp(5);
+		camera.setx(0);
+		camera.sety(3232);
+		startui->closeUI();
+		mUI.emplace_back(map.mGameUi);
+		bRobby_full = false;
+	}
+
 	//빼줘야 할 Ui가 있다면 Ui 삭제
 	auto iter = mUI.begin();
 	while (iter != mUI.end())
@@ -423,6 +454,19 @@ void send_robby_in_packet()
 	Network::GetNetwork()->C_Send(&packet, sizeof(packet));
 }
 
+
+
+void robby_waiting()
+{
+	startui->addText(to_string(Network::GetNetwork()->countdown), "countdown", L"메이플스토리 bold", RGB(255, 255, 255), 18, Network::GetNetwork()->init_x, 200, false, 0, 0, camera);
+	cout << Network::GetNetwork()->countdown << endl;
+
+	if (Network::GetNetwork()->countdown == 1)
+	{
+		bRobby_full = true;
+	}
+}
+
 LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 {
 	if (GetText(hwnd, iMessage, wParam, lParam) == 0)
@@ -484,33 +528,15 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 
 			HideCaret(hwnd);
 		}, g_hinst, "img/LoginButton", 365, 440, 278, 53, RGB(255, 0, 0));
-		auto startui = make_shared<StartHUD>(0);
+		startui = make_shared<StartHUD>(0);
 		//hbit = (HBITMAP)LoadImage(g_hinst, TEXT("img/NoNameUi.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION); //상대경로로 변경
-		startui->addButton([startui]() {
-			occur_button = 0;
-			map.setblack_t(50);
-			map.setmapnum(map.getmapnum() + 1);
-			for (int j = 0; j < ocount; j++)
-				obj[j].ResetObject();
-			ocount = initObject(obj, map.getmapnum(), g_hinst);
-
-			map.CreateMap(g_hinst);
-			LoadBK(hbit1, g_hinst, 0);
-			//hbit1 = (HBITMAP)LoadImage(g_hinst, TEXT("img/bk.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
-			Sound::GetSelf()->setindex(Sound::GetSelf()->getindex() + 1);
-			Sound::GetSelf()->Sound_Play(EFFECTSOUND, PORTALEF, EFVOL);
-			Sound::GetSelf()->Sound_Play(BGMSOUND, FIRSTMAPBGM, BGMVOL);
-			player.initPos();
-			player.sethp(5);
-			camera.setx(0);
-			camera.sety(3232); 
-			startui->closeUI();
-			mUI.emplace_back(map.mGameUi);
+		startui->addButton([]() {
+			
 		}, g_hinst, "img/start", 292, 490, 138, 82, RGB(255, 0, 0));
-		startui->addButton([startui]() {}, g_hinst, "img/help", 215, 300, 400, 200, RGB(60, 60, 60));
+		startui->addButton([]() {}, g_hinst, "img/help", 215, 300, 400, 200, RGB(60, 60, 60));
 		map.mStartui = startui;
 
-		startui->addButton([startui]() {
+		startui->addButton([]() {
 
 			}, g_hinst, "img/Exit", 800, 400, 138, 82, RGB(255, 0, 0));// g_hinst, "img/help", 215, 300, 400, 200, RGB(60, 60, 60));
 		map.mStartui = startui;

@@ -36,5 +36,8 @@ public:
 	int net_stealth;
 	int net_dir;
 	int net_bx;
+
+	int countdown;
+	int init_x = 300;
 };
 

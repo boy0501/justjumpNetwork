@@ -2,17 +2,26 @@
 
 #include "LobbyClient.h"
 
+LobbyClient* LobbyClient::mLobbyClient = nullptr;
 
 LobbyClient::LobbyClient()
 	:elapsedtime(0)
-	,obj_t(0)
+	, obj_t(0)
+	, robby_timer(11)
 {
 	
 }
 
 LobbyClient::~LobbyClient()
 {
+	delete mLobbyClient;
+}
 
+LobbyClient* LobbyClient::GetLobbyClient()
+{
+	if (mLobbyClient == nullptr)
+		mLobbyClient = new LobbyClient();
+	return mLobbyClient;
 }
 
 
@@ -22,8 +31,13 @@ void LobbyClient::update(float delta_time)
 	elapsedtime += delta_time;
 	if (elapsedtime > 1)
 	{
+		
+	
 		elapsedtime = 0;
 		std::cout << "로비클라" << std::endl;
+		//std::cout << "로비클라" << robby_timer << "초" << std::endl;
+		
+		
 	}
 
 	obj_t += 1;

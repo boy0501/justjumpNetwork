@@ -9,8 +9,8 @@ const int  MAX_USER = 10;
 
 const char CS_PACKET_LOGIN = 1;
 const char CS_PACKET_MOVE = 2;
-const char CS_PACKET_ROBBY = 3;
 
+const char CS_PACKET_ROBBY = 98;
 const char CS_PACKET_TEST = 99;
 
 const char SC_PACKET_LOGIN_OK = 1;
@@ -89,9 +89,10 @@ struct sc_packet_logout_object {
 struct sc_packet_robby {
 	unsigned char size;
 	char type;
-	char count_start; // 1: start
+	//char count_start; // 1: start
 	int player_cnt;
 	//float countdownTime;
+	int countdown;
 };
 
 struct sc_packet_empty {

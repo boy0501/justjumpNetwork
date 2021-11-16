@@ -64,5 +64,5 @@ public:
 	void do_send(void* packet, int bytes);
 	void ProcessPacket(unsigned char* p);
 
-	//+	
+	//+
 };

@@ -1,5 +1,7 @@
 ﻿#include "Client.h"
 #include "../CLIENT/LoginClient.h"
+#include "../CLIENT/LobbyClient.h"
+
 #include <iostream>
 
 
@@ -353,6 +355,13 @@ void Client::ProcessPacket(unsigned char* p)
 		//	break;
 
 	}
+	case CS_PACKET_ROBBY:
+		cs_packet_robby* packet = reinterpret_cast<cs_packet_robby*>(p);
+		if (packet->is_in == 1)
+		{
+			LobbyClient::GetLobbyClient()->robby_cnt++;
+			std::cout << LobbyClient::GetLobbyClient()->robby_cnt << std::endl;
+		}
 	}
 }
 int Client::do_recv()

@@ -105,13 +105,11 @@ void Network::ProcessPacket(unsigned char* p)
 	}
 	case SC_PACKET_ROBBY: {
 		sc_packet_robby* packet = reinterpret_cast<sc_packet_robby*>(p);
-		/*if ((int)(packet->count_start) == 1) {
-			mPlayer->ready_to_go = true;
-		}*/
-		if (packet->player_cnt == 1) {
-			mPlayer->ready_to_go = true;
-
-		}
+		
+		if (countdown != packet->countdown)
+			init_x += 20;
+		countdown = packet->countdown;
+		std::cout << packet->countdown << std::endl;
 		break;
 	}
 	case SC_PACKET_MOVE_PROCESS: 
