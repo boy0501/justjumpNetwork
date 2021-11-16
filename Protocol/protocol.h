@@ -30,6 +30,7 @@ struct cs_packet_login {
 	unsigned char size;
 	char	type;
 	char	username[MAX_NAME_SIZE];
+	
 };
 
 struct cs_packet_move {
@@ -58,7 +59,7 @@ struct cs_packet_gamejoin {
 struct cs_packet_robby {
 	unsigned char size;
 	char type;
-	short is_in; //1: in
+	
 };
 
 //-----------------------server packet
@@ -124,5 +125,6 @@ struct sc_packet_gamestart {
 	short state;
 	short dir;
 	short stealth;
+	bool COMMAND_die;
 };
 #pragma pack(pop)

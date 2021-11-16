@@ -4,7 +4,6 @@
 #include "../Map.h"
 #include "../Object.h"
 
-LobbyClient* LobbyClient::mLobbyClient = nullptr;
 
 LobbyClient::LobbyClient()
 	:elapsedtime(0)
@@ -16,15 +15,8 @@ LobbyClient::LobbyClient()
 
 LobbyClient::~LobbyClient()
 {
-	delete mLobbyClient;
 }
 
-LobbyClient* LobbyClient::GetLobbyClient()
-{
-	if (mLobbyClient == nullptr)
-		mLobbyClient = new LobbyClient();
-	return mLobbyClient;
-}
 
 
 void LobbyClient::update(float delta_time)
@@ -39,13 +31,48 @@ void LobbyClient::update(float delta_time)
 		std::cout << "로비클라" << std::endl;
 		//std::cout << "로비클라" << robby_timer << "초" << std::endl;
 		
-		
+		if (robby_cnt == 1)
+		{
+			robby_timer--;
+			if (robby_timer < 0) {
+				//mCss = CSS_DEAD;
+				//mSn = SN_INGAME;
+				//SetEvent(SceneChangeTrigger);
+				robby_timer = 0;
+
+				x = 80;
+				y = 3700;
+				savey = 3700;
+				w = 14;
+				h = 25;
+				state = 7;
+				dir = 2;
+				adjustspd = 0;
+				stealth = 0;
+				spike_hurt = 0;
+				COMMAND_move = false;
+				COMMAND_hurt = false;
+				COMMAND_die = false;
+				mStageNum = 1;
+
+				mCss = CSS_DEAD;
+				mSn = SN_INGAME;
+				SetEvent(SceneChangeTrigger);
+			}
+			std::cout << robby_timer << std::endl;
+			sc_packet_robby packet;
+			packet.size = sizeof(sc_packet_robby);
+			packet.type = SC_PACKET_ROBBY;
+			packet.countdown = robby_timer;
+			do_send(&packet, sizeof(packet));
+			
+		}
 	}
 
 	obj_t += 1;
 	move(obj_t, delta_time);
 	BitMove();
-
+	//timer();
 	//send packet
 	sc_packet_empty packet;
 	packet.size = sizeof(sc_packet_empty);
@@ -55,6 +82,17 @@ void LobbyClient::update(float delta_time)
 	Client::update(delta_time);
 }
 
+
+
+//void timer()
+//{
+//
+//	if (time == 10)
+//	{
+//		mCss = CSS_DEAD;
+//		mSn = SN_INGAME;
+//	}
+//}
 void LobbyClient::initBitPos()
 {
 	bx = 0;

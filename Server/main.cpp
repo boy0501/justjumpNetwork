@@ -74,11 +74,12 @@ void ChangeRobbyToGame(const int& c_id)
 	packet.type = SC_PACKET_GAMESTART;
 	packet.dir = CLIENTS[my_id]->dir;
 	packet.h = CLIENTS[my_id]->h;
-	packet.stage = 0;
+	packet.stage = 9;
 	packet.state = CLIENTS[my_id]->state;
 	packet.stealth = CLIENTS[my_id]->stealth;
 	packet.x = CLIENTS[my_id]->x;
 	packet.y = CLIENTS[my_id]->y;
+	packet.COMMAND_die = CLIENTS[my_id]->COMMAND_die;
 	CLIENTS[my_id]->do_send(&packet, sizeof(packet));
 
 }
@@ -98,15 +99,7 @@ void send_move_process(int c_id, int mover)
 	CLIENTS[c_id]->do_send(&packet, sizeof(packet));
 }
 
-void send_robby_timer(int c_id, int sec)
-{
-	sc_packet_robby packet;
-	packet.size = sizeof(sc_packet_robby);
-	packet.type = SC_PACKET_ROBBY;
-	packet.countdown = sec;
 
-	CLIENTS[c_id]->do_send(&packet, sizeof(packet));
-}
 
 
 //http://www.tipssoft.com/bulletin/board.php?bo_table=FAQ&wr_id=735 타임관련
@@ -130,15 +123,7 @@ DWORD WINAPI GameLogicThread(LPVOID arg)
 				//cout << "FPS:" << Fps << endl;
 				Fps = 0;
 				elapsed_time = 0;
-				if (LobbyClient::GetLobbyClient()->robby_cnt == 1)
-				{
-					LobbyClient::GetLobbyClient()->robby_timer--;
-					if (LobbyClient::GetLobbyClient()->robby_timer < 0) {
-						LobbyClient::GetLobbyClient()->robby_timer = 0;
-					}
-					send_robby_timer(0, LobbyClient::GetLobbyClient()->robby_timer);
-					cout << LobbyClient::GetLobbyClient()->robby_timer << endl;
-				}
+				
 			}
 
 
@@ -172,15 +157,24 @@ DWORD WINAPI GameLogicThread(LPVOID arg)
 				switch (c->mSn)
 				{
 				case SN_LOBBY:
+				{
 					ChangeLoginToRobby(c->c_id);
 					c->mCss = CSS_LIVE;
+					auto lc = reinterpret_cast<LobbyClient*>(c);
+					lc->robby_cnt++;
+
 					SetEvent(c->SceneChangeIsDone);
 					break;
-				case SN_INGAME:
+				}
+				case SN_INGAME: 
+				{
 					ChangeRobbyToGame(c->c_id);
 					c->mCss = CSS_LIVE;
 					SetEvent(c->SceneChangeIsDone);
+
+
 					break;
+				}
 				}
 				//서버에서 플레이어를 옮겨줬다면 SetEvent를 하여 클라이언트에게 바뀌었다고 패킷을 날림
 				//1.서버처리 2.클라에게 패킷처리 [ 순서 존재 ]

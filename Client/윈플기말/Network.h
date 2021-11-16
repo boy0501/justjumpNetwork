@@ -2,6 +2,7 @@
 #include <iostream>
 #include <windows.h>
 #include "../../Protocol/protocol.h"
+#include <vector>
 
 static HDC mem1dc, pdc, hdc;
 static HWND hWnd;
@@ -33,6 +34,11 @@ public:
 	int C_Recv();
 	void ProcessPacket(unsigned char* p);
 	unsigned char* buf[MAX_BUF_SIZE];
+
+	bool occur_button = 0;
+	//int ocount;
+	//class OBJECT obj[150];
+	std::vector<std::shared_ptr<class UI>> mUI;
 
 public:
 	int net_x, net_y;

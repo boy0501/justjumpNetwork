@@ -52,6 +52,7 @@ void Client::ProcessPacket(unsigned char* p)
 	case CS_PACKET_LOGIN: {
 		cs_packet_login* packet = reinterpret_cast<cs_packet_login*>(p);
 
+		
 		//한 번 로그인 하면 더이상 로그인 패킷은 받지 않음.
 		if (mSn == SN_LOBBY) break;
 
@@ -375,34 +376,13 @@ void Client::ProcessPacket(unsigned char* p)
 		//한 번 게임접속하면 더이상 게임접속 패킷은 받지않음.
 		if (mSn == SN_INGAME) break;
 
-		x = 80;
-		y = 3700;
-		savey = 3700;
-		w = 14;
-		h = 25;
-		state = 7;
-		dir = 2;
-		adjustspd = 0;
-		stealth = 0;
-		spike_hurt = 0;
-		COMMAND_move = false;
-		COMMAND_hurt = false;
-		COMMAND_die = false;
-		mStageNum = 1;
-
-		mCss = CSS_DEAD;
-		mSn = SN_INGAME;
-		SetEvent(SceneChangeTrigger);
+		
 		WaitForSingleObject(SceneChangeIsDone, INFINITE);
 		break;
 	}
 	case CS_PACKET_ROBBY:
 		cs_packet_robby* packet = reinterpret_cast<cs_packet_robby*>(p);
-		if (packet->is_in == 1)
-		{
-			LobbyClient::GetLobbyClient()->robby_cnt++;
-			std::cout << LobbyClient::GetLobbyClient()->robby_cnt << std::endl;
-		}
+		break;
 	}
 }
 int Client::do_recv()

@@ -1,8 +1,6 @@
 #pragma once
 #include "Client.h"
 #include <array>
-static std::array<class Client*, 3> CLIENTS;
-
 class LobbyClient : public Client
 {
 public:
@@ -27,6 +25,4 @@ public:
 
 	bool is_robby = false;
 
-	static class LobbyClient* mLobbyClient;
-	static class LobbyClient* GetLobbyClient();
 };

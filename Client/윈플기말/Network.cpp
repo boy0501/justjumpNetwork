@@ -98,7 +98,7 @@ int Network::C_Recv()
 void Network::ProcessPacket(unsigned char* p)
 {
 	unsigned char packet_type = p[1];
-	cout << (int)packet_type << endl;
+	//cout << (int)packet_type << endl;
 	switch (packet_type) {
 	case SC_PACKET_LOGIN_OK: {
 		sc_packet_login_ok* packet = reinterpret_cast<sc_packet_login_ok*>(p);
@@ -147,6 +147,28 @@ void Network::ProcessPacket(unsigned char* p)
 	}
 	case SC_PACKET_GAMESTART:
 	{
+		occur_button = 0;
+		mMap->setblack_t(50);
+		mMap->setmapnum(mPlayer->stage + 1);
+		for (int j = 0; j < *mOcount; j++)
+			mObj[j].ResetObject();
+
+		*mOcount = initObject(mObj, mMap->getmapnum(), g_hinst);
+
+		mMap->CreateMap(g_hinst);
+		LoadBK(hbit1, g_hinst, 0);
+		//hbit1 = (HBITMAP)LoadImage(g_hinst, TEXT("img/bk.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
+		Sound::GetSelf()->setindex(Sound::GetSelf()->getindex() + 1);
+		Sound::GetSelf()->Sound_Play(EFFECTSOUND, PORTALEF, EFVOL);
+		Sound::GetSelf()->Sound_Play(BGMSOUND, FIRSTMAPBGM, BGMVOL);
+		//mPlayer->initPos();
+		//mPlayer->sethp(5);
+		mCamera->setx(0);
+		mCamera->sety(3232);
+		mMap->mStartui->closeUI();
+		mUI.emplace_back(mMap->mGameUi);
+		
+		
 		sc_packet_gamestart* packet = reinterpret_cast<sc_packet_gamestart*>(p);
 		mPlayer->dir = packet->dir;
 		mPlayer->h = packet->h;
@@ -155,7 +177,7 @@ void Network::ProcessPacket(unsigned char* p)
 		mPlayer->stealth = packet->stealth;
 		mPlayer->x = packet->x;
 		mPlayer->y = packet->y;
-
+		mPlayer->COMMAND_die = packet->COMMAND_die;
 		break;
 
 	}
