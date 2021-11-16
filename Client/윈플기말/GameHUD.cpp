@@ -20,6 +20,10 @@ void GameHUD::draw(HDC& mem1dc)
 {
 	drawByUserUi(mem1dc );
 	drawHP(mem1dc);
+	for (const auto& button : mButtons)
+	{
+		button->drawByScreenButton(mem1dc);
+	}
 	UI::draw(mem1dc);
 	//drawExit(mem1dc);
 	//getMapNum();
@@ -47,10 +51,14 @@ void GameHUD::draw(HDC& mem1dc)
 void GameHUD::drawExit(HDC& mem1dc)
 {
 	drawByUserUi(mem1dc);
-	//drawByScreenUi(mem1dc);
+	drawByScreenUi(mem1dc);
+	for (const auto& button : mButtons)
+	{
+		button->drawByUserButton(mem1dc,mCamera);
+	}
 	UI::drawExit(mem1dc);
 	
-
+	
 		if (try_once == false) {
 			this->addButton([this]() {
 				}
