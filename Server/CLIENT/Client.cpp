@@ -7,6 +7,8 @@
 
 Client::Client()
 	:prev_size(0)
+	,mCss(CSS_LIVE)
+	,mSn(SN_LOGIN)
 {
 	x = 80; 
 	y = 655;
@@ -25,6 +27,8 @@ Client::Client()
 	COMMAND_hurt = false;
 	COMMAND_die = false;
 	COMMAND_ropehurt = false;
+	SceneChangeTrigger = CreateEvent(NULL, FALSE, FALSE, NULL);
+	SceneChangeIsDone = CreateEvent(NULL, FALSE, FALSE, NULL);
 
 	//
 	//bx = 0;
@@ -33,7 +37,6 @@ Client::Client()
 
 Client::~Client()
 {
-
 }
 
 
@@ -48,15 +51,26 @@ void Client::ProcessPacket(unsigned char* p)
 	switch (packet_type) {
 	case CS_PACKET_LOGIN: {
 		cs_packet_login* packet = reinterpret_cast<cs_packet_login*>(p);
+
+		//한 번 로그인 하면 더이상 로그인 패킷은 받지 않음.
+		if (mSn == SN_LOBBY) break;
+
 		strcpy_s(playername, packet->username);
-		//send_login_ok_packet(c_id);
+		x = 80;
+		y = 665;
+		mStageNum = 0;
+
+		mCss = CSS_DEAD;
+		mSn = SN_LOBBY;
+		SetEvent(SceneChangeTrigger);
+		WaitForSingleObject(SceneChangeIsDone, INFINITE);
+
 		break;
 	}
 	//jpark
 	case CS_PACKET_MOVE: {
 		cs_packet_move* packet = reinterpret_cast<cs_packet_move*>(p);
 
-		std::cout << (int)packet->dir << std::endl;
 
 		switch ((int)packet->dir) {
 		case 37: //VK_LEFT
@@ -353,7 +367,34 @@ void Client::ProcessPacket(unsigned char* p)
 		//case 42: //spacebar keyUp
 		//	
 		//	break;
+		break;
+	}
+	case CS_PACKET_GAMEJOIN: {
+		cs_packet_gamejoin* packet = reinterpret_cast<cs_packet_gamejoin*>(p);
 
+		//한 번 게임접속하면 더이상 게임접속 패킷은 받지않음.
+		if (mSn == SN_INGAME) break;
+
+		x = 80;
+		y = 3700;
+		savey = 3700;
+		w = 14;
+		h = 25;
+		state = 7;
+		dir = 2;
+		adjustspd = 0;
+		stealth = 0;
+		spike_hurt = 0;
+		COMMAND_move = false;
+		COMMAND_hurt = false;
+		COMMAND_die = false;
+		mStageNum = 1;
+
+		mCss = CSS_DEAD;
+		mSn = SN_INGAME;
+		SetEvent(SceneChangeTrigger);
+		WaitForSingleObject(SceneChangeIsDone, INFINITE);
+		break;
 	}
 	case CS_PACKET_ROBBY:
 		cs_packet_robby* packet = reinterpret_cast<cs_packet_robby*>(p);
@@ -366,12 +407,9 @@ void Client::ProcessPacket(unsigned char* p)
 }
 int Client::do_recv()
 {
-	//버그가 있음. player buf에 저장된걸
-	//새로받은 데이터랑 합쳐주지 않는 버그 존재.
 	int received;
-	char tmpbuf[MAX_BUF_SIZE];
-	char* ptr = tmpbuf;
-	received = recv(c_socket, ptr, MAX_BUF_SIZE, 0);
+	char* ptr = reinterpret_cast<char*>(buf + prev_size);
+	received = recv(c_socket, ptr, MAX_BUF_SIZE - prev_size, 0);
 	if (received == SOCKET_ERROR)
 	{
 		return SOCKET_ERROR;

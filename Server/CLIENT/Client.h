@@ -4,6 +4,9 @@
 #include <MSWSock.h>
 #include "../../Protocol/protocol.h"
 
+enum Client_Scene_State { CSS_LIVE, CSS_DEAD };
+enum Scene_Name { SN_LOGIN, SN_LOBBY, SN_INGAME };
+
 class Client
 {
 public:
@@ -49,7 +52,10 @@ public:
 	int jumpcount = 0;
 	int diecount = 0;
 
-
+	Client_Scene_State mCss;
+	Scene_Name mSn;
+	HANDLE SceneChangeTrigger;
+	HANDLE SceneChangeIsDone;
 	SOCKET c_socket;
 	int c_id;
 	int prev_size;

@@ -25,10 +25,63 @@ float elapsed_time;
 float change_time;
 bool do_once_change = true;
 int Fps = 0;
+std::array<class Client*, 3> CLIENTS;
 
 
+void ChangeLoginToRobby(const int& c_id)
+{
+	int my_id = c_id;
+	auto p = reinterpret_cast<LoginClient*>(CLIENTS[my_id]);
+	LobbyClient* willbe_changed = new LobbyClient();
+	auto Upcasting_changed = reinterpret_cast<Client*>(willbe_changed);
+	auto Upcasted_original = reinterpret_cast<Client*>(p);
+	*Upcasting_changed = *Upcasted_original;
+	willbe_changed->elapsedtime = 0;
+	willbe_changed->mStageNum = 0;
+	willbe_changed->initBitPos();
+	willbe_changed->initPos();
+	CLIENTS[my_id] = willbe_changed;
+	delete p;
 
+	//send_ok_packet
+	sc_packet_login_ok packet;
+	packet.size = sizeof(sc_packet_login_ok);
+	packet.type = SC_PACKET_LOGIN_OK;
+	packet.id = my_id;
+	packet.x = CLIENTS[my_id]->x;
+	packet.y = CLIENTS[my_id]->y;
+	packet.stage = 0;
+	CLIENTS[my_id]->do_send(&packet, sizeof(packet));
+}
+void ChangeRobbyToGame(const int& c_id)
+{
+	int my_id = c_id;
+	auto p = reinterpret_cast<LobbyClient*>(CLIENTS[my_id]);
+	GameClient* willbe_changed = new GameClient();
+	auto Upcasting_changed = reinterpret_cast<Client*>(willbe_changed);
+	auto Upcasted_original = reinterpret_cast<Client*>(p);
+	*Upcasting_changed = *Upcasted_original;
+	willbe_changed->elapsedtime = 0;
+	willbe_changed->mStageNum = 1;
+	willbe_changed->mMap = mainMap;
+	willbe_changed->initBitPos();
+	willbe_changed->initPos();
+	CLIENTS[my_id] = willbe_changed;
+	delete p;
 
+	sc_packet_gamestart packet;
+	packet.size = sizeof(sc_packet_gamestart);
+	packet.type = SC_PACKET_GAMESTART;
+	packet.dir = CLIENTS[my_id]->dir;
+	packet.h = CLIENTS[my_id]->h;
+	packet.stage = 0;
+	packet.state = CLIENTS[my_id]->state;
+	packet.stealth = CLIENTS[my_id]->stealth;
+	packet.x = CLIENTS[my_id]->x;
+	packet.y = CLIENTS[my_id]->y;
+	CLIENTS[my_id]->do_send(&packet, sizeof(packet));
+
+}
 void send_move_process(int c_id, int mover)
 {
 	sc_packet_move_process packet;
@@ -109,55 +162,30 @@ DWORD WINAPI GameLogicThread(LPVOID arg)
 
 			}
 			if (change_time > 3 && do_once_change)
+			for (auto& c : CLIENTS)
 			{
-				do_once_change = false;
-				// 1. CLIENT에 들어있는 클래스명으로 캐스팅을 한 후, p에 집어넣는다(다운캐스팅) 
-				// 이유 : delete 할 때 할당한 만큼 해제해줘야하기 때문.
-				auto p = reinterpret_cast<LoginClient*>(CLIENTS[0]);
-				// 2. 새롭게 들어갈 클래스를 할당한다.
-				LobbyClient* willbe_changed = new LobbyClient();
-
-				// 3. 새롭게 들어갈 클래스에 원래 p의 정보를 넣는다.
-				// 이유: 로그인-> 로비로 가더라도, 플레이어의 정보가 다시 쓰여지면 안되고 유지되어야함.
-				// 플레이어의 정보는 부모클래스인 Client에 다 저장되어있음.
-				//------------------------2021-11-15 좀더 안전한 씬체인져 방식을 고안해냈음.
-				//*tmp = *reinterpret_cast<GameClient*>(p); 기존의 방식 
-				// 기존의방식은 어쨋든 LoginClient를 강제로 GameClient에 넣는것이기 때문에
-				// GameClient에 stl이 있다면 transposed pointer range 오류가 발생함.
-				// 따라서 딱 Client만 복사해주는 방법 생각
-				// 대안 1. memcpy(dest,p,sizeof(Client)) 해봤지만, LoginClient꼬리표가 붙는건 여전했다. -> 실패
-				// 따라서 변경될것과, 현재의것을 둘다 Upcast를 해서 Client로 맞추고
-				// Upcasting 된 것 끼리의 값 복사를 한다. 그럼 Client값만 빼낼 수 있고
-				// 이 Client는 변경될것을 가리키고있기 때문에, 바로 Client값만 추출해서 넣을 수 있다.
-				
-				//또한 변수명도 tmp, tp가 아닌 네임택을 붙여놓음.
-				auto Upcasting_changed = reinterpret_cast<Client*>(willbe_changed);
-				auto Upcasted_original = reinterpret_cast<Client*>(p);
-				*Upcasting_changed = *Upcasted_original;
-				//4. willbe_changed에서만 사용하는 변수들 다시 초기화
-				//함수화를 해도 괜찮을 것 같다.
-				willbe_changed->elapsedtime = 0;
-				//willbe_changed->mMap = mainMap;
-				willbe_changed->mStageNum = 0;
-
-				//willbe_changed->update(deltatime);
-				
-				willbe_changed->initBitPos();
-				willbe_changed->initPos();
-	
-				//willbe_changed->x = 80;
-				//willbe_changed->y = 655;
-				//willbe_changed->w = 14;
-				//willbe_changed->h = 25;
-				//willbe_changed->state = 7;
-				//5. CLIENTS에 바꿀 class를 연결
-				CLIENTS[0] = willbe_changed;
-
-
-				//6. 원래 CLIENT에 할당되어있던 메모리를 해제
-				delete p;
+				if (c->mCss == CSS_LIVE) continue;
+				//PlayerInputThread에서 mCss와 mSn을 바꿔주는데
+				// mCss가 바뀌고 mSn이 바뀌기 전에(순서가 존재함) 이 아래 코드를 실행하면 동기화문제가 생기니
+				// Event를 사용하여 동기화문제를 해결한다.
+				WaitForSingleObject(c->SceneChangeTrigger, INFINITE);
+				switch (c->mSn)
+				{
+				case SN_LOBBY:
+					ChangeLoginToRobby(c->c_id);
+					c->mCss = CSS_LIVE;
+					SetEvent(c->SceneChangeIsDone);
+					break;
+				case SN_INGAME:
+					ChangeRobbyToGame(c->c_id);
+					c->mCss = CSS_LIVE;
+					SetEvent(c->SceneChangeIsDone);
+					break;
+				}
+				//서버에서 플레이어를 옮겨줬다면 SetEvent를 하여 클라이언트에게 바뀌었다고 패킷을 날림
+				//1.서버처리 2.클라에게 패킷처리 [ 순서 존재 ]
 			}
-			//
+
 
 			
 			for (int i = 0; i < Cnt_Player; ++i)
@@ -199,16 +227,6 @@ DWORD WINAPI ClientInputThread(LPVOID arg)
 	}
 }
 
-void send_login_ok(int c_id)
-{
-	sc_packet_login_ok packet;
-	packet.size = sizeof(sc_packet_login_ok);
-	packet.type = SC_PACKET_LOGIN_OK;
-	packet.id = c_id;
-	packet.x = 0;
-	packet.y = 0;
-	CLIENTS[c_id]->do_send(&packet, sizeof(packet));
-}
 
 int main()
 {
@@ -232,7 +250,7 @@ int main()
 	{
 		CLIENTS[i]->c_socket = mNet->AcceptClient(CLIENTS[i]->c_addr);
 		CLIENTS[i]->c_id = i;
-		send_login_ok(i);
+		//send_login_ok(i);
 		hThread = CreateThread(NULL, 0, ClientInputThread, (LPVOID)i, 0, NULL);
 		if (hThread == NULL) closesocket(CLIENTS[i]->c_socket);
 	}

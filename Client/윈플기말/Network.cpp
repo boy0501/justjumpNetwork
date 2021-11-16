@@ -2,9 +2,11 @@
 #include "Network.h"
 
 #include "../../Protocol/protocol.h"
+#include "Load.h"
 #include "player.h"
 #include "Camera.h"
-static CAMERA camera;
+#include "ObjectManager.h"
+#include "Map.h"
 
 Network* Network::mNetwork = nullptr;
 
@@ -23,6 +25,7 @@ void error_display(int err_no)
 Network::Network()
 	: mPlayer(nullptr)
 	, prev_size(0)
+	, mOcount(nullptr)
 {
 	WSAStartup(MAKEWORD(2, 2), &WSAData);
 	s_socket = socket(AF_INET, SOCK_STREAM, 0);
@@ -63,11 +66,10 @@ void Network::ConnectServer(const char* server_ip)
 
 int Network::C_Recv()
 {
-	//std::cout << "recvÁß!" << std::endl;
 	int received;
-	char tmpbuf[MAX_BUF_SIZE];
-	char* ptr = tmpbuf;
-	received = recv(s_socket, ptr, MAX_BUF_SIZE, 0);
+	
+	char* ptr = reinterpret_cast<char*>(buf + prev_size);
+	received = recv(s_socket, ptr, MAX_BUF_SIZE - prev_size, 0);
 	if (received == SOCKET_ERROR)
 	{
 		return SOCKET_ERROR;
@@ -96,11 +98,25 @@ int Network::C_Recv()
 void Network::ProcessPacket(unsigned char* p)
 {
 	unsigned char packet_type = p[1];
+	cout << (int)packet_type << endl;
 	switch (packet_type) {
 	case SC_PACKET_LOGIN_OK: {
 		sc_packet_login_ok* packet = reinterpret_cast<sc_packet_login_ok*>(p);
+		mPlayer->stage = packet->stage;
 		mPlayer->player_cid = packet->id;
-		//send_login_ok_packet(c_id);
+		mPlayer->x = packet->x;
+		mPlayer->y = packet->y;
+
+		mMap->setmapnum(9);
+		*mOcount = initObject(mObj, mMap->getmapnum(), g_hinst);
+		mMap->CreateMap(g_hinst);
+		LoadBK(hbit1, g_hinst, 9);
+		mCamera->setx(0);
+		mCamera->sety(0);
+		//player.setx(80);
+		//player.sety(655);
+		Sound::GetSelf()->Sound_Play(BGMSOUND, MAINMENUBGM, BGMVOL);
+
 		break;
 	}
 	case SC_PACKET_ROBBY: {
@@ -117,7 +133,7 @@ void Network::ProcessPacket(unsigned char* p)
 		sc_packet_move_process* packet = reinterpret_cast<sc_packet_move_process*>(p);
 		
 		//std::cout << packet->x << "," << packet->y << std::endl;
-		std::cout << (int)packet->bx << std::endl;
+		//std::cout << (int)packet->bx << std::endl;
 
 		mPlayer->x = packet->x;
 		mPlayer->y = packet->y;
@@ -129,7 +145,20 @@ void Network::ProcessPacket(unsigned char* p)
 
 		break;
 	}
+	case SC_PACKET_GAMESTART:
+	{
+		sc_packet_gamestart* packet = reinterpret_cast<sc_packet_gamestart*>(p);
+		mPlayer->dir = packet->dir;
+		mPlayer->h = packet->h;
+		mPlayer->stage = packet->stage;
+		mPlayer->state = packet->state;
+		mPlayer->stealth = packet->stealth;
+		mPlayer->x = packet->x;
+		mPlayer->y = packet->y;
 
+		break;
+
+	}
 	}
 	
 }

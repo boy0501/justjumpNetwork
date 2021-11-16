@@ -30,6 +30,7 @@ public:
 	bool ready_to_go = false;
 	int player_cid = 0;
 	bool WhenPlayerDied = false;
+	char stage;			//몇번째 스테이지에 있는지
 	float falldy = 0;	//속도 제어
 	float GroundAccel = 0.5;	//중력가속도
 	std::string mPlayername;	//플레이어이름
