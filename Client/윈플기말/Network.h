@@ -7,6 +7,7 @@ static HDC mem1dc, pdc, hdc;
 static HWND hWnd;
 static HBITMAP hbit1;
 static RECT rectview;
+static HINSTANCE g_hinst;
 static int obj_t = 0;
 void error_display(int err_no);
 
@@ -20,9 +21,13 @@ public:
 	SOCKADDR_IN server_addr;
 	WSADATA WSAData;
 	class PLAYER* mPlayer;
+	class MAP* mMap;
+	class CAMERA* mCamera;
 	static class Network* mNetwork;
 	static class Network* GetNetwork();
 	int prev_size;
+	int* mOcount;
+	class OBJECT* mObj;
 	void ConnectServer(const char* server_ip);
 	void C_Send(void* packet, int bytes);
 	int C_Recv();
