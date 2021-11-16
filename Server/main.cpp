@@ -12,7 +12,7 @@
 #include "Object.h"
 #include "Map.h"
 #include "../Protocol/protocol.h"
-
+#include <time.h>
 #pragma comment(lib, "ws2_32")
 using namespace std;
 
@@ -28,6 +28,22 @@ bool do_once_change = true;
 int Fps = 0;
 
 
+void send_move_process(int c_id, int mover)
+{
+	sc_packet_move_process packet;
+	packet.size = sizeof(sc_packet_move_process);
+	packet.type = SC_PACKET_MOVE_PROCESS;
+	packet.id = mover;
+	packet.x = CLIENTS[mover]->x;
+	packet.y = CLIENTS[mover]->y;
+	packet.h = CLIENTS[mover]->h;
+	packet.state = CLIENTS[mover]->state;
+	packet.stealth = CLIENTS[mover]->stealth;
+	packet.dir = CLIENTS[mover]->dir;
+	packet.bx = CLIENTS[mover]->bx;
+	CLIENTS[c_id]->do_send(&packet, sizeof(packet));
+}
+
 
 //http://www.tipssoft.com/bulletin/board.php?bo_table=FAQ&wr_id=735 타임관련
 
@@ -35,8 +51,10 @@ DWORD WINAPI GameLogicThread(LPVOID arg)
 {
 	QueryPerformanceFrequency(&Frequency);
 	QueryPerformanceCounter(&Endtime);
+	//time_t current_time = time(NULL);
 	while (1) {
-
+		//time_t frame_time = time(NULL) - current_time;
+		//cout << "frame_time = "<<frame_time << endl;
 		QueryPerformanceCounter(&BeginTime);
 		auto elapsed = BeginTime.QuadPart - Endtime.QuadPart;
 		auto deltatime = (double)elapsed / (double)Frequency.QuadPart;
@@ -47,7 +65,7 @@ DWORD WINAPI GameLogicThread(LPVOID arg)
 			Fps++;
 			if (elapsed_time > 1.0f)
 			{
-				cout << "FPS:" << Fps << endl;
+				//cout << "FPS:" << Fps << endl;
 				Fps = 0;
 				elapsed_time = 0;
 			}
@@ -64,7 +82,7 @@ DWORD WINAPI GameLogicThread(LPVOID arg)
 				// 이유 : delete 할 때 할당한 만큼 해제해줘야하기 때문.
 				auto p = reinterpret_cast<LoginClient*>(CLIENTS[0]);
 				// 2. 새롭게 들어갈 클래스를 할당한다.
-				GameClient* willbe_changed = new GameClient();
+				LobbyClient* willbe_changed = new LobbyClient();
 
 				// 3. 새롭게 들어갈 클래스에 원래 p의 정보를 넣는다.
 				// 이유: 로그인-> 로비로 가더라도, 플레이어의 정보가 다시 쓰여지면 안되고 유지되어야함.
@@ -86,25 +104,38 @@ DWORD WINAPI GameLogicThread(LPVOID arg)
 				//4. willbe_changed에서만 사용하는 변수들 다시 초기화
 				//함수화를 해도 괜찮을 것 같다.
 				willbe_changed->elapsedtime = 0;
-				willbe_changed->mMap = mainMap;
+				//willbe_changed->mMap = mainMap;
 				willbe_changed->mStageNum = 0;
-				willbe_changed->x = 80;
-				willbe_changed->y = 655;
-				willbe_changed->w = 14;
-				willbe_changed->h = 25;
-				willbe_changed->state = 7;
+
+				//willbe_changed->update(deltatime);
+				
+				willbe_changed->initBitPos();
+				willbe_changed->initPos();
+	
+				//willbe_changed->x = 80;
+				//willbe_changed->y = 655;
+				//willbe_changed->w = 14;
+				//willbe_changed->h = 25;
+				//willbe_changed->state = 7;
 				//5. CLIENTS에 바꿀 class를 연결
 				CLIENTS[0] = willbe_changed;
+
+
 				//6. 원래 CLIENT에 할당되어있던 메모리를 해제
 				delete p;
 			}
 			//
 
-
+			
 			for (int i = 0; i < Cnt_Player; ++i)
 			{
 				CLIENTS[i]->update(deltatime);
 			}
+
+			//현재 문제
+			//1. 이동시 뚝뚝 끊긴다. v
+			//2. 점프 시 obj와 충돌처리가 되어야 함. v
+			//3. initpos?
 		}
 
 		
@@ -125,6 +156,12 @@ DWORD WINAPI ClientInputThread(LPVOID arg)
 			closesocket(CLIENTS[c_id]->c_socket);
 			return 0;
 		}
+
+		for (int i = 0; i < Cnt_Player; ++i)
+		{
+			send_move_process(i, c_id);
+
+		}
 	}
 }
 
@@ -142,7 +179,7 @@ void send_login_ok(int c_id)
 int main()
 {
 	wcout.imbue(locale("korean"));
-	for (int i = 0; i < 3; ++i)
+	for (int i = 0; i < 3; ++i) //오브젝트 풀링
 	{
 		CLIENTS[i] = new LoginClient();
 	}

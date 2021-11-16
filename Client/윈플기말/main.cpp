@@ -410,6 +410,7 @@ void send_move_packet(char dr)
 	packet.dir = dr;
 
 	Network::GetNetwork()->C_Send(&packet, sizeof(packet));
+	//cout << "sendÆÐÅ¶ º¸³¿" << endl;
 }
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
