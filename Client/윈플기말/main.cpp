@@ -430,7 +430,9 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 
 		Network::GetNetwork()->mPlayer = &player;
 		Network::GetNetwork()->mMap = &map;
-		Network::GetNetwork()->mOcount = ocount;
+		Network::GetNetwork()->mOcount = &ocount;
+		Network::GetNetwork()->mObj = obj;
+		Network::GetNetwork()->mCamera = &camera;
 		Network::GetNetwork()->ConnectServer("127.0.0.1");
 		
 
@@ -465,9 +467,18 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 
 			HideCaret(hwnd);
 		}, g_hinst, "img/LoginButton", 365, 440, 278, 53, RGB(255, 0, 0));
+
 		auto startui = make_shared<StartHUD>(0);
 		//hbit = (HBITMAP)LoadImage(g_hinst, TEXT("img/NoNameUi.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION); //상대경로로 변경
 		startui->addButton([startui]() {
+
+			cs_packet_gamejoin packet;
+			packet.size = sizeof(cs_packet_gamejoin);
+			packet.type = CS_PACKET_GAMEJOIN;
+			packet.id = player.player_cid;
+			Network::GetNetwork()->C_Send(&packet, sizeof(packet));
+
+
 			occur_button = 0;
 			map.setblack_t(50);
 			map.setmapnum(map.getmapnum() + 1);
@@ -582,8 +593,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 			break;
 		}
 		
-		std::cout << LOWORD(lParam) << endl;
-		std::cout << HIWORD(lParam) + camera.gety() << endl;
+		//std::cout << LOWORD(lParam) << endl;
+		//std::cout << HIWORD(lParam) + camera.gety() << endl;
 		break;
 	case WM_LBUTTONUP:
 		
@@ -680,7 +691,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 			if (hbitobj[i]) DeleteObject(hbitobj[i]);		
 		RemoveFontResourceA("font/Maplestory Bold.ttf");
 		RemoveFontResourceA("font/Maplestory Light.ttf");
-		Sound::GetSelf()->~Sound();
+		delete Sound::GetSelf();
 		PostQuitMessage(0);
 		return 0;
 	}

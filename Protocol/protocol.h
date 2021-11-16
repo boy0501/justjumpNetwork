@@ -10,6 +10,7 @@ const int  MAX_USER = 10;
 const char CS_PACKET_LOGIN = 1;
 const char CS_PACKET_MOVE = 2;
 const char CS_PACKET_SCENE_CHANGE = 3;
+const char CS_PACKET_GAMEJOIN = 4;
 const char CS_PACKET_TEST = 99;
 
 const char SC_PACKET_LOGIN_OK = 1;
@@ -18,7 +19,8 @@ const char SC_PACKET_PUT_OBJECT = 3;
 const char SC_PACKET_LOGOUT_OBJECT = 4;
 const char SC_PACKET_ROBBY = 5;
 const char SC_PACKET_EMPTY = 6;
-const char SC_PACKET_SCENE_CHANGE_OK = 7;
+const char SC_PACKET_GAMESTART = 7;
+
 
 #pragma pack (push, 1)
 //---------------------client packet
@@ -44,6 +46,12 @@ struct cs_packet_scene_change {
 	unsigned char size;
 	char type;
 	char stage;
+};
+
+struct cs_packet_gamejoin {
+	unsigned char size;
+	char type;
+	int		id;
 };
 //-----------------------server packet
 struct sc_packet_login_ok {
@@ -99,7 +107,7 @@ struct sc_packet_empty {
 	char type;
 };
 
-struct sc_packet_scene_change_ok {
+struct sc_packet_gamestart {
 	unsigned char size;
 	char type;
 	char stage;

@@ -9,7 +9,6 @@ Sound::Sound()
 
 Sound::~Sound()
 {
-	delete mSound;
 }
 
 int Sound::getindex()
