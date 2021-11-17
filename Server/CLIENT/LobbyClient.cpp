@@ -8,7 +8,6 @@
 LobbyClient::LobbyClient()
 	:elapsedtime(0)
 	, obj_t(0)
-	, robby_timer(11)
 {
 	
 }
@@ -59,13 +58,13 @@ void LobbyClient::update(float delta_time)
 				mSn = SN_INGAME;
 				SetEvent(SceneChangeTrigger);
 			}
+
 			std::cout << robby_timer << std::endl;
 			sc_packet_robby packet;
 			packet.size = sizeof(sc_packet_robby);
 			packet.type = SC_PACKET_ROBBY;
 			packet.countdown = robby_timer;
 			do_send(&packet, sizeof(packet));
-			
 		}
 	}
 

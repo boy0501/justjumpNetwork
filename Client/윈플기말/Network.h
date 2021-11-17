@@ -3,6 +3,7 @@
 #include <windows.h>
 #include "../../Protocol/protocol.h"
 #include <vector>
+//#include "object.h"
 
 static HDC mem1dc, pdc, hdc;
 static HWND hWnd;
@@ -50,5 +51,7 @@ public:
 
 	int countdown;
 	int init_x = 300;
+
+	void test();
 };
 

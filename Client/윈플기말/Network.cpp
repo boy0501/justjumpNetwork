@@ -7,6 +7,7 @@
 #include "Camera.h"
 #include "ObjectManager.h"
 #include "Map.h"
+#include "StartHUD.h"
 
 Network* Network::mNetwork = nullptr;
 
@@ -94,6 +95,40 @@ int Network::C_Recv()
 	return 0;
 }
 
+void Network::test()
+{
+	/*occur_button = 0;
+	mMap->setblack_t(50);
+	mMap->setmapnum(10);
+	for (int j = 0; j < ocount; j++)
+		obj[j].ResetObject();
+
+	ocount = initObject(obj, mMap->getmapnum(), g_hinst);
+	mMap->CreateMap(g_hinst);
+
+	LoadBK(hbit1, g_hinst, 10);*/
+
+	//hbit1 = (HBITMAP)LoadImage(g_hinst, TEXT("img/bk.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
+	//Sound::GetSelf()->setindex(Sound::GetSelf()->getindex() + 1);
+	//Sound::GetSelf()->Sound_Play(EFFECTSOUND, PORTALEF, EFVOL);
+	//Sound::GetSelf()->Sound_Play(BGMSOUND, FIRSTMAPBGM, BGMVOL);
+	//mPlayer->initPos();
+	//mPlayer->sethp(5);
+	//mCamera->setx(0);
+	//mCamera->sety(3232);
+	//mMap->mStartui->closeUI();
+
+	//mUI.emplace_back(mMap->mGameUi);
+
+	/*auto it = find(mUI.begin(), mUI.end(), mMap->mGameUi);
+	if (it == mUI.end()) {
+		cout << mMap->mGameUi << "은 찾을 수 없습니다.\n";
+	}
+	else {
+		cout << mMap->mGameUi << "는 존재하며 인덱스는 " << it - mUI.begin() << " 입니다.\n";
+	}*/
+	cout << "게임 스타트!" << endl;
+}
 
 void Network::ProcessPacket(unsigned char* p)
 {
@@ -125,7 +160,7 @@ void Network::ProcessPacket(unsigned char* p)
 		if (countdown != packet->countdown)
 			init_x += 20;
 		countdown = packet->countdown;
-		std::cout << packet->countdown << std::endl;
+		//std::cout << packet->countdown << std::endl;
 		break;
 	}
 	case SC_PACKET_MOVE_PROCESS: 
@@ -147,28 +182,6 @@ void Network::ProcessPacket(unsigned char* p)
 	}
 	case SC_PACKET_GAMESTART:
 	{
-		occur_button = 0;
-		mMap->setblack_t(50);
-		mMap->setmapnum(mPlayer->stage + 1);
-		for (int j = 0; j < *mOcount; j++)
-			mObj[j].ResetObject();
-
-		*mOcount = initObject(mObj, mMap->getmapnum(), g_hinst);
-
-		mMap->CreateMap(g_hinst);
-		LoadBK(hbit1, g_hinst, 0);
-		//hbit1 = (HBITMAP)LoadImage(g_hinst, TEXT("img/bk.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
-		Sound::GetSelf()->setindex(Sound::GetSelf()->getindex() + 1);
-		Sound::GetSelf()->Sound_Play(EFFECTSOUND, PORTALEF, EFVOL);
-		Sound::GetSelf()->Sound_Play(BGMSOUND, FIRSTMAPBGM, BGMVOL);
-		//mPlayer->initPos();
-		//mPlayer->sethp(5);
-		mCamera->setx(0);
-		mCamera->sety(3232);
-		mMap->mStartui->closeUI();
-		mUI.emplace_back(mMap->mGameUi);
-		
-		
 		sc_packet_gamestart* packet = reinterpret_cast<sc_packet_gamestart*>(p);
 		mPlayer->dir = packet->dir;
 		mPlayer->h = packet->h;
@@ -178,6 +191,39 @@ void Network::ProcessPacket(unsigned char* p)
 		mPlayer->x = packet->x;
 		mPlayer->y = packet->y;
 		mPlayer->COMMAND_die = packet->COMMAND_die;
+
+
+		occur_button = 0;
+		mMap->setblack_t(50);
+		mMap->setmapnum(10);
+		for (int j = 0; j < *mOcount; j++)
+			mObj[j].ResetObject();
+
+		*mOcount = initObject(mObj, mMap->getmapnum(), g_hinst);
+		mMap->CreateMap(g_hinst);
+
+		LoadBK(hbit1, g_hinst, 10);
+
+		hbit1 = (HBITMAP)LoadImage(g_hinst, TEXT("img/bk.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
+		Sound::GetSelf()->setindex(Sound::GetSelf()->getindex() + 1);
+		Sound::GetSelf()->Sound_Play(EFFECTSOUND, PORTALEF, EFVOL);
+		Sound::GetSelf()->Sound_Play(BGMSOUND, FIRSTMAPBGM, BGMVOL);
+		mPlayer->initPos();
+		mPlayer->sethp(5);
+		mCamera->setx(0);
+		mCamera->sety(3232);
+		startui->closeUI();
+		mUI.emplace_back(mMap->mGameUi);
+
+		/*auto it = find(mUI.begin(), mUI.end(), mMap->mGameUi);
+		if (it == mUI.end()) {
+			cout << mMap->mGameUi << "은 찾을 수 없습니다.\n";
+		}
+		else {
+			cout << mMap->mGameUi << "는 존재하며 인덱스는 " << it - mUI.begin() << " 입니다.\n";
+		}*/
+		cout << "게임 스타트!" << endl;
+		
 		break;
 
 	}

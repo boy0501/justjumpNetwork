@@ -82,7 +82,7 @@ void update(float delta_time)
 	robby_waiting();
 
 	//if (bRobby_full == true) {
-	//	occur_button = 0;
+	//	bool occur_button = 0;
 	//	map.setblack_t(50);
 	//	map.setmapnum(player.stage + 1);
 	//	for (int j = 0; j < ocount; j++)
@@ -100,7 +100,7 @@ void update(float delta_time)
 	//	camera.setx(0);
 	//	camera.sety(3232);
 	//	map.mStartui->closeUI();
-	//	mUI.emplace_back(map.mGameUi);
+	//	Network::GetNetwork()->mUI.emplace_back(map.mGameUi);
 	//	bRobby_full = false;
 	//}
 
@@ -456,12 +456,12 @@ void send_robby_in_packet()
 void robby_waiting()
 {
 	map.mStartui->addText(to_string(Network::GetNetwork()->countdown), "countdown", L"메이플스토리 bold", RGB(255, 255, 255), 18, Network::GetNetwork()->init_x, 200, false, 0, 0, camera);
-	cout << Network::GetNetwork()->countdown << endl;
+	//cout << Network::GetNetwork()->countdown << endl;
 
-	//if (Network::GetNetwork()->countdown == 1)
-	//{
-	//	bRobby_full = true;
-	//}
+	/*if (Network::GetNetwork()->countdown == 1)
+	{
+		bRobby_full = true;
+	}*/
 }
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
@@ -532,16 +532,32 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		auto startui = make_shared<StartHUD>(0);
 		//hbit = (HBITMAP)LoadImage(g_hinst, TEXT("img/NoNameUi.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION); //상대경로로 변경
 		startui->addButton([startui]() {
+			//Network::GetNetwork()->test();
 
-			
+
+			/*for (int j = 0; j < ocount; j++)
+				obj[j].ResetObject();
+			ocount = initObject(obj, map.getmapnum(), g_hinst);
+			map.CreateMap(g_hinst);
+			LoadBK(hbit1, g_hinst, 10);
+			Sound::GetSelf()->setindex(Sound::GetSelf()->getindex() + 1);
+			Sound::GetSelf()->Sound_Play(EFFECTSOUND, PORTALEF, EFVOL);
+			Sound::GetSelf()->Sound_Play(BGMSOUND, FIRSTMAPBGM, BGMVOL);
+			player.initPos();
+			player.sethp(5);
+			camera.setx(0);
+			camera.sety(3232);
+			map.mStartui->closeUI();
+			Network::GetNetwork()->mUI.emplace_back(map.mGameUi);*/
+
 		}, g_hinst, "img/start", 292, 490, 138, 82, RGB(255, 0, 0));
 		startui->addButton([]() {}, g_hinst, "img/help", 215, 300, 400, 200, RGB(60, 60, 60));
 		map.mStartui = startui;
 
-		startui->addButton([]() {
+		//startui->addButton([]() {
 
-			}, g_hinst, "img/Exit", 800, 400, 138, 82, RGB(255, 0, 0));// g_hinst, "img/help", 215, 300, 400, 200, RGB(60, 60, 60));
-		map.mStartui = startui;
+		//	}, g_hinst, "img/Exit", 800, 400, 138, 82, RGB(255, 0, 0));// g_hinst, "img/help", 215, 300, 400, 200, RGB(60, 60, 60));
+		//map.mStartui = startui;
 		
 		auto dieui = make_shared<DieHUD>(1,player,camera);
 		
@@ -690,6 +706,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		}
 		if (wParam == 'r')
 		{
+			cout << "r키 누름" << endl;
 			player.setx(obj[ocount - 1].getX() + 10);
 			player.sety(obj[ocount - 1].getY() - 25);
 			break;
