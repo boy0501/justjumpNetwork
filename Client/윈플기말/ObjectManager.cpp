@@ -465,7 +465,6 @@ int initObject(OBJECT* obj, int mapnum, HINSTANCE g_hinst)
 //카메라 무빙워크
 void adjustCamera(CAMERA& camera, PLAYER player)
 {
-	std::cout << camera.getx() << ", " << camera.gety() << std::endl;
 	//플레이어의 머리부분이 카메라의 꼭대기점을 넘어가면 바로 따라붙게한다
 	if (player.gety() - player.geth() < camera.gety())
 	{

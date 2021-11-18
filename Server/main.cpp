@@ -38,6 +38,7 @@ void ChangeLoginToRobby(const int& c_id)
 	*Upcasting_changed = *Upcasted_original;
 	willbe_changed->elapsedtime = 0;
 	willbe_changed->mStageNum = 0;
+	willbe_changed->mMap = mainMap;
 	willbe_changed->initBitPos();
 	willbe_changed->initPos();
 	CLIENTS[my_id] = willbe_changed;
