@@ -20,6 +20,7 @@ const char SC_PACKET_LOGOUT_OBJECT = 4;
 const char SC_PACKET_ROBBY = 5;
 const char SC_PACKET_EMPTY = 6;
 const char SC_PACKET_GAMESTART = 7;
+const char SC_PACKET_STAGENUM = 8;
 
 
 #pragma pack (push, 1)
@@ -115,5 +116,12 @@ struct sc_packet_gamestart {
 	short state;
 	short dir;
 	short stealth;
+};
+
+struct sc_packet_stagenum {
+	unsigned char size;
+	char type;
+	int id;
+	int stagenum;
 };
 #pragma pack(pop)

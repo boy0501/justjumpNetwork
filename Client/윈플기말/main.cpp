@@ -217,6 +217,12 @@ void render()
 	//cout << player.x << endl;
 	for (const auto& ui : mUI)
 		ui->draw(mem1dc);
+	//지우지 마세요------
+	if (map.getmapnum() == 13) {
+		for (const auto& ui : mUI)
+			ui->drawExit(mem1dc);
+	}
+	//-------------------
 
 	if (map.getblack_t() > 0) map.DrawLoadBK(mem1dc, mem2dc, loadbf);
 
