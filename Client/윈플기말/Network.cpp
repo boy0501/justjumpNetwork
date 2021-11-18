@@ -144,7 +144,7 @@ void Network::ProcessPacket(unsigned char* p)
 
 		mMap->setmapnum(9);
 		*mOcount = initObject(mObj, mMap->getmapnum(), g_hinst);
-		//mMap->CreateMap(g_hinst);
+		mMap->CreateMap(g_hinst);
 		LoadBK(hbit1, g_hinst, 9);
 		mCamera->setx(0);
 		mCamera->sety(0);
@@ -192,40 +192,45 @@ void Network::ProcessPacket(unsigned char* p)
 		mPlayer->y = packet->y;
 		mPlayer->COMMAND_die = packet->COMMAND_die;
 
-		auto gameui = make_shared<GameHUD>(1, *mPlayer);
+		//auto gameui = make_shared<GameHUD>(1, *mPlayer);
 
 		occur_button = 0;
-		mMap->setblack_t(50);
+		mMap->setblack_t(1);
 		mMap->setmapnum(mPlayer->stage + 1);
 		for (int j = 0; j < *mOcount; j++)
 			mObj[j].ResetObject();
 
 		*mOcount = initObject(mObj, mMap->getmapnum(), g_hinst);
 		mMap->CreateMap(g_hinst);
+		LoadBK(hbit1, g_hinst, mMap->getmapnum());
 
-		//LoadBK(hbit1, g_hinst, mMap->getmapnum());
 
 		//hbit1 = (HBITMAP)LoadImage(g_hinst, TEXT("img/bk.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
 		Sound::GetSelf()->setindex(Sound::GetSelf()->getindex() + 1);
 		Sound::GetSelf()->Sound_Play(EFFECTSOUND, PORTALEF, EFVOL);
 		Sound::GetSelf()->Sound_Play(BGMSOUND, FIRSTMAPBGM, BGMVOL);
-		//mPlayer->initPos();
-		//mPlayer->sethp(5);
+		mPlayer->initPos();
+		mPlayer->sethp(5);
 		//cout << mCamera->getx() << ", " << mCamera->gety() << endl;
-		//mCamera->setx(0);
-		//mCamera->sety(500);
+		
+		//cout << mPlayer->x <<", "<< mPlayer->y<<endl;
+		//cout << mCamera->getx() << ", " << mCamera->gety() << endl;
+
+		mCamera->setx(0);
+		mCamera->sety(500);
+
+		mMap->mStartui->closeUI();
+		mUI.emplace_back(mMap->mGameUi);
 		//auto gameui = make_shared<GameHUD>(1, *mPlayer);
 		//gameui->LoadUiBitmap(g_hinst, "img/NoNameUi.bmp", 400, 700, 199, 65, RGB(0, 255, 0), *mCamera);
 		//gameui->addText(mPlayer->mPlayerwname, "NickName", L"메이플스토리 light", RGB(255, 255, 255), 14, 475, 705, true, 100, 65, *mCamera);
 		//gameui->LoadHpUiBitmap(g_hinst, "img/Ui_HP.bmp", 421, 728, 100, 65, RGB(0, 0, 255), *mCamera);
 
 		//startui->closeUI();
-		mMap->mStartui->closeUI();
 		//mMap->mGameUi = make_shared<GameHUD>(1, *mPlayer);
+		//BitBlt(hdc, 0, 0, 1024, 768, mem1dc, camera.getx(), camera.gety(), SRCCOPY);
 
-		mUI.emplace_back(mMap->mGameUi);
-
-		mMap->mGameUi = gameui;
+		//mMap->mGameUi = gameui;
 		
 		/*auto it = find(mUI.begin(), mUI.end(), mMap->mGameUi);
 		if (it == mUI.end()) {

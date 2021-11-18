@@ -5,6 +5,7 @@
 #include <vector>
 //#include "object.h"
 #include "Camera.h"
+//#include "Map.h"
 
 static HDC mem1dc, pdc, hdc;
 static HWND hWnd;
@@ -15,6 +16,7 @@ static int obj_t = 0;
 void error_display(int err_no);
 
 static CAMERA camera;
+//static MAP map;
 
 class Network
 {

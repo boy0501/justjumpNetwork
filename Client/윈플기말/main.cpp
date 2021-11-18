@@ -78,8 +78,9 @@ void update(float delta_time)
 	//	Nameunsigan--;
 	//	
 	//}
-	Network::GetNetwork()->C_Recv();
 	robby_waiting();
+
+	Network::GetNetwork()->C_Recv();
 
 	//if (bRobby_full == true) {
 	//	bool occur_button = 0;
@@ -252,7 +253,7 @@ void render()
 
 	BitBlt(hdc, 0, 0, 1024, 768, mem1dc, camera.getx(), camera.gety(), SRCCOPY);
 
-	cout << camera.getx() << ", " << camera.gety() << endl;
+	//cout << camera.getx() << ", " << camera.gety() << endl;
 
 
 	DeleteObject(mem1dc);
