@@ -4,6 +4,7 @@
 #include "../../Protocol/protocol.h"
 #include <vector>
 //#include "object.h"
+#include "Camera.h"
 
 static HDC mem1dc, pdc, hdc;
 static HWND hWnd;
@@ -12,6 +13,8 @@ static RECT rectview;
 static HINSTANCE g_hinst;
 static int obj_t = 0;
 void error_display(int err_no);
+
+static CAMERA camera;
 
 class Network
 {

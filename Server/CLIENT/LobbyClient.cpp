@@ -39,6 +39,7 @@ void LobbyClient::update(float delta_time)
 				//SetEvent(SceneChangeTrigger);
 				robby_timer = 0;
 
+				//gamestart initpos
 				x = 80;
 				y = 3700;
 				savey = 3700;

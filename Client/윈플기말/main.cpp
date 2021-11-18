@@ -41,7 +41,7 @@ static PLAYER player;
 PLAYER others[2];
 
 static MAP map;
-static CAMERA camera;
+//static CAMERA camera;
 static OBJECT obj[150];
 static BLENDFUNCTION loadbf;
 bool isComposit = false;
@@ -252,6 +252,7 @@ void render()
 
 	BitBlt(hdc, 0, 0, 1024, 768, mem1dc, camera.getx(), camera.gety(), SRCCOPY);
 
+	cout << camera.getx() << ", " << camera.gety() << endl;
 
 
 	DeleteObject(mem1dc);
@@ -526,29 +527,36 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 			map.mGameUi = gameui;
 			//gameUi설정 끝 
 
+			
+
 			HideCaret(hwnd);
 		}, g_hinst, "img/LoginButton", 365, 440, 278, 53, RGB(255, 0, 0));
-
+		
 		auto startui = make_shared<StartHUD>(0);
 		//hbit = (HBITMAP)LoadImage(g_hinst, TEXT("img/NoNameUi.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION); //상대경로로 변경
 		startui->addButton([startui]() {
 			//Network::GetNetwork()->test();
+			//cout << "들어옴" << endl;
 
-
-			/*for (int j = 0; j < ocount; j++)
-				obj[j].ResetObject();
-			ocount = initObject(obj, map.getmapnum(), g_hinst);
-			map.CreateMap(g_hinst);
-			LoadBK(hbit1, g_hinst, 10);
-			Sound::GetSelf()->setindex(Sound::GetSelf()->getindex() + 1);
-			Sound::GetSelf()->Sound_Play(EFFECTSOUND, PORTALEF, EFVOL);
-			Sound::GetSelf()->Sound_Play(BGMSOUND, FIRSTMAPBGM, BGMVOL);
-			player.initPos();
-			player.sethp(5);
-			camera.setx(0);
-			camera.sety(3232);
-			map.mStartui->closeUI();
-			Network::GetNetwork()->mUI.emplace_back(map.mGameUi);*/
+			//bool occur_button = 0;
+			//map.setblack_t(50);
+			//map.setmapnum(player.stage + 1);
+			//for (int j = 0; j < ocount; j++)
+			//	obj[j].ResetObject();
+			//ocount = initObject(obj, map.getmapnum(), g_hinst);
+			//map.CreateMap(g_hinst);
+			//LoadBK(hbit1, g_hinst, map.getmapnum());
+			//Sound::GetSelf()->setindex(Sound::GetSelf()->getindex() + 1);
+			//Sound::GetSelf()->Sound_Play(EFFECTSOUND, PORTALEF, EFVOL);
+			//Sound::GetSelf()->Sound_Play(BGMSOUND, FIRSTMAPBGM, BGMVOL);
+			//player.initPos();
+			//player.sethp(5);
+			//camera.setx(0);
+			//camera.sety(3232);
+			//map.mStartui->closeUI();
+			//Network::GetNetwork()->mUI.emplace_back(map.mGameUi);
+		    //Network::GetNetwork()->mUI.emplace_back(map.mGameUi);
+			
 
 		}, g_hinst, "img/start", 292, 490, 138, 82, RGB(255, 0, 0));
 		startui->addButton([]() {}, g_hinst, "img/help", 215, 300, 400, 200, RGB(60, 60, 60));
@@ -558,6 +566,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 
 		//	}, g_hinst, "img/Exit", 800, 400, 138, 82, RGB(255, 0, 0));// g_hinst, "img/help", 215, 300, 400, 200, RGB(60, 60, 60));
 		//map.mStartui = startui;
+
+
 		
 		auto dieui = make_shared<DieHUD>(1,player,camera);
 		

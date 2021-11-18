@@ -50,7 +50,7 @@ void ChangeLoginToRobby(const int& c_id)
 	packet.id = my_id;
 	packet.x = CLIENTS[my_id]->x;
 	packet.y = CLIENTS[my_id]->y;
-	packet.stage = 0;
+	packet.stage = 1;
 	CLIENTS[my_id]->do_send(&packet, sizeof(packet));
 }
 void ChangeRobbyToGame(const int& c_id)
@@ -132,18 +132,6 @@ DWORD WINAPI GameLogicThread(LPVOID arg)
 			//예상대로라면 로그인 버튼을 누르면 로그인 클라에서 로비클라로 보내면 되겠지.
 			if (Cnt_Player > 0) {
 				change_time += deltatime;
-				//cout << Cnt_Player << endl;
-
-
-				
-				//CLIENTS[0]->do_recv();
-				//time_t current_time = time(NULL);
-
-				//if (CLIENTS[0]->robby_cnt == 0) {
-				//	//타이머 10초 시작(클라에 1초마다 초 보내주기)
-				//	time_t frame_time = time(NULL) - current_time;
-				//	cout << "frame_time = "<<frame_time << endl;
-				//}
 
 			}
 			if (change_time > 3 && do_once_change)
