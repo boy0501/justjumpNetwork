@@ -19,6 +19,7 @@
 #include "Text.h"
 #include "Network.h"
 #include "../../Protocol/protocol.h"
+#include <string>
 
 #pragma comment(lib,"Winmm.lib")
 #pragma comment(lib,"imm32.lib")
@@ -37,10 +38,12 @@ static HDC /*hdc, mem1dc,*/ mem2dc, loaddc, playerdc, odc, /*pdc,*/ ui_dc, hp_dc
 /*static RECT rectview;*/
 static HBITMAP /*hbit1,*/ loadbit, oldload, oldbit1, hbitobj[100];
 static PLAYER player;
-PLAYER others[2];
+PLAYER others[3];
+
+bool keyboard[256];
 
 static MAP map;
-static CAMERA camera;
+//static CAMERA camera;
 static OBJECT obj[150];
 static BLENDFUNCTION loadbf;
 bool isComposit = false;
@@ -50,38 +53,45 @@ static int nCaretPosx, nCaretPosy;	//폰트 x,y크기 , 캐럿 x y 위치
 /*static int obj_t = 0;*/ //오브젝트 애니메이션을 1번타이머에 넣기위해 추가한 변수
 static int ocount;		//obj 개수를 세주는 변수
 static int help_button = 0, start_button = 0; //조작법 온오프
-static bool occur_button = 0;	//사망했을때의 button이 활성화되었는지 
+//static bool occur_button = 0;	//사망했을때의 button이 활성화되었는지 
 static bool gamemode = 0;	//0이면 기본 1이면 자유모드
 static float deltatime = 0;
 static float elapsedtime = 0;
 static int Fps = 0;
 static DWORD oldtime;
 
-static vector<shared_ptr<UI>> mUI;
+//static vector<shared_ptr<UI>> mUI;
 //extern int ROWSPEED;
 
 //extern int COLSPEED;
 
-//한줄에 79자까지 입력가능한 메모장
 using namespace std;
 //float elapsedt;
 //int Nameunsigan= 10;
+
+bool IsKeyPressed(char key)
+{
+	return keyboard[key];
+}
+void robby_waiting();
+void player_keyProcess();
+bool bRobby_full = false;
+
 void update(float delta_time)
 {
-	//elapsedt += delta_time;
-	//if (elapsedt > 1)
-	//{
-	//	Nameunsigan--;
-	//	
-	//}
+
+	player_keyProcess();
+	robby_waiting();
+
 	Network::GetNetwork()->C_Recv();
+
 	//빼줘야 할 Ui가 있다면 Ui 삭제
-	auto iter = mUI.begin();
-	while (iter != mUI.end())
+	auto iter = Network::GetNetwork()->mUI.begin();
+	while (iter != Network::GetNetwork()->mUI.end())
 	{
 		if ((*iter)->getState() == UI::UIState::Dead)
 		{
-			iter = mUI.erase(iter);
+			iter = Network::GetNetwork()->mUI.erase(iter);
 		}
 		else
 		{
@@ -105,7 +115,7 @@ void update(float delta_time)
 		if (player.getCMD_die())
 		{
 			if(player.WhenPlayerDied==false)
-				mUI.emplace_back(map.mDieUi);
+				Network::GetNetwork()->mUI.emplace_back(map.mDieUi);
 			player.WhenPlayerDied = true;
 		}
 	}
@@ -128,6 +138,8 @@ void update(float delta_time)
 	player.selectBit();
 	player.stealthtime();
 	player.spike_hurttime();
+	for (auto& o : others)
+		o.selectBit();
 
 	// 이거를 따로 넣는게 나을듯 오브젝트 멤버함수로다가
 	for (int i = 0; i <= ocount; i++)
@@ -210,12 +222,10 @@ void render()
 	}	
 	for (int i = 0; i <= ocount; i++)
 		obj[i].DrawObj(mem1dc, odc);
-	//player.draw(mem1dc, pdc, Network::GetNetwork()->net_x, Network::GetNetwork()->net_y, Network::GetNetwork()->net_h,
-	//	Network::GetNetwork()->net_stealth, Network::GetNetwork()->net_state, Network::GetNetwork()->net_dir,
-	//	Network::GetNetwork()->net_bx);
-	player.draw(mem1dc, pdc, player.x, player.y, player.h, player.stealth, player.state, player.dir, player.bx);
-	//cout << player.x << endl;
-	for (const auto& ui : mUI)
+	player.draw(mem1dc, pdc);
+	for (auto& other : others)
+		other.draw(mem1dc, pdc);
+	for (const auto& ui : Network::GetNetwork()->mUI)
 		ui->draw(mem1dc);
 	//지우지 마세요------
 	if (map.getmapnum() == 13) {
@@ -277,22 +287,22 @@ int GetText(HWND hWnd, UINT msg, WPARAM wparam, LPARAM lparam)
 
 				if (map.LoginInputFlag == false)
 				{
-					if (mUI.back()->FindTextByNameTag("id")->getTextLen() < 10)
+					if (Network::GetNetwork()->mUI.back()->FindTextByNameTag("id")->getTextLen() < 10)
 					{
-						mUI.back()->FindTextByNameTag("id")->changewChar(*wszComp);
+						Network::GetNetwork()->mUI.back()->FindTextByNameTag("id")->changewChar(*wszComp);
 						isComposit = false;
 					}
-					mUI.back()->FindTextByNameTag("id")->UpdateFontSize(hWnd);
-					nCaretPosx = 380 + mUI.back()->FindTextByNameTag("id")->getFontLen().cx;
+					Network::GetNetwork()->mUI.back()->FindTextByNameTag("id")->UpdateFontSize(hWnd);
+					nCaretPosx = 380 + Network::GetNetwork()->mUI.back()->FindTextByNameTag("id")->getFontLen().cx;
 				}
 				else {
-					if (mUI.back()->FindTextByNameTag("pass")->getTextLen() < 10)
+					if (Network::GetNetwork()->mUI.back()->FindTextByNameTag("pass")->getTextLen() < 10)
 					{
-						mUI.back()->FindTextByNameTag("pass")->changewChar(*wszComp);
+						Network::GetNetwork()->mUI.back()->FindTextByNameTag("pass")->changewChar(*wszComp);
 						isComposit = false;
 					}
-					mUI.back()->FindTextByNameTag("pass")->UpdateFontSize(hWnd);
-					nCaretPosx = 380 + mUI.back()->FindTextByNameTag("pass")->getFontLen().cx;
+					Network::GetNetwork()->mUI.back()->FindTextByNameTag("pass")->UpdateFontSize(hWnd);
+					nCaretPosx = 380 + Network::GetNetwork()->mUI.back()->FindTextByNameTag("pass")->getFontLen().cx;
 				}
 			}
 
@@ -308,30 +318,30 @@ int GetText(HWND hWnd, UINT msg, WPARAM wparam, LPARAM lparam)
 			wsz1Comp[len] = 0;
 			if (map.LoginInputFlag == false)
 			{
-				if (mUI.back()->FindTextByNameTag("id")->getTextLen() < 10)
+				if (Network::GetNetwork()->mUI.back()->FindTextByNameTag("id")->getTextLen() < 10)
 				{
 					if (!isComposit)
 					{
-						mUI.back()->FindTextByNameTag("id")->pushwChar(NULL);
+						Network::GetNetwork()->mUI.back()->FindTextByNameTag("id")->pushwChar(NULL);
 						isComposit = true;
 					}
-					mUI.back()->FindTextByNameTag("id")->changewChar(*wsz1Comp);
+					Network::GetNetwork()->mUI.back()->FindTextByNameTag("id")->changewChar(*wsz1Comp);
 				}
-				mUI.back()->FindTextByNameTag("id")->UpdateFontSize(hWnd);
-				nCaretPosx = 380 + mUI.back()->FindTextByNameTag("id")->getFontLen().cx;
+				Network::GetNetwork()->mUI.back()->FindTextByNameTag("id")->UpdateFontSize(hWnd);
+				nCaretPosx = 380 + Network::GetNetwork()->mUI.back()->FindTextByNameTag("id")->getFontLen().cx;
 			}
 			else {
-				if (mUI.back()->FindTextByNameTag("pass")->getTextLen() < 10)
+				if (Network::GetNetwork()->mUI.back()->FindTextByNameTag("pass")->getTextLen() < 10)
 				{
 					if (!isComposit)
 					{
-						mUI.back()->FindTextByNameTag("pass")->pushwChar(NULL);
+						Network::GetNetwork()->mUI.back()->FindTextByNameTag("pass")->pushwChar(NULL);
 						isComposit = true;
 					}
-					mUI.back()->FindTextByNameTag("pass")->changewChar(*wsz1Comp);
+					Network::GetNetwork()->mUI.back()->FindTextByNameTag("pass")->changewChar(*wsz1Comp);
 				}
-				mUI.back()->FindTextByNameTag("pass")->UpdateFontSize(hWnd);
-				nCaretPosx = 380 + mUI.back()->FindTextByNameTag("pass")->getFontLen().cx;
+				Network::GetNetwork()->mUI.back()->FindTextByNameTag("pass")->UpdateFontSize(hWnd);
+				nCaretPosx = 380 + Network::GetNetwork()->mUI.back()->FindTextByNameTag("pass")->getFontLen().cx;
 			}
 
 			
@@ -418,6 +428,63 @@ void send_move_packet(char dr)
 	//cout << "send패킷 보냄" << endl;
 }
 
+void send_keyup_packet(char vk_key)
+{
+	cs_packet_keyup packet;
+	packet.size = sizeof(packet);
+	packet.type = CS_PACKET_KEYUP;
+	packet.vk_key = vk_key;
+	Network::GetNetwork()->C_Send(&packet, sizeof(packet));
+}
+void send_robby_in_packet()
+{
+	cs_packet_robby packet;
+	packet.size = sizeof(packet);
+	packet.type = CS_PACKET_ROBBY;
+	
+
+	Network::GetNetwork()->C_Send(&packet, sizeof(packet));
+}
+
+
+
+void robby_waiting()
+{
+	map.mStartui->addText(to_string(Network::GetNetwork()->countdown), "countdown", L"메이플스토리 bold", RGB(255, 255, 255), 18, Network::GetNetwork()->init_x, 200, false, 0, 0, camera);
+	//cout << Network::GetNetwork()->countdown << endl;
+
+	/*if (Network::GetNetwork()->countdown == 1)
+	{
+		bRobby_full = true;
+	}*/
+}
+
+
+
+void player_keyProcess()
+{
+	if (IsKeyPressed(VK_LEFT))
+	{
+		send_move_packet(VK_LEFT);
+	}
+	if (IsKeyPressed(VK_RIGHT))
+	{
+		send_move_packet(VK_RIGHT);
+	}
+	if (IsKeyPressed(VK_UP))
+	{
+		send_move_packet(VK_UP);
+	}
+	if (IsKeyPressed(VK_DOWN))
+	{
+		send_move_packet(VK_DOWN);
+	}
+	if (IsKeyPressed(VK_SPACE))
+	{
+		send_move_packet(VK_SPACE);
+	}
+}
+
 LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 {
 	if (GetText(hwnd, iMessage, wParam, lParam) == 0)
@@ -434,11 +501,13 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		oldtime = timeGetTime();
 		map.CreateMap(g_hinst);
 
+		player.is_active = true;
 		Network::GetNetwork()->mPlayer = &player;
 		Network::GetNetwork()->mMap = &map;
 		Network::GetNetwork()->mOcount = &ocount;
 		Network::GetNetwork()->mObj = obj;
 		Network::GetNetwork()->mCamera = &camera;
+		Network::GetNetwork()->mOthers = others;
 		Network::GetNetwork()->ConnectServer("127.0.0.1");
 		
 
@@ -454,13 +523,22 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 			strcpy_s(packet.username, 20, ui->FindTextByNameTag("id")->getTextForString().c_str());
 			packet.size = sizeof(cs_packet_login);
 			packet.type = CS_PACKET_LOGIN;
+			
 			Network::GetNetwork()->C_Send(&packet, sizeof(packet));
 
 
+
+			//로비 카운트 start===================================================
+			send_robby_in_packet();
+
+			//====================================================================
+
+			//player.setx(80);
+			//player.sety(655);
 			player.mPlayername = ui->FindTextByNameTag("id")->getTextForString();
 			player.mPlayerwname = ui->FindTextByNameTag("id")->getText();
 			ui->closeUI();
-			mUI.emplace_back(map.mStartui);
+			Network::GetNetwork()->mUI.emplace_back(map.mStartui);
 
 			//gameui는 로그인을 했을때 UserID가 필요하므로 로그인 버튼이 눌렸을 때 처리한다.
 			//나중 로그인패킷까지 온다고 가정했을때, 로그인패킷 ok시에 ui를 만들어도 좋다.
@@ -471,47 +549,47 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 			map.mGameUi = gameui;
 			//gameUi설정 끝 
 
+			
+
 			HideCaret(hwnd);
 		}, g_hinst, "img/LoginButton", 365, 440, 278, 53, RGB(255, 0, 0));
-
+		
 		auto startui = make_shared<StartHUD>(0);
 		//hbit = (HBITMAP)LoadImage(g_hinst, TEXT("img/NoNameUi.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION); //상대경로로 변경
 		startui->addButton([startui]() {
+			//Network::GetNetwork()->test();
+			//cout << "들어옴" << endl;
 
-			cs_packet_gamejoin packet;
-			packet.size = sizeof(cs_packet_gamejoin);
-			packet.type = CS_PACKET_GAMEJOIN;
-			packet.id = player.player_cid;
-			Network::GetNetwork()->C_Send(&packet, sizeof(packet));
+			//bool occur_button = 0;
+			//map.setblack_t(50);
+			//map.setmapnum(player.stage + 1);
+			//for (int j = 0; j < ocount; j++)
+			//	obj[j].ResetObject();
+			//ocount = initObject(obj, map.getmapnum(), g_hinst);
+			//map.CreateMap(g_hinst);
+			//LoadBK(hbit1, g_hinst, map.getmapnum());
+			//Sound::GetSelf()->setindex(Sound::GetSelf()->getindex() + 1);
+			//Sound::GetSelf()->Sound_Play(EFFECTSOUND, PORTALEF, EFVOL);
+			//Sound::GetSelf()->Sound_Play(BGMSOUND, FIRSTMAPBGM, BGMVOL);
+			//player.initPos();
+			//player.sethp(5);
+			//camera.setx(0);
+			//camera.sety(3232);
+			//map.mStartui->closeUI();
+			//Network::GetNetwork()->mUI.emplace_back(map.mGameUi);
+		    //Network::GetNetwork()->mUI.emplace_back(map.mGameUi);
+			
 
-
-			occur_button = 0;
-			map.setblack_t(50);
-			map.setmapnum(map.getmapnum() + 1);
-			for (int j = 0; j < ocount; j++)
-				obj[j].ResetObject();
-			ocount = initObject(obj, map.getmapnum(), g_hinst);
-
-			map.CreateMap(g_hinst);
-			LoadBK(hbit1, g_hinst, 0);
-			//hbit1 = (HBITMAP)LoadImage(g_hinst, TEXT("img/bk.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
-			Sound::GetSelf()->setindex(Sound::GetSelf()->getindex() + 1);
-			Sound::GetSelf()->Sound_Play(EFFECTSOUND, PORTALEF, EFVOL);
-			Sound::GetSelf()->Sound_Play(BGMSOUND, FIRSTMAPBGM, BGMVOL);
-			player.initPos();
-			player.sethp(5);
-			camera.setx(0);
-			camera.sety(3232); 
-			startui->closeUI();
-			mUI.emplace_back(map.mGameUi);
 		}, g_hinst, "img/start", 292, 490, 138, 82, RGB(255, 0, 0));
-		startui->addButton([startui]() {}, g_hinst, "img/help", 215, 300, 400, 200, RGB(60, 60, 60));
+		startui->addButton([]() {}, g_hinst, "img/help", 215, 300, 400, 200, RGB(60, 60, 60));
 		map.mStartui = startui;
 
-		startui->addButton([startui]() {
+		//startui->addButton([]() {
 
-			}, g_hinst, "img/Exit", 800, 400, 138, 82, RGB(255, 0, 0));// g_hinst, "img/help", 215, 300, 400, 200, RGB(60, 60, 60));
-		map.mStartui = startui;
+		//	}, g_hinst, "img/Exit", 800, 400, 138, 82, RGB(255, 0, 0));// g_hinst, "img/help", 215, 300, 400, 200, RGB(60, 60, 60));
+		//map.mStartui = startui;
+
+
 		
 		auto dieui = make_shared<DieHUD>(1,player,camera);
 		
@@ -523,11 +601,13 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		}, g_hinst, "img/notice", 380, 240, 260, 130, RGB(255, 0, 0));
 		map.mDieUi = dieui;
 
-		mUI.emplace_back(ui);
+		Network::GetNetwork()->mUI.emplace_back(ui);
 		player.setBit(g_hinst);
+		for (auto& other : others)
+			other.setBit(g_hinst);
 		//player.initBitPos();
-		mUI.back()->FindTextByNameTag("id")->UpdateFontSize(hwnd);
-		nCaretPosx = 380 + mUI.back()->FindTextByNameTag("id")->getFontLen().cx;
+		Network::GetNetwork()->mUI.back()->FindTextByNameTag("id")->UpdateFontSize(hwnd);
+		nCaretPosx = 380 + Network::GetNetwork()->mUI.back()->FindTextByNameTag("id")->getFontLen().cx;
 		nCaretPosy = 330;
 		if (map.getmapnum() == 1)
 		{
@@ -550,8 +630,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		if (player.getCMD_die() == 1)
 			break;
 		if (player.getGamemode() == 0) {
-			//player.PlayerSetting(wParam);
-			send_move_packet(wParam);
+			keyboard[wParam] = true;
+			//send_move_packet(wParam);
 		}	
 		else if (player.getGamemode() == 1)
 			camera.CameraSetting(wParam);
@@ -560,18 +640,18 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		if (player.getCMD_die() == 1)
 			break;
 		if (player.getGamemode() == 0) {
-			//player.PlayerWaiting(wParam);
-			send_move_packet(wParam + 10);
+			keyboard[wParam] = false;
+			send_keyup_packet(wParam);
 		}
 		else if (player.getGamemode() == 1)
 			camera.CameraSetting(wParam);
 		break;
 	case WM_MOUSEMOVE:
-		mUI.back()->processInput(LOWORD(lParam), HIWORD(lParam), WM_MOUSEMOVE);
+		Network::GetNetwork()->mUI.back()->processInput(LOWORD(lParam), HIWORD(lParam), WM_MOUSEMOVE);
 		break;
 	case WM_LBUTTONDOWN:
 		SetCursor(LoadCursorFromFile(TEXT("cursor/cursor4.cur")));
-		mUI.back()->processInput(LOWORD(lParam), HIWORD(lParam), WM_LBUTTONDOWN);
+		Network::GetNetwork()->mUI.back()->processInput(LOWORD(lParam), HIWORD(lParam), WM_LBUTTONDOWN);
 		
 		if (map.getmapnum() == LOGINBG)
 		{
@@ -580,8 +660,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 				if (HIWORD(lParam) > 320 && HIWORD(lParam) < 360)
 				{
 					map.LoginInputFlag = false;
-					mUI.back()->FindTextByNameTag("id")->UpdateFontSize(hwnd);
-					nCaretPosx = 380 + mUI.back()->FindTextByNameTag("id")->getFontLen().cx;
+					Network::GetNetwork()->mUI.back()->FindTextByNameTag("id")->UpdateFontSize(hwnd);
+					nCaretPosx = 380 + Network::GetNetwork()->mUI.back()->FindTextByNameTag("id")->getFontLen().cx;
 					nCaretPosy = 330;
 					SetCaretPos(nCaretPosx, nCaretPosy);
 				}
@@ -589,8 +669,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 				{
 
 					map.LoginInputFlag = true;
-					mUI.back()->FindTextByNameTag("pass")->UpdateFontSize(hwnd);
-					nCaretPosx = 380 + mUI.back()->FindTextByNameTag("pass")->getFontLen().cx;
+					Network::GetNetwork()->mUI.back()->FindTextByNameTag("pass")->UpdateFontSize(hwnd);
+					nCaretPosx = 380 + Network::GetNetwork()->mUI.back()->FindTextByNameTag("pass")->getFontLen().cx;
 					nCaretPosy = 380;
 					SetCaretPos(nCaretPosx, nCaretPosy);
 				}
@@ -604,7 +684,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		break;
 	case WM_LBUTTONUP:
 		
-		mUI.back()->processInput(LOWORD(lParam), HIWORD(lParam), WM_LBUTTONUP);
+		Network::GetNetwork()->mUI.back()->processInput(LOWORD(lParam), HIWORD(lParam), WM_LBUTTONUP);
 		
 		break;
 	case WM_CHAR:
@@ -619,17 +699,17 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 			case 0x08:
 				if (map.LoginInputFlag == false)
 				{
-					if (mUI.back()->FindTextByNameTag("id")->getTextLen() > 0)
-						mUI.back()->FindTextByNameTag("id")->popChar();
-					mUI.back()->FindTextByNameTag("id")->UpdateFontSize(hwnd);
-					nCaretPosx = 380 + mUI.back()->FindTextByNameTag("id")->getFontLen().cx;
+					if (Network::GetNetwork()->mUI.back()->FindTextByNameTag("id")->getTextLen() > 0)
+						Network::GetNetwork()->mUI.back()->FindTextByNameTag("id")->popChar();
+					Network::GetNetwork()->mUI.back()->FindTextByNameTag("id")->UpdateFontSize(hwnd);
+					nCaretPosx = 380 + Network::GetNetwork()->mUI.back()->FindTextByNameTag("id")->getFontLen().cx;
 				}
 				else
 				{
-					if (mUI.back()->FindTextByNameTag("pass")->getTextLen() > 0)
-						mUI.back()->FindTextByNameTag("pass")->popChar();
-					mUI.back()->FindTextByNameTag("pass")->UpdateFontSize(hwnd);
-					nCaretPosx = 380 + mUI.back()->FindTextByNameTag("pass")->getFontLen().cx;
+					if (Network::GetNetwork()->mUI.back()->FindTextByNameTag("pass")->getTextLen() > 0)
+						Network::GetNetwork()->mUI.back()->FindTextByNameTag("pass")->popChar();
+					Network::GetNetwork()->mUI.back()->FindTextByNameTag("pass")->UpdateFontSize(hwnd);
+					nCaretPosx = 380 + Network::GetNetwork()->mUI.back()->FindTextByNameTag("pass")->getFontLen().cx;
 				}
 				break;
 			case 0x09:
@@ -640,16 +720,16 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 			default:
 				if (map.LoginInputFlag == false)
 				{
-					if (mUI.back()->FindTextByNameTag("id")->getTextLen() < 10)
-						mUI.back()->FindTextByNameTag("id")->pushChar(wParam);
-					mUI.back()->FindTextByNameTag("id")->UpdateFontSize(hwnd);
-					nCaretPosx = 380 + mUI.back()->FindTextByNameTag("id")->getFontLen().cx;
+					if (Network::GetNetwork()->mUI.back()->FindTextByNameTag("id")->getTextLen() < 10)
+						Network::GetNetwork()->mUI.back()->FindTextByNameTag("id")->pushChar(wParam);
+					Network::GetNetwork()->mUI.back()->FindTextByNameTag("id")->UpdateFontSize(hwnd);
+					nCaretPosx = 380 + Network::GetNetwork()->mUI.back()->FindTextByNameTag("id")->getFontLen().cx;
 				}
 				else {
-					if (mUI.back()->FindTextByNameTag("pass")->getTextLen() < 10)
-						mUI.back()->FindTextByNameTag("pass")->pushChar(wParam);
-					mUI.back()->FindTextByNameTag("pass")->UpdateFontSize(hwnd);
-					nCaretPosx = 380 + mUI.back()->FindTextByNameTag("pass")->getFontLen().cx;
+					if (Network::GetNetwork()->mUI.back()->FindTextByNameTag("pass")->getTextLen() < 10)
+						Network::GetNetwork()->mUI.back()->FindTextByNameTag("pass")->pushChar(wParam);
+					Network::GetNetwork()->mUI.back()->FindTextByNameTag("pass")->UpdateFontSize(hwnd);
+					nCaretPosx = 380 + Network::GetNetwork()->mUI.back()->FindTextByNameTag("pass")->getFontLen().cx;
 				}
 				isComposit = false;
 				break;
@@ -660,6 +740,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		}
 		if (wParam == 'r')
 		{
+			cout << "r키 누름" << endl;
 			player.setx(obj[ocount - 1].getX() + 10);
 			player.sety(obj[ocount - 1].getY() - 25);
 			break;

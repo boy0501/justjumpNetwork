@@ -1,5 +1,7 @@
 ﻿#include "Client.h"
 #include "../CLIENT/LoginClient.h"
+#include "../CLIENT/LobbyClient.h"
+
 #include <iostream>
 
 
@@ -7,6 +9,7 @@ Client::Client()
 	:prev_size(0)
 	,mCss(CSS_LIVE)
 	,mSn(SN_LOGIN)
+	,is_active(false)
 {
 	x = 80; 
 	y = 655;
@@ -50,6 +53,7 @@ void Client::ProcessPacket(unsigned char* p)
 	case CS_PACKET_LOGIN: {
 		cs_packet_login* packet = reinterpret_cast<cs_packet_login*>(p);
 
+		
 		//한 번 로그인 하면 더이상 로그인 패킷은 받지 않음.
 		if (mSn == SN_LOBBY) break;
 
@@ -69,9 +73,8 @@ void Client::ProcessPacket(unsigned char* p)
 	case CS_PACKET_MOVE: {
 		cs_packet_move* packet = reinterpret_cast<cs_packet_move*>(p);
 
-
 		switch ((int)packet->dir) {
-		case 37: //VK_LEFT
+		case VK_LEFT: //VK_LEFT
 			//std::cout << "left" << std::endl;
 			LEFTkey = true;
 			if (RIGHTkey == true)
@@ -88,7 +91,7 @@ void Client::ProcessPacket(unsigned char* p)
 			{
 				if (state == 1)
 				{
-				state = 4;
+					state = 4;
 					dir = 1;
 
 				}
@@ -96,14 +99,14 @@ void Client::ProcessPacket(unsigned char* p)
 					state = 4;
 					dir = 1;
 				}
-				COMMAND_move = 1;	
-				
+				COMMAND_move = 1;
+
 			}
 			else if (state == 2)
 			{
-				if (COMMAND_hurt != 1)	
-					ROWSPEED = ROWSPEED/3;
-				dir = 1;	
+				if (COMMAND_hurt != 1)
+					ROWSPEED = 150;
+				dir = 1;
 			}
 			else if (state == 3)
 			{
@@ -119,18 +122,18 @@ void Client::ProcessPacket(unsigned char* p)
 				dir = 1;
 			}
 			break;
-		case 39: //VK_RIGHT
-			RIGHTkey = true;	
+		case VK_RIGHT: //VK_RIGHT
+			RIGHTkey = true;
 			if (LEFTkey == true)
 			{
 				LRkey = true;
-				if (state == 4)		
+				if (state == 4)
 					state = 1;
 				return;
 			}
 			if (state == 7)
 			{
-				dir = 2;	
+				dir = 2;
 			}
 			else if (state == 1 || state == 4)
 			{
@@ -145,14 +148,14 @@ void Client::ProcessPacket(unsigned char* p)
 					dir = 2;
 
 				}
-				COMMAND_move = 2;	
-				
+				COMMAND_move = 2;
+
 			}
 			else if (state == 2)
 			{
-				if (COMMAND_hurt != 1)	
-					ROWSPEED = ROWSPEED/3;
-				dir = 2;	
+				if (COMMAND_hurt != 1)
+					ROWSPEED = 150;
+				dir = 2;
 			}
 			else if (state == 3)
 			{
@@ -168,7 +171,7 @@ void Client::ProcessPacket(unsigned char* p)
 				//COMMAND_move = 2;
 			}
 			break;
-		case 38: //VK_UP
+		case VK_UP: //VK_UP
 			UPkey = true;
 
 			if (DOWNkey == true)
@@ -185,7 +188,7 @@ void Client::ProcessPacket(unsigned char* p)
 
 			}
 			break;
-		case 40: //VK_DOWN
+		case VK_DOWN: //VK_DOWN
 			if (COMMAND_hurt == 1)
 				return;
 			DOWNkey = true;
@@ -213,12 +216,12 @@ void Client::ProcessPacket(unsigned char* p)
 			}
 			else if (state == 1) {
 
-				state = 3;	
-				h -= 12;		
+				state = 3;
+				h -= 12;
 				y += 12;
 			}
 			break;
-		case 32: //VK_SPACE
+		case VK_SPACE: //VK_SPACE
 			//std::cout << "space bar " << std::endl;
 			if (DOWNkey == true)
 			{
@@ -226,32 +229,39 @@ void Client::ProcessPacket(unsigned char* p)
 			}
 			if (state == 5 || state == 8)
 			{
-				if (LRkey == 0)		
+				if (LRkey == 0)
 				{
-					if (LEFTkey == 1 || RIGHTkey == 1)	
+					if (LEFTkey == 1 || RIGHTkey == 1)
 					{
 						COMMAND_move = dir;
-						jumpignore = 2;	
+						jumpignore = 2;
 					}
 					else return;
 				}
 				else return;
 			}
-			if (state != 2 && state != 7)	
+			if (state != 2 && state != 7)
 			{
 				//Sound::GetSelf()->Sound_Play(EFFECTSOUND, JUMPEF, EFVOL);
-				falldy = 10;	
+				falldy = 10;
 				jumpcount++;
 				state = 2;
 				savey = y;
 			}
 			break;
 
-		case 47: //left keyUp
-			if (RIGHTkey == true)		
+		}
+		break;
+	}
+	case CS_PACKET_KEYUP: {
+		cs_packet_keyup* packet = reinterpret_cast<cs_packet_keyup*>(p);
+		switch (packet->vk_key)
+		{
+		case VK_LEFT: //left keyUp
+			if (RIGHTkey == true)
 			{
 				dir = 2;
-				if (state == 1)			
+				if (state == 1)
 					COMMAND_move = 2;
 			}
 			else if (RIGHTkey == false)
@@ -259,15 +269,15 @@ void Client::ProcessPacket(unsigned char* p)
 				if (state == 4)
 				{
 					state = 1;
-					COMMAND_move = 0;	
+					COMMAND_move = 0;
 				}
-				else if (state == 1)	
+				else if (state == 1)
 				{
 					COMMAND_move = 0;
 				}
 				if (DOWNkey == true)
 				{
-					if (state == 1)	
+					if (state == 1)
 					{
 						state = 3;
 						h -= 12;
@@ -277,30 +287,30 @@ void Client::ProcessPacket(unsigned char* p)
 			}
 
 
-			LRkey = false;				
-			LEFTkey = false;			
+			LRkey = false;
+			LEFTkey = false;
 			break;
-		case 49: //right keyUp
-			if (LEFTkey == true)		
+		case VK_RIGHT: //right keyUp
+			if (LEFTkey == true)
 			{
 				dir = 1;
-				if (state == 1)			
+				if (state == 1)
 					COMMAND_move = 1;
 			}
-			else if (LEFTkey == false)	
+			else if (LEFTkey == false)
 			{
 				if (state == 4)
 				{
 					state = 1;
-					COMMAND_move = 0;	
+					COMMAND_move = 0;
 				}
-				else if (state == 1)	
+				else if (state == 1)
 				{
 					COMMAND_move = 0;
 				}
 				if (DOWNkey == true)
 				{
-					if (state == 1)	
+					if (state == 1)
 					{
 						state = 3;
 						h -= 12;
@@ -309,13 +319,13 @@ void Client::ProcessPacket(unsigned char* p)
 				}
 			}
 
-			LRkey = false;				
-			RIGHTkey = false;			
+			LRkey = false;
+			RIGHTkey = false;
 			break;
-		case 48: //up keyUp
+		case VK_UP: //up keyUp
 			if (DOWNkey == true)
 			{
-				if (state == 5)			
+				if (state == 5)
 					COMMAND_move = 4;
 			}
 			else if (DOWNkey == false)
@@ -323,27 +333,27 @@ void Client::ProcessPacket(unsigned char* p)
 				if (state == 8)
 				{
 					state = 5;
-					COMMAND_move = 0;	
+					COMMAND_move = 0;
 				}
 			}
 
 			UPkey = false;
 			UDkey = false;
 			break;
-		case 50: //down keyDown
+		case VK_DOWN: //down keyDown
 			if (UPkey == true)
 			{
-				if (state == 5)			
+				if (state == 5)
 					COMMAND_move = 3;
 			}
-			else if (UPkey == false)	
+			else if (UPkey == false)
 			{
 				if (state == 8)
 				{
 					state = 5;
-					COMMAND_move = 0;	
+					COMMAND_move = 0;
 				}
-				else if (state == 5)	
+				else if (state == 5)
 				{
 					COMMAND_move = 0;
 				}
@@ -353,7 +363,7 @@ void Client::ProcessPacket(unsigned char* p)
 				if (state == 3)
 				{
 					h += 12;
-					y -= 12;	
+					y -= 12;
 					state = 1;
 				}
 			}
@@ -361,10 +371,7 @@ void Client::ProcessPacket(unsigned char* p)
 			UDkey = false;
 			DOWNkey = false;
 			break;
-		}
-		//case 42: //spacebar keyUp
-		//	
-		//	break;
+		}		
 		break;
 	}
 	case CS_PACKET_GAMEJOIN: {
@@ -373,27 +380,13 @@ void Client::ProcessPacket(unsigned char* p)
 		//한 번 게임접속하면 더이상 게임접속 패킷은 받지않음.
 		if (mSn == SN_INGAME) break;
 
-		x = 80;
-		y = 3700;
-		savey = 3700;
-		w = 14;
-		h = 25;
-		state = 7;
-		dir = 2;
-		adjustspd = 0;
-		stealth = 0;
-		spike_hurt = 0;
-		COMMAND_move = false;
-		COMMAND_hurt = false;
-		COMMAND_die = false;
-		mStageNum = 1;
-
-		mCss = CSS_DEAD;
-		mSn = SN_INGAME;
-		SetEvent(SceneChangeTrigger);
+		
 		WaitForSingleObject(SceneChangeIsDone, INFINITE);
 		break;
 	}
+	case CS_PACKET_ROBBY:
+		cs_packet_robby* packet = reinterpret_cast<cs_packet_robby*>(p);
+		break;
 	}
 }
 int Client::do_recv()
@@ -406,7 +399,7 @@ int Client::do_recv()
 		return SOCKET_ERROR;
 	}
 	int remain_data = received + prev_size;
-	unsigned char* packet_start = reinterpret_cast<unsigned char*>(ptr);
+	unsigned char* packet_start = reinterpret_cast<unsigned char*>(buf);
 	int packet_size = packet_start[0];
 
 	while (packet_size <= remain_data)

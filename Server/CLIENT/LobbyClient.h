@@ -1,6 +1,6 @@
 #pragma once
 #include "Client.h"
-
+#include <array>
 class LobbyClient : public Client
 {
 public:
@@ -19,4 +19,12 @@ public:
 	void BitMove();
 	void initBitPos();
 	void initPos();
+
+	int robby_timer = 11;
+	int robby_cnt = 0;
+
+	bool is_robby = false;
+
+	bool collp2o(class Object* Obj);
+	void adjustPlayer();
 };

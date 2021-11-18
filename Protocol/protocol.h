@@ -11,6 +11,9 @@ const char CS_PACKET_LOGIN = 1;
 const char CS_PACKET_MOVE = 2;
 const char CS_PACKET_SCENE_CHANGE = 3;
 const char CS_PACKET_GAMEJOIN = 4;
+const char CS_PACKET_KEYUP = 5;
+
+const char CS_PACKET_ROBBY = 98;
 const char CS_PACKET_TEST = 99;
 
 const char SC_PACKET_LOGIN_OK = 1;
@@ -29,12 +32,19 @@ struct cs_packet_login {
 	unsigned char size;
 	char	type;
 	char	username[MAX_NAME_SIZE];
+	
 };
 
 struct cs_packet_move {
 	unsigned char size;
 	char	type;
 	char	dir;			// 0 : up,  1: down, 2:left, 3:right, 4:jump
+};
+
+struct cs_packet_keyup {
+	unsigned char size;
+	char type;
+	char vk_key;
 };
 
 struct cs_packet_test {
@@ -54,6 +64,12 @@ struct cs_packet_gamejoin {
 	char type;
 	int		id;
 };
+struct cs_packet_robby {
+	unsigned char size;
+	char type;
+	
+};
+
 //-----------------------server packet
 struct sc_packet_login_ok {
 	unsigned char size;
@@ -98,9 +114,10 @@ struct sc_packet_logout_object {
 struct sc_packet_robby {
 	unsigned char size;
 	char type;
-	char count_start; // 1: start
+	//char count_start; // 1: start
 	int player_cnt;
 	//float countdownTime;
+	int countdown;
 };
 
 struct sc_packet_empty {
@@ -116,6 +133,7 @@ struct sc_packet_gamestart {
 	short state;
 	short dir;
 	short stealth;
+	bool COMMAND_die;
 };
 
 struct sc_packet_stagenum {

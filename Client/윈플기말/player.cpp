@@ -15,6 +15,7 @@ bool UDkey = 0;
 int jumpcount = 0;
 int diecount = 0;
 PLAYER::PLAYER()
+	:is_active(false)
 {
 	// x y 는 캐릭터의 중심좌표이고 w,h 는 xy에서 좌우로 반틈씩만 간 좌표이다. 
 	x = 80; //100 캐릭터의 중심x좌표
@@ -837,9 +838,9 @@ void PLAYER::BitMove()
 }
 
 //플레이어를 그려줌
-void PLAYER::draw(HDC& mem1dc, HDC& pdc, int x, int y, int h, int stealth, int state, int dir, int bx)
+void PLAYER::draw(HDC& mem1dc, HDC& pdc)
 {
-	//std::cout << x << ", " << y << std::endl;
+	if (is_active == false) return;
 	BLENDFUNCTION bf;
 	bf.AlphaFormat = 0;
 	bf.BlendFlags = 0;
@@ -890,7 +891,6 @@ void PLAYER::draw(HDC& mem1dc, HDC& pdc, int x, int y, int h, int stealth, int s
 			TransparentBlt(gdidc, 0, 0, 62, 50, pdc, 0, 50, 62, 50, RGB(255, 255, 255));
 			if (stealth > 0)
 			{
-
 				bf.SourceConstantAlpha = 155;//투명도
 				//이 함수는 일반 stretchblt 와 비슷하다 gdidc 는 최대가 0,0 ~62,50 이므로 뒷 인자는 0 0 62 50
 				GdiAlphaBlend(mem1dc, x - charw, y - h, charw * 2, h * 2, gdidc, 0, 0, 62, 50, bf);
@@ -898,7 +898,9 @@ void PLAYER::draw(HDC& mem1dc, HDC& pdc, int x, int y, int h, int stealth, int s
 
 			}
 			else
+			{
 				GdiAlphaBlend(mem1dc, x - charw, y - h, charw * 2, h * 2, gdidc, 0, 0, 62, 50, bf);
+			}
 		}
 
 	}
@@ -926,7 +928,6 @@ void PLAYER::draw(HDC& mem1dc, HDC& pdc, int x, int y, int h, int stealth, int s
 			TransparentBlt(gdidc, 0, 0, 62, 50, pdc, bx * 68, by + 50, bw, bh, RGB(255, 255, 255));
 			if (stealth > 0)
 			{
-
 				bf.SourceConstantAlpha = 155;//투명도
 				//이 함수는 일반 stretchblt 와 비슷하다 gdidc 는 최대가 0,0 ~62,50 이므로 뒷 인자는 0 0 62 50
 				GdiAlphaBlend(mem1dc, x - charw, y - h, charw * 2, h * 2, gdidc, 0, 0, 62, 50, bf);
@@ -934,7 +935,9 @@ void PLAYER::draw(HDC& mem1dc, HDC& pdc, int x, int y, int h, int stealth, int s
 
 			}
 			else
+			{
 				GdiAlphaBlend(mem1dc, x - charw, y - h, charw * 2, h * 2, gdidc, 0, 0, 62, 50, bf);
+			}
 		}
 
 

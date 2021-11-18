@@ -38,20 +38,65 @@ void ChangeLoginToRobby(const int& c_id)
 	*Upcasting_changed = *Upcasted_original;
 	willbe_changed->elapsedtime = 0;
 	willbe_changed->mStageNum = 0;
+	willbe_changed->mMap = mainMap;
 	willbe_changed->initBitPos();
 	willbe_changed->initPos();
 	CLIENTS[my_id] = willbe_changed;
 	delete p;
 
-	//send_ok_packet
-	sc_packet_login_ok packet;
-	packet.size = sizeof(sc_packet_login_ok);
-	packet.type = SC_PACKET_LOGIN_OK;
-	packet.id = my_id;
-	packet.x = CLIENTS[my_id]->x;
-	packet.y = CLIENTS[my_id]->y;
-	packet.stage = 0;
-	CLIENTS[my_id]->do_send(&packet, sizeof(packet));
+	//send_ok_packet me and other
+	for (auto& c : CLIENTS)
+	{
+		if (c->is_active == false) continue;
+		if (c->c_id == my_id)
+		{
+			sc_packet_login_ok packet;
+			packet.size = sizeof(sc_packet_login_ok);
+			packet.type = SC_PACKET_LOGIN_OK;
+			packet.id = my_id;
+			packet.x = CLIENTS[my_id]->x;
+			packet.y = CLIENTS[my_id]->y;
+			packet.stage = 1;
+			c->do_send(&packet, sizeof(packet));
+		}
+		else {
+			sc_packet_put_object packet;
+			packet.size = sizeof(sc_packet_put_object);
+			packet.type = SC_PACKET_PUT_OBJECT;
+			packet.dir = CLIENTS[my_id]->dir;
+			packet.h = CLIENTS[my_id]->h;
+			packet.hp = CLIENTS[my_id]->hp;
+			packet.id = my_id;
+			packet.state = CLIENTS[my_id]->state;
+			packet.stealth = CLIENTS[my_id]->stealth;
+			strcpy_s(packet.username, 20, CLIENTS[my_id]->playername);
+			packet.x = CLIENTS[my_id]->x;
+			packet.y = CLIENTS[my_id]->y;
+			packet.w = CLIENTS[my_id]->w;
+			c->do_send(&packet, sizeof(packet));
+		}
+	}
+	//send_ok_packet 상대방껄 나에게
+	for (auto& c : CLIENTS)
+	{
+		if (c->is_active == false) continue;
+		if (c->c_id == my_id)continue;
+
+		sc_packet_put_object packet;
+		packet.size = sizeof(sc_packet_put_object);
+		packet.type = SC_PACKET_PUT_OBJECT;
+		packet.dir = c->dir;
+		packet.h = c->h;
+		packet.hp = c->hp;
+		packet.id = c->c_id;
+		packet.state = c->state;
+		packet.stealth = c->stealth;
+		strcpy_s(packet.username, 20, c->playername);
+		packet.x = c->x;
+		packet.y = c->y;
+		packet.w = c->w;
+		CLIENTS[my_id]->do_send(&packet, sizeof(packet));
+	}
 }
 void ChangeRobbyToGame(const int& c_id)
 {
@@ -74,11 +119,12 @@ void ChangeRobbyToGame(const int& c_id)
 	packet.type = SC_PACKET_GAMESTART;
 	packet.dir = CLIENTS[my_id]->dir;
 	packet.h = CLIENTS[my_id]->h;
-	packet.stage = 0;
+	packet.stage = 9;
 	packet.state = CLIENTS[my_id]->state;
 	packet.stealth = CLIENTS[my_id]->stealth;
 	packet.x = CLIENTS[my_id]->x;
 	packet.y = CLIENTS[my_id]->y;
+	packet.COMMAND_die = CLIENTS[my_id]->COMMAND_die;
 	CLIENTS[my_id]->do_send(&packet, sizeof(packet));
 
 }
@@ -99,16 +145,16 @@ void send_move_process(int c_id, int mover)
 }
 
 
+
+
 //http://www.tipssoft.com/bulletin/board.php?bo_table=FAQ&wr_id=735 타임관련
 
 DWORD WINAPI GameLogicThread(LPVOID arg)
 {
 	QueryPerformanceFrequency(&Frequency);
 	QueryPerformanceCounter(&Endtime);
-	//time_t current_time = time(NULL);
 	while (1) {
-		//time_t frame_time = time(NULL) - current_time;
-		//cout << "frame_time = "<<frame_time << endl;
+		
 		QueryPerformanceCounter(&BeginTime);
 		auto elapsed = BeginTime.QuadPart - Endtime.QuadPart;
 		auto deltatime = (double)elapsed / (double)Frequency.QuadPart;
@@ -122,8 +168,18 @@ DWORD WINAPI GameLogicThread(LPVOID arg)
 				//cout << "FPS:" << Fps << endl;
 				Fps = 0;
 				elapsed_time = 0;
+				
 			}
 
+
+			//이런식으로 로그인에서 로비클라로 바꾼다. Scene Change같은 역할을 하는 것.
+			//현재 1번클라 접속하면 10초뒤에 로그인클라에서 로비클라로 보내는 역할을 한다.
+			//예상대로라면 로그인 버튼을 누르면 로그인 클라에서 로비클라로 보내면 되겠지.
+			if (Cnt_Player > 0) {
+				change_time += deltatime;
+
+			}
+			if (change_time > 3 && do_once_change)
 			for (auto& c : CLIENTS)
 			{
 				if (c->mCss == CSS_LIVE) continue;
@@ -134,15 +190,24 @@ DWORD WINAPI GameLogicThread(LPVOID arg)
 				switch (c->mSn)
 				{
 				case SN_LOBBY:
+				{
 					ChangeLoginToRobby(c->c_id);
 					c->mCss = CSS_LIVE;
+					auto lc = reinterpret_cast<LobbyClient*>(c);
+					lc->robby_cnt++;
+
 					SetEvent(c->SceneChangeIsDone);
 					break;
-				case SN_INGAME:
+				}
+				case SN_INGAME: 
+				{
 					ChangeRobbyToGame(c->c_id);
 					c->mCss = CSS_LIVE;
 					SetEvent(c->SceneChangeIsDone);
+
+
 					break;
+				}
 				}
 				//서버에서 플레이어를 옮겨줬다면 SetEvent를 하여 클라이언트에게 바뀌었다고 패킷을 날림
 				//1.서버처리 2.클라에게 패킷처리 [ 순서 존재 ]
@@ -153,6 +218,22 @@ DWORD WINAPI GameLogicThread(LPVOID arg)
 			for (int i = 0; i < Cnt_Player; ++i)
 			{
 				CLIENTS[i]->update(deltatime);
+
+				
+				auto& c = CLIENTS[i];
+				//send packet
+				sc_packet_move_process packet;
+				packet.size = sizeof(sc_packet_move_process);
+				packet.type = SC_PACKET_MOVE_PROCESS;
+				packet.dir = c->dir;
+				packet.h = c->h;
+				packet.id = c->c_id;
+				packet.state = c->state;
+				packet.stealth = c->stealth;
+				packet.x = c->x;
+				packet.y = c->y;
+				for (int i = 0; i < Cnt_Player; ++i)
+					CLIENTS[i]->do_send(&packet, sizeof(packet));
 			}
 
 			//현재 문제
@@ -211,6 +292,7 @@ int main()
 	{
 		CLIENTS[i]->c_socket = mNet->AcceptClient(CLIENTS[i]->c_addr);
 		CLIENTS[i]->c_id = i;
+		CLIENTS[i]->is_active = true;
 		//send_login_ok(i);
 		hThread = CreateThread(NULL, 0, ClientInputThread, (LPVOID)i, 0, NULL);
 		if (hThread == NULL) closesocket(CLIENTS[i]->c_socket);
