@@ -11,6 +11,7 @@ const char CS_PACKET_LOGIN = 1;
 const char CS_PACKET_MOVE = 2;
 const char CS_PACKET_SCENE_CHANGE = 3;
 const char CS_PACKET_GAMEJOIN = 4;
+const char CS_PACKET_KEYUP = 5;
 
 const char CS_PACKET_ROBBY = 98;
 const char CS_PACKET_TEST = 99;
@@ -37,6 +38,12 @@ struct cs_packet_move {
 	unsigned char size;
 	char	type;
 	char	dir;			// 0 : up,  1: down, 2:left, 3:right, 4:jump
+};
+
+struct cs_packet_keyup {
+	unsigned char size;
+	char type;
+	char vk_key;
 };
 
 struct cs_packet_test {

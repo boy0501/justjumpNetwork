@@ -40,6 +40,8 @@ static HBITMAP /*hbit1,*/ loadbit, oldload, oldbit1, hbitobj[100];
 static PLAYER player;
 PLAYER others[2];
 
+bool keyboard[256];
+
 static MAP map;
 //static CAMERA camera;
 static OBJECT obj[150];
@@ -63,47 +65,25 @@ static DWORD oldtime;
 
 //extern int COLSPEED;
 
-//한줄에 79자까지 입력가능한 메모장
 using namespace std;
 //float elapsedt;
 //int Nameunsigan= 10;
+
+bool IsKeyPressed(char key)
+{
+	return keyboard[key];
+}
 void robby_waiting();
+void player_keyProcess();
 bool bRobby_full = false;
 
 void update(float delta_time)
 {
-	//elapsedt += delta_time;
-	//if (elapsedt > 1)
-	//{
-	//	Nameunsigan--;
-	//	
-	//}
+
+	player_keyProcess();
 	robby_waiting();
 
 	Network::GetNetwork()->C_Recv();
-
-	//if (bRobby_full == true) {
-	//	bool occur_button = 0;
-	//	map.setblack_t(50);
-	//	map.setmapnum(player.stage + 1);
-	//	for (int j = 0; j < ocount; j++)
-	//		obj[j].ResetObject();
-	//	ocount = initObject(obj, map.getmapnum(), g_hinst);
-
-	//	map.CreateMap(g_hinst);
-	//	LoadBK(hbit1, g_hinst, 0);
-	//	//hbit1 = (HBITMAP)LoadImage(g_hinst, TEXT("img/bk.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
-	//	Sound::GetSelf()->setindex(Sound::GetSelf()->getindex() + 1);
-	//	Sound::GetSelf()->Sound_Play(EFFECTSOUND, PORTALEF, EFVOL);
-	//	Sound::GetSelf()->Sound_Play(BGMSOUND, FIRSTMAPBGM, BGMVOL);
-	//	player.initPos();
-	//	player.sethp(5);
-	//	camera.setx(0);
-	//	camera.sety(3232);
-	//	map.mStartui->closeUI();
-	//	Network::GetNetwork()->mUI.emplace_back(map.mGameUi);
-	//	bRobby_full = false;
-	//}
 
 	//빼줘야 할 Ui가 있다면 Ui 삭제
 	auto iter = Network::GetNetwork()->mUI.begin();
@@ -443,6 +423,14 @@ void send_move_packet(char dr)
 	//cout << "send패킷 보냄" << endl;
 }
 
+void send_keyup_packet(char vk_key)
+{
+	cs_packet_keyup packet;
+	packet.size = sizeof(packet);
+	packet.type = CS_PACKET_KEYUP;
+	packet.vk_key = vk_key;
+	Network::GetNetwork()->C_Send(&packet, sizeof(packet));
+}
 void send_robby_in_packet()
 {
 	cs_packet_robby packet;
@@ -464,6 +452,32 @@ void robby_waiting()
 	{
 		bRobby_full = true;
 	}*/
+}
+
+
+
+void player_keyProcess()
+{
+	if (IsKeyPressed(VK_LEFT))
+	{
+		send_move_packet(VK_LEFT);
+	}
+	if (IsKeyPressed(VK_RIGHT))
+	{
+		send_move_packet(VK_RIGHT);
+	}
+	if (IsKeyPressed(VK_UP))
+	{
+		send_move_packet(VK_UP);
+	}
+	if (IsKeyPressed(VK_DOWN))
+	{
+		send_move_packet(VK_DOWN);
+	}
+	if (IsKeyPressed(VK_SPACE))
+	{
+		send_move_packet(VK_SPACE);
+	}
 }
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
@@ -607,8 +621,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		if (player.getCMD_die() == 1)
 			break;
 		if (player.getGamemode() == 0) {
-			//player.PlayerSetting(wParam);
-			send_move_packet(wParam);
+			keyboard[wParam] = true;
+			//send_move_packet(wParam);
 		}	
 		else if (player.getGamemode() == 1)
 			camera.CameraSetting(wParam);
@@ -617,8 +631,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		if (player.getCMD_die() == 1)
 			break;
 		if (player.getGamemode() == 0) {
-			//player.PlayerWaiting(wParam);
-			send_move_packet(wParam + 10);
+			keyboard[wParam] = false;
+			send_keyup_packet(wParam);
 		}
 		else if (player.getGamemode() == 1)
 			camera.CameraSetting(wParam);

@@ -25,4 +25,6 @@ public:
 
 	bool is_robby = false;
 
+	bool collp2o(class Object* Obj);
+	void adjustPlayer();
 };

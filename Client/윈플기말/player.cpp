@@ -890,7 +890,6 @@ void PLAYER::draw(HDC& mem1dc, HDC& pdc, int x, int y, int h, int stealth, int s
 			TransparentBlt(gdidc, 0, 0, 62, 50, pdc, 0, 50, 62, 50, RGB(255, 255, 255));
 			if (stealth > 0)
 			{
-
 				bf.SourceConstantAlpha = 155;//투명도
 				//이 함수는 일반 stretchblt 와 비슷하다 gdidc 는 최대가 0,0 ~62,50 이므로 뒷 인자는 0 0 62 50
 				GdiAlphaBlend(mem1dc, x - charw, y - h, charw * 2, h * 2, gdidc, 0, 0, 62, 50, bf);
@@ -898,7 +897,9 @@ void PLAYER::draw(HDC& mem1dc, HDC& pdc, int x, int y, int h, int stealth, int s
 
 			}
 			else
+			{
 				GdiAlphaBlend(mem1dc, x - charw, y - h, charw * 2, h * 2, gdidc, 0, 0, 62, 50, bf);
+			}
 		}
 
 	}
@@ -926,7 +927,6 @@ void PLAYER::draw(HDC& mem1dc, HDC& pdc, int x, int y, int h, int stealth, int s
 			TransparentBlt(gdidc, 0, 0, 62, 50, pdc, bx * 68, by + 50, bw, bh, RGB(255, 255, 255));
 			if (stealth > 0)
 			{
-
 				bf.SourceConstantAlpha = 155;//투명도
 				//이 함수는 일반 stretchblt 와 비슷하다 gdidc 는 최대가 0,0 ~62,50 이므로 뒷 인자는 0 0 62 50
 				GdiAlphaBlend(mem1dc, x - charw, y - h, charw * 2, h * 2, gdidc, 0, 0, 62, 50, bf);
@@ -934,7 +934,9 @@ void PLAYER::draw(HDC& mem1dc, HDC& pdc, int x, int y, int h, int stealth, int s
 
 			}
 			else
+			{
 				GdiAlphaBlend(mem1dc, x - charw, y - h, charw * 2, h * 2, gdidc, 0, 0, 62, 50, bf);
+			}
 		}
 
 
