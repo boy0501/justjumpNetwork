@@ -28,6 +28,7 @@ public:
 	SOCKADDR_IN server_addr;
 	WSADATA WSAData;
 	class PLAYER* mPlayer;
+	class PLAYER* mOthers;
 	class MAP* mMap;
 	class CAMERA* mCamera;
 	static class Network* mNetwork;
@@ -39,7 +40,7 @@ public:
 	void C_Send(void* packet, int bytes);
 	int C_Recv();
 	void ProcessPacket(unsigned char* p);
-	unsigned char* buf[MAX_BUF_SIZE];
+	unsigned char buf[MAX_BUF_SIZE];
 
 	bool occur_button = 0;
 	//int ocount;
@@ -47,6 +48,7 @@ public:
 	std::vector<std::shared_ptr<class UI>> mUI;
 
 public:
+	bool isLogin = true;
 	int net_x, net_y;
 	int net_h;
 	int net_state;

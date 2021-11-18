@@ -57,10 +57,11 @@ public:
 	HANDLE SceneChangeTrigger;
 	HANDLE SceneChangeIsDone;
 	SOCKET c_socket;
+	bool is_active;
 	int c_id;
 	int prev_size;
 
-	unsigned char* buf[MAX_BUF_SIZE];
+	unsigned char buf[MAX_BUF_SIZE];
 	SOCKADDR_IN c_addr;
 	Client();
 	virtual ~Client() noexcept;

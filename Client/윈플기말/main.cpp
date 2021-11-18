@@ -38,7 +38,7 @@ static HDC /*hdc, mem1dc,*/ mem2dc, loaddc, playerdc, odc, /*pdc,*/ ui_dc, hp_dc
 /*static RECT rectview;*/
 static HBITMAP /*hbit1,*/ loadbit, oldload, oldbit1, hbitobj[100];
 static PLAYER player;
-PLAYER others[2];
+PLAYER others[3];
 
 bool keyboard[256];
 
@@ -138,6 +138,8 @@ void update(float delta_time)
 	player.selectBit();
 	player.stealthtime();
 	player.spike_hurttime();
+	for (auto& o : others)
+		o.selectBit();
 
 	// 이거를 따로 넣는게 나을듯 오브젝트 멤버함수로다가
 	for (int i = 0; i <= ocount; i++)
@@ -220,11 +222,9 @@ void render()
 	}	
 	for (int i = 0; i <= ocount; i++)
 		obj[i].DrawObj(mem1dc, odc);
-	//player.draw(mem1dc, pdc, Network::GetNetwork()->net_x, Network::GetNetwork()->net_y, Network::GetNetwork()->net_h,
-	//	Network::GetNetwork()->net_stealth, Network::GetNetwork()->net_state, Network::GetNetwork()->net_dir,
-	//	Network::GetNetwork()->net_bx);
-	player.draw(mem1dc, pdc, player.x, player.y, player.h, player.stealth, player.state, player.dir, player.bx);
-	//cout << player.x << endl;
+	player.draw(mem1dc, pdc);
+	for (auto& other : others)
+		other.draw(mem1dc, pdc);
 	for (const auto& ui : Network::GetNetwork()->mUI)
 		ui->draw(mem1dc);
 
@@ -233,7 +233,6 @@ void render()
 
 	BitBlt(hdc, 0, 0, 1024, 768, mem1dc, camera.getx(), camera.gety(), SRCCOPY);
 
-	//cout << camera.getx() << ", " << camera.gety() << endl;
 
 
 	DeleteObject(mem1dc);
@@ -496,11 +495,13 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		oldtime = timeGetTime();
 		map.CreateMap(g_hinst);
 
+		player.is_active = true;
 		Network::GetNetwork()->mPlayer = &player;
 		Network::GetNetwork()->mMap = &map;
 		Network::GetNetwork()->mOcount = &ocount;
 		Network::GetNetwork()->mObj = obj;
 		Network::GetNetwork()->mCamera = &camera;
+		Network::GetNetwork()->mOthers = others;
 		Network::GetNetwork()->ConnectServer("127.0.0.1");
 		
 
@@ -596,6 +597,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 
 		Network::GetNetwork()->mUI.emplace_back(ui);
 		player.setBit(g_hinst);
+		for (auto& other : others)
+			other.setBit(g_hinst);
 		//player.initBitPos();
 		Network::GetNetwork()->mUI.back()->FindTextByNameTag("id")->UpdateFontSize(hwnd);
 		nCaretPosx = 380 + Network::GetNetwork()->mUI.back()->FindTextByNameTag("id")->getFontLen().cx;

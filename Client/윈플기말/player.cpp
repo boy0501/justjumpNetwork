@@ -15,6 +15,7 @@ bool UDkey = 0;
 int jumpcount = 0;
 int diecount = 0;
 PLAYER::PLAYER()
+	:is_active(false)
 {
 	// x y 는 캐릭터의 중심좌표이고 w,h 는 xy에서 좌우로 반틈씩만 간 좌표이다. 
 	x = 80; //100 캐릭터의 중심x좌표
@@ -837,9 +838,9 @@ void PLAYER::BitMove()
 }
 
 //플레이어를 그려줌
-void PLAYER::draw(HDC& mem1dc, HDC& pdc, int x, int y, int h, int stealth, int state, int dir, int bx)
+void PLAYER::draw(HDC& mem1dc, HDC& pdc)
 {
-	//std::cout << x << ", " << y << std::endl;
+	if (is_active == false) return;
 	BLENDFUNCTION bf;
 	bf.AlphaFormat = 0;
 	bf.BlendFlags = 0;
