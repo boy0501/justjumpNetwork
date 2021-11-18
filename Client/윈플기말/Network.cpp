@@ -11,6 +11,12 @@
 
 Network* Network::mNetwork = nullptr;
 
+HDC mem1dc, pdc, hdc;
+HWND hWnd;
+RECT rectview;
+HBITMAP hbit1;
+HINSTANCE g_hinst;
+int obj_t = 0;
 void error_display(int err_no)
 {
 	wchar_t* lpMsgBuf;
@@ -195,7 +201,7 @@ void Network::ProcessPacket(unsigned char* p)
 		//auto gameui = make_shared<GameHUD>(1, *mPlayer);
 
 		occur_button = 0;
-		mMap->setblack_t(1);
+		mMap->setblack_t(100);
 		mMap->setmapnum(mPlayer->stage + 1);
 		for (int j = 0; j < *mOcount; j++)
 			mObj[j].ResetObject();
@@ -217,7 +223,7 @@ void Network::ProcessPacket(unsigned char* p)
 		//cout << mCamera->getx() << ", " << mCamera->gety() << endl;
 
 		mCamera->setx(0);
-		mCamera->sety(500);
+		mCamera->sety(3232);
 
 		mMap->mStartui->closeUI();
 		mUI.emplace_back(mMap->mGameUi);

@@ -7,12 +7,12 @@
 #include "Camera.h"
 //#include "Map.h"
 
-static HDC mem1dc, pdc, hdc;
-static HWND hWnd;
-static HBITMAP hbit1;
-static RECT rectview;
-static HINSTANCE g_hinst;
-static int obj_t = 0;
+extern HDC mem1dc, pdc, hdc;
+extern HWND hWnd;
+extern RECT rectview;
+extern HBITMAP hbit1;
+extern HINSTANCE g_hinst;
+extern int obj_t;
 void error_display(int err_no);
 
 static CAMERA camera;
