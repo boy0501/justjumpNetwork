@@ -2,14 +2,21 @@
 #include <iostream>
 #include <windows.h>
 #include "../../Protocol/protocol.h"
+#include <vector>
+//#include "object.h"
+#include "Camera.h"
+//#include "Map.h"
 
-static HDC mem1dc, pdc, hdc;
-static HWND hWnd;
-static HBITMAP hbit1;
-static RECT rectview;
-static HINSTANCE g_hinst;
-static int obj_t = 0;
+extern HDC mem1dc, pdc, hdc;
+extern HWND hWnd;
+extern RECT rectview;
+extern HBITMAP hbit1;
+extern HINSTANCE g_hinst;
+extern int obj_t;
 void error_display(int err_no);
+
+static CAMERA camera;
+//static MAP map;
 
 class Network
 {
@@ -34,6 +41,11 @@ public:
 	void ProcessPacket(unsigned char* p);
 	unsigned char* buf[MAX_BUF_SIZE];
 
+	bool occur_button = 0;
+	//int ocount;
+	//class OBJECT obj[150];
+	std::vector<std::shared_ptr<class UI>> mUI;
+
 public:
 	int net_x, net_y;
 	int net_h;
@@ -41,5 +53,10 @@ public:
 	int net_stealth;
 	int net_dir;
 	int net_bx;
+
+	int countdown;
+	int init_x = 300;
+
+	void test();
 };
 

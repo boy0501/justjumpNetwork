@@ -50,7 +50,7 @@ void ChangeLoginToRobby(const int& c_id)
 	packet.id = my_id;
 	packet.x = CLIENTS[my_id]->x;
 	packet.y = CLIENTS[my_id]->y;
-	packet.stage = 0;
+	packet.stage = 1;
 	CLIENTS[my_id]->do_send(&packet, sizeof(packet));
 }
 void ChangeRobbyToGame(const int& c_id)
@@ -74,11 +74,12 @@ void ChangeRobbyToGame(const int& c_id)
 	packet.type = SC_PACKET_GAMESTART;
 	packet.dir = CLIENTS[my_id]->dir;
 	packet.h = CLIENTS[my_id]->h;
-	packet.stage = 0;
+	packet.stage = 9;
 	packet.state = CLIENTS[my_id]->state;
 	packet.stealth = CLIENTS[my_id]->stealth;
 	packet.x = CLIENTS[my_id]->x;
 	packet.y = CLIENTS[my_id]->y;
+	packet.COMMAND_die = CLIENTS[my_id]->COMMAND_die;
 	CLIENTS[my_id]->do_send(&packet, sizeof(packet));
 
 }
@@ -99,16 +100,16 @@ void send_move_process(int c_id, int mover)
 }
 
 
+
+
 //http://www.tipssoft.com/bulletin/board.php?bo_table=FAQ&wr_id=735 타임관련
 
 DWORD WINAPI GameLogicThread(LPVOID arg)
 {
 	QueryPerformanceFrequency(&Frequency);
 	QueryPerformanceCounter(&Endtime);
-	//time_t current_time = time(NULL);
 	while (1) {
-		//time_t frame_time = time(NULL) - current_time;
-		//cout << "frame_time = "<<frame_time << endl;
+		
 		QueryPerformanceCounter(&BeginTime);
 		auto elapsed = BeginTime.QuadPart - Endtime.QuadPart;
 		auto deltatime = (double)elapsed / (double)Frequency.QuadPart;
@@ -122,8 +123,18 @@ DWORD WINAPI GameLogicThread(LPVOID arg)
 				//cout << "FPS:" << Fps << endl;
 				Fps = 0;
 				elapsed_time = 0;
+				
 			}
 
+
+			//이런식으로 로그인에서 로비클라로 바꾼다. Scene Change같은 역할을 하는 것.
+			//현재 1번클라 접속하면 10초뒤에 로그인클라에서 로비클라로 보내는 역할을 한다.
+			//예상대로라면 로그인 버튼을 누르면 로그인 클라에서 로비클라로 보내면 되겠지.
+			if (Cnt_Player > 0) {
+				change_time += deltatime;
+
+			}
+			if (change_time > 3 && do_once_change)
 			for (auto& c : CLIENTS)
 			{
 				if (c->mCss == CSS_LIVE) continue;
@@ -134,15 +145,24 @@ DWORD WINAPI GameLogicThread(LPVOID arg)
 				switch (c->mSn)
 				{
 				case SN_LOBBY:
+				{
 					ChangeLoginToRobby(c->c_id);
 					c->mCss = CSS_LIVE;
+					auto lc = reinterpret_cast<LobbyClient*>(c);
+					lc->robby_cnt++;
+
 					SetEvent(c->SceneChangeIsDone);
 					break;
-				case SN_INGAME:
+				}
+				case SN_INGAME: 
+				{
 					ChangeRobbyToGame(c->c_id);
 					c->mCss = CSS_LIVE;
 					SetEvent(c->SceneChangeIsDone);
+
+
 					break;
+				}
 				}
 				//서버에서 플레이어를 옮겨줬다면 SetEvent를 하여 클라이언트에게 바뀌었다고 패킷을 날림
 				//1.서버처리 2.클라에게 패킷처리 [ 순서 존재 ]
@@ -153,6 +173,7 @@ DWORD WINAPI GameLogicThread(LPVOID arg)
 			for (int i = 0; i < Cnt_Player; ++i)
 			{
 				CLIENTS[i]->update(deltatime);
+				
 			}
 
 			//현재 문제

@@ -2,6 +2,7 @@
 #include "resource.h"
 #include <windows.h>
 #include <tchar.h>
+#include <iostream>
 
 //HBITMAP LoadBlack(HBITMAP hbit1, HINSTANCE g_hinst)
 //{
@@ -16,6 +17,7 @@ HBITMAP LoadBK(HBITMAP& hbit1, HINSTANCE& g_hinst, int mapnum)
 	//게임시작 인터페이스
 	if (mapnum == 9)
 	{
+		std::cout << "로비 배경으로 바꿈" << std::endl;
 		hbit1 = (HBITMAP)LoadImage(g_hinst, TEXT("img/start_rayer1.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION); //상대경로로 변경
 		return hbit1;
 	}
@@ -32,6 +34,7 @@ HBITMAP LoadBK(HBITMAP& hbit1, HINSTANCE& g_hinst, int mapnum)
 	}
 	//나머지 게임맵
 	else {
+		std::cout << "게임시작 배경으로 바꿈" << std::endl;
 		hbit1 = (HBITMAP)LoadImage(g_hinst, TEXT("img/bk.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION); //상대경로로 변경
 		return hbit1;
 
