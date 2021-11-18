@@ -82,7 +82,7 @@ int Network::C_Recv()
 		return SOCKET_ERROR;
 	}
 	int remain_data = received + prev_size;
-	unsigned char* packet_start = reinterpret_cast<unsigned char*>(ptr);
+	unsigned char* packet_start = reinterpret_cast<unsigned char*>(buf);
 	int packet_size = packet_start[0];
 
 	while (packet_size <= remain_data)
@@ -142,6 +142,7 @@ void Network::ProcessPacket(unsigned char* p)
 	//cout << (int)packet_type << endl;
 	switch (packet_type) {
 	case SC_PACKET_LOGIN_OK: {
+		isLogin = false;
 		sc_packet_login_ok* packet = reinterpret_cast<sc_packet_login_ok*>(p);
 		mPlayer->stage = packet->stage;
 		mPlayer->player_cid = packet->id;
@@ -160,6 +161,23 @@ void Network::ProcessPacket(unsigned char* p)
 
 		break;
 	}
+	case SC_PACKET_PUT_OBJECT: {
+		sc_packet_put_object* packet = reinterpret_cast<sc_packet_put_object*>(p);
+		auto id = packet->id;
+		mOthers[id].is_active = true;
+		mOthers[id].dir=packet->dir;
+		mOthers[id].h=packet->h;
+		mOthers[id].hp=packet->hp;
+		mOthers[id].player_cid=packet->id;
+		mOthers[id].state=packet->state;
+		mOthers[id].stealth=packet->stealth;
+		mOthers[id].mPlayername = packet->username;
+		mOthers[id].mPlayerwname.assign(mOthers[id].mPlayername.begin(), mOthers[id].mPlayername.end());
+		mOthers[id].x=packet->x;
+		mOthers[id].y=packet->y;
+		mOthers[id].w=packet->w;
+		break;
+	}
 	case SC_PACKET_ROBBY: {
 		sc_packet_robby* packet = reinterpret_cast<sc_packet_robby*>(p);
 		
@@ -171,18 +189,31 @@ void Network::ProcessPacket(unsigned char* p)
 	}
 	case SC_PACKET_MOVE_PROCESS: 
 	{
+		if (isLogin == true) break;
 		sc_packet_move_process* packet = reinterpret_cast<sc_packet_move_process*>(p);
 		
 		//std::cout << packet->x << "," << packet->y << std::endl;
 		//std::cout << (int)packet->bx << std::endl;
-
-		mPlayer->x = packet->x;
-		mPlayer->y = packet->y;
-		mPlayer->h = packet->h;
-		mPlayer->state = packet->state;
-		mPlayer->stealth = packet->stealth;
-		mPlayer->dir = packet->dir;
-		mPlayer->bx = packet->bx;
+		if (packet->id == mPlayer->player_cid)
+		{
+			mPlayer->x = packet->x;
+			mPlayer->y = packet->y;
+			mPlayer->h = packet->h;
+			mPlayer->state = packet->state;
+			mPlayer->stealth = packet->stealth;
+			mPlayer->dir = packet->dir;
+			mPlayer->bx = packet->bx;
+		}
+		else {
+			auto& other = mOthers[packet->id];
+			other.x = packet->x;
+			other.y = packet->y;
+			other.h = packet->h;
+			other.state = packet->state;
+			other.stealth = packet->stealth;
+			other.dir = packet->dir;
+			other.bx = packet->bx;
+		}
 
 		break;
 	}

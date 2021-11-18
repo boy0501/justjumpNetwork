@@ -9,6 +9,7 @@ Client::Client()
 	:prev_size(0)
 	,mCss(CSS_LIVE)
 	,mSn(SN_LOGIN)
+	,is_active(false)
 {
 	x = 80; 
 	y = 655;
@@ -398,7 +399,7 @@ int Client::do_recv()
 		return SOCKET_ERROR;
 	}
 	int remain_data = received + prev_size;
-	unsigned char* packet_start = reinterpret_cast<unsigned char*>(ptr);
+	unsigned char* packet_start = reinterpret_cast<unsigned char*>(buf);
 	int packet_size = packet_start[0];
 
 	while (packet_size <= remain_data)

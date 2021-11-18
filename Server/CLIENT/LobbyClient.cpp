@@ -75,17 +75,17 @@ void LobbyClient::update(float delta_time)
 	//timer();
 	//send packet
 
-	sc_packet_move_process packet;
-	packet.size = sizeof(sc_packet_move_process);
-	packet.type = SC_PACKET_MOVE_PROCESS;
-	packet.dir = dir;
-	packet.h = h;
-	packet.id = c_id;
-	packet.state = state;
-	packet.stealth = stealth;
-	packet.x = x;
-	packet.y = y;
-	do_send(&packet, sizeof(packet));
+	//sc_packet_move_process packet;
+	//packet.size = sizeof(sc_packet_move_process);
+	//packet.type = SC_PACKET_MOVE_PROCESS;
+	//packet.dir = dir;
+	//packet.h = h;
+	//packet.id = c_id;
+	//packet.state = state;
+	//packet.stealth = stealth;
+	//packet.x = x;
+	//packet.y = y;
+	//do_send(&packet, sizeof(packet));
 
 	Client::update(delta_time);
 }

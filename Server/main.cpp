@@ -44,15 +44,59 @@ void ChangeLoginToRobby(const int& c_id)
 	CLIENTS[my_id] = willbe_changed;
 	delete p;
 
-	//send_ok_packet
-	sc_packet_login_ok packet;
-	packet.size = sizeof(sc_packet_login_ok);
-	packet.type = SC_PACKET_LOGIN_OK;
-	packet.id = my_id;
-	packet.x = CLIENTS[my_id]->x;
-	packet.y = CLIENTS[my_id]->y;
-	packet.stage = 1;
-	CLIENTS[my_id]->do_send(&packet, sizeof(packet));
+	//send_ok_packet me and other
+	for (auto& c : CLIENTS)
+	{
+		if (c->is_active == false) continue;
+		if (c->c_id == my_id)
+		{
+			sc_packet_login_ok packet;
+			packet.size = sizeof(sc_packet_login_ok);
+			packet.type = SC_PACKET_LOGIN_OK;
+			packet.id = my_id;
+			packet.x = CLIENTS[my_id]->x;
+			packet.y = CLIENTS[my_id]->y;
+			packet.stage = 1;
+			c->do_send(&packet, sizeof(packet));
+		}
+		else {
+			sc_packet_put_object packet;
+			packet.size = sizeof(sc_packet_put_object);
+			packet.type = SC_PACKET_PUT_OBJECT;
+			packet.dir = CLIENTS[my_id]->dir;
+			packet.h = CLIENTS[my_id]->h;
+			packet.hp = CLIENTS[my_id]->hp;
+			packet.id = my_id;
+			packet.state = CLIENTS[my_id]->state;
+			packet.stealth = CLIENTS[my_id]->stealth;
+			strcpy_s(packet.username, 20, CLIENTS[my_id]->playername);
+			packet.x = CLIENTS[my_id]->x;
+			packet.y = CLIENTS[my_id]->y;
+			packet.w = CLIENTS[my_id]->w;
+			c->do_send(&packet, sizeof(packet));
+		}
+	}
+	//send_ok_packet 상대방껄 나에게
+	for (auto& c : CLIENTS)
+	{
+		if (c->is_active == false) continue;
+		if (c->c_id == my_id)continue;
+
+		sc_packet_put_object packet;
+		packet.size = sizeof(sc_packet_put_object);
+		packet.type = SC_PACKET_PUT_OBJECT;
+		packet.dir = c->dir;
+		packet.h = c->h;
+		packet.hp = c->hp;
+		packet.id = c->c_id;
+		packet.state = c->state;
+		packet.stealth = c->stealth;
+		strcpy_s(packet.username, 20, c->playername);
+		packet.x = c->x;
+		packet.y = c->y;
+		packet.w = c->w;
+		CLIENTS[my_id]->do_send(&packet, sizeof(packet));
+	}
 }
 void ChangeRobbyToGame(const int& c_id)
 {
@@ -174,7 +218,22 @@ DWORD WINAPI GameLogicThread(LPVOID arg)
 			for (int i = 0; i < Cnt_Player; ++i)
 			{
 				CLIENTS[i]->update(deltatime);
+
 				
+				auto& c = CLIENTS[i];
+				//send packet
+				sc_packet_move_process packet;
+				packet.size = sizeof(sc_packet_move_process);
+				packet.type = SC_PACKET_MOVE_PROCESS;
+				packet.dir = c->dir;
+				packet.h = c->h;
+				packet.id = c->c_id;
+				packet.state = c->state;
+				packet.stealth = c->stealth;
+				packet.x = c->x;
+				packet.y = c->y;
+				for (int i = 0; i < Cnt_Player; ++i)
+					CLIENTS[i]->do_send(&packet, sizeof(packet));
 			}
 
 			//현재 문제
@@ -233,6 +292,7 @@ int main()
 	{
 		CLIENTS[i]->c_socket = mNet->AcceptClient(CLIENTS[i]->c_addr);
 		CLIENTS[i]->c_id = i;
+		CLIENTS[i]->is_active = true;
 		//send_login_ok(i);
 		hThread = CreateThread(NULL, 0, ClientInputThread, (LPVOID)i, 0, NULL);
 		if (hThread == NULL) closesocket(CLIENTS[i]->c_socket);
