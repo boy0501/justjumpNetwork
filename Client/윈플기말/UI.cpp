@@ -178,5 +178,6 @@ std::shared_ptr<Text> UI::FindTextByNameTag(std::string NameTag)
 }
 void UI::closeUI()
 {
+	std::cout << "closeUI È£Ãâ" << std::endl;
 	mState = UIState::Dead;
 }

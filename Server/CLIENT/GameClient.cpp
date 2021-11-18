@@ -33,11 +33,18 @@ void GameClient::update(float delta_time)
 	move(obj_t, delta_time);
 	BitMove();
 
-	//send packet
-	sc_packet_empty packet;
-	packet.size = sizeof(sc_packet_empty);
-	packet.type = SC_PACKET_EMPTY;
-	do_send(&packet, sizeof(packet));
+	////send packet
+	//sc_packet_move_process packet;
+	//packet.size = sizeof(sc_packet_move_process);
+	//packet.type = SC_PACKET_MOVE_PROCESS;
+	//packet.dir = dir;
+	//packet.h = h;
+	//packet.id = c_id;
+	//packet.state = state;
+	//packet.stealth = stealth;
+	//packet.x = x;
+	//packet.y = y;
+	//do_send(&packet, sizeof(packet));
 
 	Client::update(delta_time);
 }
@@ -112,12 +119,11 @@ void GameClient::move(int obj_t, float deltatime)
 		{
 			if (COMMAND_move == 1)
 			{
-
-				x -= ROWSPEED * deltatime;
+				x -= (int)(ROWSPEED * deltatime);
 			}
 			else if (COMMAND_move == 2)
 			{
-				x += ROWSPEED * deltatime;
+				x += (int)(ROWSPEED * deltatime);
 			}
 			//y -= 1;
 			if (abs(y - savey) > 40) {
@@ -137,11 +143,11 @@ void GameClient::move(int obj_t, float deltatime)
 			if (COMMAND_move == 1)
 			{
 
-				x -= ROWSPEED * deltatime;
+				x -= (int)(ROWSPEED * deltatime);
 			}
 			else if (COMMAND_move == 2)
 			{
-				x += ROWSPEED * deltatime;
+				x += (int)(ROWSPEED * deltatime);
 			}
 
 
@@ -149,11 +155,10 @@ void GameClient::move(int obj_t, float deltatime)
 				falldy -= GroundAccel;
 			if (falldy < 0)
 			{
-				std::cout << "state7로 change" << std::endl;
+				//std::cout << "state7로 change" << std::endl;
 				state = 7;
 			}
 			y -= falldy;
-			std::cout << "y = " << y << std::endl;
 		}
 
 
@@ -177,11 +182,13 @@ void GameClient::move(int obj_t, float deltatime)
 
 			if (COMMAND_move == 1)
 			{
-				x -= ROWSPEED * deltatime;
+				x -= (int)(ROWSPEED * deltatime);
+				
 			}
 			else if (COMMAND_move == 2)
 			{
-				x += ROWSPEED * deltatime;
+				x += (int)(ROWSPEED * deltatime);
+				
 			}
 		}
 	}
@@ -225,25 +232,23 @@ void GameClient::move(int obj_t, float deltatime)
 			adjustspd++;
 		if (LEFTkey == true)
 			if (adjustspd % 30 == 0)
-				x -= ROWSPEED * deltatime;
+				x -= (int)(ROWSPEED * deltatime);
 		if (RIGHTkey == true)
 			if (adjustspd % 30 == 0)
-				x += ROWSPEED * deltatime;
+				x += (int)(ROWSPEED * deltatime);
 		if (COMMAND_move == 1)
 		{
 			if (adjustspd <= 10)
-			{
-				x -= ROWSPEED * deltatime;
-			}
+				x -= (int)(ROWSPEED * deltatime);
 			if (adjustspd > 10)
 			{
 				if (adjustspd % 2 == 0)
-					x -= ROWSPEED * deltatime;
+					x -= (int)(ROWSPEED * deltatime);
 			}
 			else if (adjustspd > 30)
 			{
 				if (adjustspd % 5 == 0)
-					x -= ROWSPEED * deltatime;
+					x -= (int)(ROWSPEED * deltatime);
 			}
 
 			if (LEFTkey == 0)
@@ -255,17 +260,17 @@ void GameClient::move(int obj_t, float deltatime)
 		{
 			if (adjustspd <= 10)
 			{
-				x += ROWSPEED * deltatime;
+				x += (int)(ROWSPEED * deltatime);
 			}
 			if (adjustspd > 10)
 			{
 				if (adjustspd % 2 == 0)
-					x += ROWSPEED * deltatime;
+					x += (int)(ROWSPEED * deltatime);
 			}
 			else if (adjustspd > 30)
 			{
 				if (adjustspd % 5 == 0)
-					x += ROWSPEED * deltatime;
+					x += (int)(ROWSPEED * deltatime);
 			}
 			if (RIGHTkey == 0)
 				if (abs(x - savex) > 50)
@@ -429,8 +434,8 @@ void GameClient::adjustPlayer()
 					COMMAND_hurt = 0;			//땅에 닿았으면 피격아님
 					COMMAND_ropehurt = 0;		//땅에 닿았으면 피격아님
 
-					//if (ROWSPEED != 3)		//ROWSPEED를 임의로 바꿔주었다면 땅에 닿으면 초기화니 원래대로 돌려준다
-					//	ROWSPEED = 3;
+					if (ROWSPEED != 150)		//ROWSPEED를 임의로 바꿔주었다면 땅에 닿으면 초기화니 원래대로 돌려준다
+						ROWSPEED = 150;
 				}
 
 				if (obj->type == 4)
@@ -498,8 +503,8 @@ void GameClient::adjustPlayer()
 						COMMAND_hurt = 0;			//땅에 닿았으면 피격아님
 						COMMAND_ropehurt = 0;		//땅에 닿았으면 피격아님
 
-						//if (ROWSPEED != 3)		//ROWSPEED를 임의로 바꿔주었다면 땅에 닿으면 초기화니 원래대로 돌려준다
-						//	ROWSPEED = 3;
+						if (ROWSPEED != 150)		//ROWSPEED를 임의로 바꿔주었다면 땅에 닿으면 초기화니 원래대로 돌려준다
+							ROWSPEED = 150;
 					}
 					//X Collapse
 					if (state == 1 || state == 4) //Walking Collpse
@@ -689,8 +694,8 @@ void GameClient::adjustPlayer()
 			{
 
 			}
-			//if (ROWSPEED != 3)		//ROWSPEED를 임의로 바꿔주었다면 땅에 닿으면 초기화니 원래대로 돌려준다
-			//	ROWSPEED = 3; 잠깐 위로 올려줬음 주석처리하고 ㅇㅇ 근데 이게 맞을거같긴해
+			if (ROWSPEED != 150)		//ROWSPEED를 임의로 바꿔주었다면 땅에 닿으면 초기화니 원래대로 돌려준다
+				ROWSPEED = 150;			//잠깐 위로 올려줬음 주석처리하고 ㅇㅇ 근데 이게 맞을거같긴해
 
 			//return;			//하나라도 부딪혔다면 그대로 탈출한다
 		}

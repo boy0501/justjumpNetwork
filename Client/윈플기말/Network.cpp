@@ -7,9 +7,16 @@
 #include "Camera.h"
 #include "ObjectManager.h"
 #include "Map.h"
+#include "StartHUD.h"
 
 Network* Network::mNetwork = nullptr;
 
+HDC mem1dc, pdc, hdc;
+HWND hWnd;
+RECT rectview;
+HBITMAP hbit1;
+HINSTANCE g_hinst;
+int obj_t = 0;
 void error_display(int err_no)
 {
 	wchar_t* lpMsgBuf;
@@ -75,7 +82,7 @@ int Network::C_Recv()
 		return SOCKET_ERROR;
 	}
 	int remain_data = received + prev_size;
-	unsigned char* packet_start = reinterpret_cast<unsigned char*>(ptr);
+	unsigned char* packet_start = reinterpret_cast<unsigned char*>(buf);
 	int packet_size = packet_start[0];
 
 	while (packet_size <= remain_data)
@@ -94,13 +101,48 @@ int Network::C_Recv()
 	return 0;
 }
 
+void Network::test()
+{
+	/*occur_button = 0;
+	mMap->setblack_t(50);
+	mMap->setmapnum(10);
+	for (int j = 0; j < ocount; j++)
+		obj[j].ResetObject();
+
+	ocount = initObject(obj, mMap->getmapnum(), g_hinst);
+	mMap->CreateMap(g_hinst);
+
+	LoadBK(hbit1, g_hinst, 10);*/
+
+	//hbit1 = (HBITMAP)LoadImage(g_hinst, TEXT("img/bk.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
+	//Sound::GetSelf()->setindex(Sound::GetSelf()->getindex() + 1);
+	//Sound::GetSelf()->Sound_Play(EFFECTSOUND, PORTALEF, EFVOL);
+	//Sound::GetSelf()->Sound_Play(BGMSOUND, FIRSTMAPBGM, BGMVOL);
+	//mPlayer->initPos();
+	//mPlayer->sethp(5);
+	//mCamera->setx(0);
+	//mCamera->sety(3232);
+	//mMap->mStartui->closeUI();
+
+	//mUI.emplace_back(mMap->mGameUi);
+
+	/*auto it = find(mUI.begin(), mUI.end(), mMap->mGameUi);
+	if (it == mUI.end()) {
+		cout << mMap->mGameUi << "은 찾을 수 없습니다.\n";
+	}
+	else {
+		cout << mMap->mGameUi << "는 존재하며 인덱스는 " << it - mUI.begin() << " 입니다.\n";
+	}*/
+	cout << "게임 스타트!" << endl;
+}
 
 void Network::ProcessPacket(unsigned char* p)
 {
 	unsigned char packet_type = p[1];
-	cout << (int)packet_type << endl;
+	//cout << (int)packet_type << endl;
 	switch (packet_type) {
 	case SC_PACKET_LOGIN_OK: {
+		isLogin = false;
 		sc_packet_login_ok* packet = reinterpret_cast<sc_packet_login_ok*>(p);
 		mPlayer->stage = packet->stage;
 		mPlayer->player_cid = packet->id;
@@ -119,31 +161,59 @@ void Network::ProcessPacket(unsigned char* p)
 
 		break;
 	}
+	case SC_PACKET_PUT_OBJECT: {
+		sc_packet_put_object* packet = reinterpret_cast<sc_packet_put_object*>(p);
+		auto id = packet->id;
+		mOthers[id].is_active = true;
+		mOthers[id].dir=packet->dir;
+		mOthers[id].h=packet->h;
+		mOthers[id].hp=packet->hp;
+		mOthers[id].player_cid=packet->id;
+		mOthers[id].state=packet->state;
+		mOthers[id].stealth=packet->stealth;
+		mOthers[id].mPlayername = packet->username;
+		mOthers[id].mPlayerwname.assign(mOthers[id].mPlayername.begin(), mOthers[id].mPlayername.end());
+		mOthers[id].x=packet->x;
+		mOthers[id].y=packet->y;
+		mOthers[id].w=packet->w;
+		break;
+	}
 	case SC_PACKET_ROBBY: {
 		sc_packet_robby* packet = reinterpret_cast<sc_packet_robby*>(p);
-		/*if ((int)(packet->count_start) == 1) {
-			mPlayer->ready_to_go = true;
-		}*/
-		if (packet->player_cnt == 1) {
-			mPlayer->ready_to_go = true;
-
-		}
+		
+		if (countdown != packet->countdown)
+			init_x += 20;
+		countdown = packet->countdown;
+		//std::cout << packet->countdown << std::endl;
 		break;
 	}
 	case SC_PACKET_MOVE_PROCESS: 
 	{
+		if (isLogin == true) break;
 		sc_packet_move_process* packet = reinterpret_cast<sc_packet_move_process*>(p);
 		
 		//std::cout << packet->x << "," << packet->y << std::endl;
 		//std::cout << (int)packet->bx << std::endl;
-
-		mPlayer->x = packet->x;
-		mPlayer->y = packet->y;
-		mPlayer->h = packet->h;
-		mPlayer->state = packet->state;
-		mPlayer->stealth = packet->stealth;
-		mPlayer->dir = packet->dir;
-		mPlayer->bx = packet->bx;
+		if (packet->id == mPlayer->player_cid)
+		{
+			mPlayer->x = packet->x;
+			mPlayer->y = packet->y;
+			mPlayer->h = packet->h;
+			mPlayer->state = packet->state;
+			mPlayer->stealth = packet->stealth;
+			mPlayer->dir = packet->dir;
+			mPlayer->bx = packet->bx;
+		}
+		else {
+			auto& other = mOthers[packet->id];
+			other.x = packet->x;
+			other.y = packet->y;
+			other.h = packet->h;
+			other.state = packet->state;
+			other.stealth = packet->stealth;
+			other.dir = packet->dir;
+			other.bx = packet->bx;
+		}
 
 		break;
 	}
@@ -157,7 +227,57 @@ void Network::ProcessPacket(unsigned char* p)
 		mPlayer->stealth = packet->stealth;
 		mPlayer->x = packet->x;
 		mPlayer->y = packet->y;
+		mPlayer->COMMAND_die = packet->COMMAND_die;
 
+		//auto gameui = make_shared<GameHUD>(1, *mPlayer);
+
+		occur_button = 0;
+		mMap->setblack_t(100);
+		mMap->setmapnum(mPlayer->stage + 1);
+		for (int j = 0; j < *mOcount; j++)
+			mObj[j].ResetObject();
+
+		*mOcount = initObject(mObj, mMap->getmapnum(), g_hinst);
+		mMap->CreateMap(g_hinst);
+		LoadBK(hbit1, g_hinst, mMap->getmapnum());
+
+
+		//hbit1 = (HBITMAP)LoadImage(g_hinst, TEXT("img/bk.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
+		Sound::GetSelf()->setindex(Sound::GetSelf()->getindex() + 1);
+		Sound::GetSelf()->Sound_Play(EFFECTSOUND, PORTALEF, EFVOL);
+		Sound::GetSelf()->Sound_Play(BGMSOUND, FIRSTMAPBGM, BGMVOL);
+		mPlayer->initPos();
+		mPlayer->sethp(5);
+		//cout << mCamera->getx() << ", " << mCamera->gety() << endl;
+		
+		//cout << mPlayer->x <<", "<< mPlayer->y<<endl;
+		//cout << mCamera->getx() << ", " << mCamera->gety() << endl;
+
+		mCamera->setx(0);
+		mCamera->sety(3232);
+
+		mMap->mStartui->closeUI();
+		mUI.emplace_back(mMap->mGameUi);
+		//auto gameui = make_shared<GameHUD>(1, *mPlayer);
+		//gameui->LoadUiBitmap(g_hinst, "img/NoNameUi.bmp", 400, 700, 199, 65, RGB(0, 255, 0), *mCamera);
+		//gameui->addText(mPlayer->mPlayerwname, "NickName", L"메이플스토리 light", RGB(255, 255, 255), 14, 475, 705, true, 100, 65, *mCamera);
+		//gameui->LoadHpUiBitmap(g_hinst, "img/Ui_HP.bmp", 421, 728, 100, 65, RGB(0, 0, 255), *mCamera);
+
+		//startui->closeUI();
+		//mMap->mGameUi = make_shared<GameHUD>(1, *mPlayer);
+		//BitBlt(hdc, 0, 0, 1024, 768, mem1dc, camera.getx(), camera.gety(), SRCCOPY);
+
+		//mMap->mGameUi = gameui;
+		
+		/*auto it = find(mUI.begin(), mUI.end(), mMap->mGameUi);
+		if (it == mUI.end()) {
+			cout << mMap->mGameUi << "은 찾을 수 없습니다.\n";
+		}
+		else {
+			cout << mMap->mGameUi << "는 존재하며 인덱스는 " << it - mUI.begin() << " 입니다.\n";
+		}*/
+		cout << "게임 스타트!" << endl;
+		
 		break;
 
 	}
