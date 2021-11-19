@@ -44,6 +44,7 @@ public:
 
 	int ROWSPEED = 150;
 	int COLSPEED = 10;
+	int beltspeed = 100;
 	int ROPESPEED = 2;
 	//bool LEFTkey = 0;
 	//bool RIGHTkey = 0;

@@ -31,7 +31,9 @@ void GameClient::update(float delta_time)
 	}
 
 	move(delta_time);
-	adjustPlayer();
+	adjustPlayer(delta_time);
+	spike_hurttime(delta_time);
+	stealthtime();
 	Client::update(delta_time);
 }
 
@@ -389,7 +391,7 @@ bool GameClient::collp2o(Object* Obj)
 
 
 //플레이어와 오브젝트간 상호작용 판단하고 그에맞게 바꿔줌
-void GameClient::adjustPlayer()
+void GameClient::adjustPlayer(float deltatime)
 {
 	int check_coll = 0;	//하나라도 부딪혔는지 판별하기위함
 	if (x - w < 0)
@@ -451,11 +453,11 @@ void GameClient::adjustPlayer()
 
 				if (obj->type == 4)
 				{
-					//x = x + beltspeed;
+					x += (int)(beltspeed * deltatime);
 				}
 				if (obj->type == 6)
 				{
-					//x = x - beltspeed;
+					x -= (int)(beltspeed * deltatime);
 				}
 			}
 			else if (obj->type >= 101 && obj->type <= 200)	//장애물에 부딪히면
@@ -532,8 +534,11 @@ void GameClient::adjustPlayer()
 				}
 				else if (obj->type == 103) //왼쪽 증기, 가시와 비슷함 대신 증기가 완전히 뿜어져  나왔을때 피격판정이 있다.
 				{
+					std::cout << "인덱스" << obj->index << std::endl;
 					if (obj->index == 2) //증기가 완전히 뿜어졌을때만 피격이 발생한다
 					{
+						std::cout << "인덱스 들어옴" << stealth << std::endl;
+
 						if (stealth == 0)
 						{
 							if (state == 5 || state == 8)
@@ -792,4 +797,32 @@ void GameClient::hurt()
 		DOWNkey = 0;
 		diecount++;
 	}
+}
+
+void GameClient::spike_hurttime(float deltatime)
+{
+	if (spike_hurt < 0)
+	{
+		spike_hurt++;
+		std::cout << "들어오긴하냐" << std::endl;
+		x -= (int)(200 * deltatime);			//왼쪽으로감
+	}
+	else if (spike_hurt > 0)
+	{
+		spike_hurt--;
+		x += (int)(200 * deltatime);
+	}
+}
+
+void GameClient::stealthtime()
+{
+	if (COMMAND_die == 0)	//죽으면 무적안풀림
+		if (stealth > 0)
+		{
+			stealth--;
+			if (stealth == 0)
+				COMMAND_hurt = 0;
+		}
+	if (jumpignore > 0)
+		jumpignore--;
 }
