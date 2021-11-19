@@ -1,7 +1,6 @@
 #pragma once
 #include "Client.h"
 #include <array>
-extern std::array<class Client*, 3> CLIENTS;
 
 
 class LobbyClient : public Client

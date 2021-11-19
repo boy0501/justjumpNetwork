@@ -17,13 +17,10 @@
 using namespace std;
 
 Map* mainMap;
-int Cnt_Player = 0;
 LARGE_INTEGER Frequency;
 LARGE_INTEGER BeginTime;
 LARGE_INTEGER Endtime;
 float elapsed_time;
-float change_time;
-bool do_once_change = true;
 int Fps = 0;
 
 
@@ -173,15 +170,7 @@ DWORD WINAPI GameLogicThread(LPVOID arg)
 				
 			}
 
-
-			//이런식으로 로그인에서 로비클라로 바꾼다. Scene Change같은 역할을 하는 것.
-			//현재 1번클라 접속하면 10초뒤에 로그인클라에서 로비클라로 보내는 역할을 한다.
-			//예상대로라면 로그인 버튼을 누르면 로그인 클라에서 로비클라로 보내면 되겠지.
-			if (Cnt_Player > 0) {
-				change_time += deltatime;
-
-			}
-			if (change_time > 3 && do_once_change)
+			// Scene Changer
 			for (auto& c : CLIENTS)
 			{
 				if (c->mCss == CSS_LIVE) continue;
@@ -226,6 +215,7 @@ DWORD WINAPI GameLogicThread(LPVOID arg)
 			{
 				CLIENTS[i]->update(deltatime);
 
+				
 				auto& c = CLIENTS[i];
 				//send packet
 				sc_packet_move_process packet;
@@ -238,8 +228,13 @@ DWORD WINAPI GameLogicThread(LPVOID arg)
 				packet.stealth = c->stealth;
 				packet.x = c->x;
 				packet.y = c->y;
-				for (int i = 0; i < Cnt_Player; ++i)
-					CLIENTS[i]->do_send(&packet, sizeof(packet));
+				for (int j = 0; j < Cnt_Player; ++j)
+				{
+					//맵이 서로 다르면 애초에 보내주질 않음.
+					if (CLIENTS[i]->mStageNum != CLIENTS[j]->mStageNum) continue;
+
+					CLIENTS[j]->do_send(&packet, sizeof(packet));
+				}
 
 			}
 

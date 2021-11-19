@@ -1,9 +1,9 @@
 #include <iostream>
 
+#include "../Network.h"
 #include "LobbyClient.h"
 #include "../Map.h"
 #include "../Object.h"
-std::array<class Client*, 3> CLIENTS;
 
 LobbyClient::LobbyClient()
 	:elapsedtime(0)

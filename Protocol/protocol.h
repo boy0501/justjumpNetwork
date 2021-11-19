@@ -24,6 +24,7 @@ const char SC_PACKET_ROBBY = 5;
 const char SC_PACKET_EMPTY = 6;
 const char SC_PACKET_GAMESTART = 7;
 const char SC_PACKET_STAGENUM = 8;
+const char SC_PACKET_PORTAL = 9;
 
 
 #pragma pack (push, 1)
@@ -143,5 +144,11 @@ struct sc_packet_stagenum {
 	char type;
 	int id;
 	int stagenum;
+};
+
+struct sc_packet_portal {
+	unsigned char size;
+	char type;
+	char stagenum;
 };
 #pragma pack(pop)

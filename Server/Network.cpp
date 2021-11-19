@@ -1,9 +1,12 @@
 #include <iostream>
+#include <array>
 #include "Network.h"
 #include "CLIENT/Client.h"
 #include "../Protocol/protocol.h"
 
+std::array<class Client*, 3> CLIENTS;
 Network* Network::mNetwork = nullptr;
+int Cnt_Player = 0;
 
 void error_display(int err_no)
 {

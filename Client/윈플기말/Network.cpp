@@ -178,6 +178,36 @@ void Network::ProcessPacket(unsigned char* p)
 		mOthers[id].w=packet->w;
 		break;
 	}
+	case SC_PACKET_LOGOUT_OBJECT: {
+		sc_packet_logout_object* packet = reinterpret_cast<sc_packet_logout_object*>(p);
+		mOthers[packet->id].is_active = false;
+		break;
+	}
+	case SC_PACKET_PORTAL: {
+		sc_packet_portal* packet = reinterpret_cast<sc_packet_portal*>(p);
+		mPlayer->stage = packet->stagenum;
+
+		occur_button = 0;
+		mMap->setblack_t(100);
+		mMap->setmapnum(mPlayer->stage + 9);
+		for (int j = 0; j < *mOcount; j++)
+			mObj[j].ResetObject();
+
+		*mOcount = initObject(mObj, mMap->getmapnum(), g_hinst);
+		mMap->CreateMap(g_hinst);
+		LoadBK(hbit1, g_hinst, mMap->getmapnum());
+
+
+		//hbit1 = (HBITMAP)LoadImage(g_hinst, TEXT("img/bk.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
+		Sound::GetSelf()->setindex(Sound::GetSelf()->getindex() + 1);
+		Sound::GetSelf()->Sound_Play(EFFECTSOUND, PORTALEF, EFVOL);
+		Sound::GetSelf()->Sound_Play(BGMSOUND, FIRSTMAPBGM, BGMVOL);
+		mPlayer->initPos();
+		//---sethp를 패킷으로 넘겨받으면 이 부분 꼭 수정해주세요
+		mPlayer->sethp(5);
+		//---
+		break;
+	}
 	case SC_PACKET_ROBBY: {
 		sc_packet_robby* packet = reinterpret_cast<sc_packet_robby*>(p);
 		
