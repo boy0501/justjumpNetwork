@@ -105,12 +105,12 @@ void update(float delta_time)
 	//Sound업데이트 끝
 	if (map.getmapnum() == LOGINBG)
 		return;
-	//obj_t += 1;
+	obj_t += 1;
 
 	if (map.getmapnum() != LOGINBG)	//로그인중일땐 캐릭터 상호작용 x 
 	{
 		
-		//player.move(obj_t);
+		player.move(obj_t);
 		adjustPlayer(player, obj, map, ocount, g_hinst);
 		if (player.getCMD_die())
 		{

@@ -7,7 +7,6 @@
 
 GameClient::GameClient()
 	:elapsedtime(0)
-	,obj_t(0)
 {
 	// stage num 초기화를 생성자에서 하는게 맞나?
 	mStageNum = 1;
@@ -31,9 +30,9 @@ void GameClient::update(float delta_time)
 
 	adjustPlayer();
 
-	obj_t += 1;
-	move(obj_t, delta_time);
-	BitMove();
+	//obj_t += 1;
+	move(delta_time);
+	//BitMove();
 
 	////send packet
 	//sc_packet_move_process packet;
@@ -77,22 +76,22 @@ void GameClient::initBitPos()
 }
 
 //비트맵을 바꿔주는함수 (애니메이션)
-void GameClient::BitMove()
-{
-	//std::cout << "bitmove" << std::endl;
-	bx += 1; //인덱스 형식으로 바꿈
-	if (state == 4)
-	{
-		if (bx >= 5) bx = 1;
-	}
-	if (state == 5 || state == 8)
-	{
+//void GameClient::BitMove()
+//{
+//	//std::cout << "bitmove" << std::endl;
+//	bx += 1; //인덱스 형식으로 바꿈
+//	if (state == 4)
+//	{
+//		if (bx >= 5) bx = 1;
+//	}
+//	if (state == 5 || state == 8)
+//	{
+//
+//		if (bx >= 2) bx = 0;
+//	}
+//}
 
-		if (bx >= 2) bx = 0;
-	}
-}
-
-void GameClient::move(int obj_t, float deltatime)
+void GameClient::move(float deltatime)
 {
 	//std::cout << "move호출" << std::endl;
 	if (state == 1)
@@ -202,10 +201,10 @@ void GameClient::move(int obj_t, float deltatime)
 
 		}
 		else {
-			if (obj_t % 5 == 0)
+			/*if (obj_t % 5 == 0)
 			{
 				BitMove();
-			}
+			}*/
 
 			if (COMMAND_move == 1)
 			{
@@ -308,8 +307,8 @@ void GameClient::move(int obj_t, float deltatime)
 	{
 		//std::cout << "state8" << std::endl;
 		savey = y;
-		if (obj_t % 10 == 0)
-			BitMove();
+		/*if (obj_t % 10 == 0)
+			BitMove();*/
 		if (UDkey == true)
 		{
 
