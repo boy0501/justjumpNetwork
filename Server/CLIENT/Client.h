@@ -16,6 +16,8 @@ public:
 	bool DOWNkey = 0;//아래쪽키 눌렀는지 1이면 누름 0이면 안누름
 	bool LRkey = 0;//왼쪽오른쪽키 동시에 눌렀는지 1이면눌림 0이면 안눌림
 	bool UDkey = 0;
+	bool EndKey = 0; //치트키(End 키)
+	
 
 	int x, y, w, h;		// x y 는 캐릭터의 중심좌표이고 w,h 는 xy에서 좌우로 반틈씩만 간 좌표이다.
 	int charw, charh;	//캐릭터 전체 사이즈이다. 
@@ -38,7 +40,7 @@ public:
 	float GroundAccel = 0.5;	//중력가속도
 	std::wstring mPlayerwname;	//플레이어이름 wchar방식
 	char playername[20];
-	int mStageNum = 0;
+	int mStageNum = 0;	//0: 로비, 1,2,3,4: 스테이지
 
 	int ROWSPEED = 150;
 	int COLSPEED = 10;

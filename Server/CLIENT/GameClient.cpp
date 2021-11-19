@@ -9,7 +9,9 @@ GameClient::GameClient()
 	:elapsedtime(0)
 	,obj_t(0)
 {
-
+	// stage num 초기화를 생성자에서 하는게 맞나?
+	mStageNum = 1;
+	std::cout << "Stage Num: " << mStageNum << std::endl;
 }
 
 
@@ -111,6 +113,31 @@ void GameClient::move(int obj_t, float deltatime)
 			dir = 1;
 			state = 4;
 		}
+
+		if (EndKey == true)
+		{
+			
+			if (mStageNum == 1)
+			{
+				x = 40;
+				y = 225;
+			}	
+			if (mStageNum == 2)
+			{
+				x = 865;
+				y = 205;
+			}
+			if (mStageNum == 3)
+			{
+				x = 14;
+				y = 0;
+			}
+			else
+			{
+				EndKey = false;
+			}
+			EndKey = false;
+		}	
 	}
 	else if (state == 2)
 	{
@@ -633,6 +660,9 @@ void GameClient::adjustPlayer()
 				{
 					if (UPkey == true)
 					{
+
+						mStageNum += 1;
+						
 						//맵이 바뀌는 로직 
 
 						//m.setblack_t(50);

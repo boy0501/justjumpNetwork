@@ -25,27 +25,7 @@ void GameHUD::draw(HDC& mem1dc)
 		button->drawByScreenButton(mem1dc);
 	}
 	UI::draw(mem1dc);
-	//drawExit(mem1dc);
-	//getMapNum();
-	//std::cout <<mapNum  << std::endl;
-	//setMapNum(mapNum);
 
-	//if (mapNum == 11)
-	//{
-	//	drawExit(mem1dc);
-	//}
-
-	//if (getMapNum() == 11) {
- //   if (try_once == false) {
-	//		this->addButton([this]() {
-	//			}
-	//		, NULL, "img/Exit", 315, 300, 138, 82, RGB(255, 0, 0));
-	//		try_once = true;
-	//	}
-	//}
-	//	
-	
-	//getMapNum();
 }
 
 void GameHUD::drawExit(HDC& mem1dc)

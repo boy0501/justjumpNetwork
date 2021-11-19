@@ -23,6 +23,7 @@ const char SC_PACKET_LOGOUT_OBJECT = 4;
 const char SC_PACKET_ROBBY = 5;
 const char SC_PACKET_EMPTY = 6;
 const char SC_PACKET_GAMESTART = 7;
+const char SC_PACKET_STAGENUM = 8;
 
 
 #pragma pack (push, 1)
@@ -87,7 +88,7 @@ struct sc_packet_move_process {
 	short dir;
 	short stealth;
 	//char hp;
-	//char rank;
+	char rank;
 	short bx; //애니메이션 위해 -> bitmove()
 }; 
 
@@ -133,5 +134,12 @@ struct sc_packet_gamestart {
 	short dir;
 	short stealth;
 	bool COMMAND_die;
+};
+
+struct sc_packet_stagenum {
+	unsigned char size;
+	char type;
+	int id;
+	int stagenum;
 };
 #pragma pack(pop)
