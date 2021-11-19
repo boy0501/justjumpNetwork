@@ -227,6 +227,12 @@ void render()
 		other.draw(mem1dc, pdc);
 	for (const auto& ui : Network::GetNetwork()->mUI)
 		ui->draw(mem1dc);
+	//지우지 마세요------
+	if (map.getmapnum() == 13) {
+		for (const auto& ui : Network::GetNetwork()->mUI)
+			ui->drawExit(mem1dc);
+	}
+	//-------------------
 
 	if (map.getblack_t() > 0) map.DrawLoadBK(mem1dc, mem2dc, loadbf);
 
@@ -476,6 +482,10 @@ void player_keyProcess()
 	if (IsKeyPressed(VK_SPACE))
 	{
 		send_move_packet(VK_SPACE);
+	}
+	if (IsKeyPressed(VK_END))
+	{
+		send_move_packet(VK_END);
 	}
 }
 
@@ -732,13 +742,13 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 			ShowCaret(hwnd);
 			break;
 		}
-		if (wParam == 'r')
+		/*if (wParam == 'r')
 		{
 			cout << "r키 누름" << endl;
 			player.setx(obj[ocount - 1].getX() + 10);
 			player.sety(obj[ocount - 1].getY() - 25);
 			break;
-		}
+		}*/
 		if (wParam == 'c')
 		{
 			player.setCMD_move(0);

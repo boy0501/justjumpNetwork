@@ -400,7 +400,6 @@ void PLAYER::PlayerSetting(WPARAM wParam)
 			h -= 12;		//숙이면 키도 줄어들어야한다.
 			y += 12;
 		}
-
 		return;
 	}
 	if (wParam == VK_SPACE)
@@ -430,6 +429,10 @@ void PLAYER::PlayerSetting(WPARAM wParam)
 			savey = y;
 		}
 		return;
+	}
+	if (wParam == VK_END)
+	{
+
 	}
 }
 //플레이어 대기상태
