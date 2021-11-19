@@ -222,7 +222,7 @@ void Client::ProcessPacket(unsigned char* p)
 			}
 			break;
 		case VK_SPACE: //VK_SPACE
-			//std::cout << "space bar " << std::endl;
+	
 			if (DOWNkey == true)
 			{
 				return;
@@ -249,7 +249,8 @@ void Client::ProcessPacket(unsigned char* p)
 				savey = y;
 			}
 			break;
-
+		case VK_END:	//치트키
+			EndKey = true;
 		}
 		break;
 	}

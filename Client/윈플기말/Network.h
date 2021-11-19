@@ -59,6 +59,8 @@ public:
 	int countdown;
 	int init_x = 300;
 
+	int rank;
+
 	void test();
 };
 

@@ -203,6 +203,10 @@ void Network::ProcessPacket(unsigned char* p)
 			mPlayer->stealth = packet->stealth;
 			mPlayer->dir = packet->dir;
 			mPlayer->bx = packet->bx;
+
+			//------
+			//rank = packet->rank;
+			//------
 		}
 		else {
 			auto& other = mOthers[packet->id];

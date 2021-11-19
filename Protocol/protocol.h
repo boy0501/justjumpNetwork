@@ -88,7 +88,7 @@ struct sc_packet_move_process {
 	short dir;
 	short stealth;
 	//char hp;
-	//char rank;
+	char rank;
 	short bx; //애니메이션 위해 -> bitmove()
 }; 
 
