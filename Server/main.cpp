@@ -25,7 +25,7 @@ float elapsed_time;
 float change_time;
 bool do_once_change = true;
 int Fps = 0;
-std::array<class Client*, 3> CLIENTS;
+
 
 
 void ChangeLoginToRobby(const int& c_id)
@@ -73,6 +73,8 @@ void ChangeLoginToRobby(const int& c_id)
 			packet.x = CLIENTS[my_id]->x;
 			packet.y = CLIENTS[my_id]->y;
 			packet.w = CLIENTS[my_id]->w;
+			//
+			//packet.bx = CLIENTS[my_id]->bx;
 			c->do_send(&packet, sizeof(packet));
 		}
 	}
@@ -128,19 +130,19 @@ void ChangeRobbyToGame(const int& c_id)
 	CLIENTS[my_id]->do_send(&packet, sizeof(packet));
 
 }
-void send_move_process(int c_id, int mover)
+void send_move_process(int c_id)
 {
 	sc_packet_move_process packet;
 	packet.size = sizeof(sc_packet_move_process);
 	packet.type = SC_PACKET_MOVE_PROCESS;
-	packet.id = mover;
-	packet.x = CLIENTS[mover]->x;
-	packet.y = CLIENTS[mover]->y;
-	packet.h = CLIENTS[mover]->h;
-	packet.state = CLIENTS[mover]->state;
-	packet.stealth = CLIENTS[mover]->stealth;
-	packet.dir = CLIENTS[mover]->dir;
-	packet.bx = CLIENTS[mover]->bx;
+	packet.id = c_id;
+	packet.x = CLIENTS[c_id]->x;
+	packet.y = CLIENTS[c_id]->y;
+	packet.h = CLIENTS[c_id]->h;
+	packet.state = CLIENTS[c_id]->state;
+	packet.stealth = CLIENTS[c_id]->stealth;
+	packet.dir = CLIENTS[c_id]->dir;
+	//packet.bx = CLIENTS[mover]->bx;
 	CLIENTS[c_id]->do_send(&packet, sizeof(packet));
 }
 
@@ -194,17 +196,22 @@ DWORD WINAPI GameLogicThread(LPVOID arg)
 					ChangeLoginToRobby(c->c_id);
 					c->mCss = CSS_LIVE;
 					auto lc = reinterpret_cast<LobbyClient*>(c);
-					lc->robby_cnt++;
+					lc->robby_cnt = Cnt_Player;
+					//cout << "lc로비카운트는"<<lc->robby_cnt << endl;
 
 					SetEvent(c->SceneChangeIsDone);
-					break;
+ 					break;
 				}
 				case SN_INGAME: 
 				{
-					ChangeRobbyToGame(c->c_id);
+					//로비에서 인게임으로 다같이 가자
+					for (int i = 0; i < Cnt_Player; ++i) {
+						ChangeRobbyToGame(i);
+						
+					}
+					
 					c->mCss = CSS_LIVE;
 					SetEvent(c->SceneChangeIsDone);
-
 
 					break;
 				}
@@ -219,7 +226,6 @@ DWORD WINAPI GameLogicThread(LPVOID arg)
 			{
 				CLIENTS[i]->update(deltatime);
 
-				
 				auto& c = CLIENTS[i];
 				//send packet
 				sc_packet_move_process packet;
@@ -234,6 +240,7 @@ DWORD WINAPI GameLogicThread(LPVOID arg)
 				packet.y = c->y;
 				for (int i = 0; i < Cnt_Player; ++i)
 					CLIENTS[i]->do_send(&packet, sizeof(packet));
+
 			}
 
 			//현재 문제
@@ -261,11 +268,11 @@ DWORD WINAPI ClientInputThread(LPVOID arg)
 			return 0;
 		}
 
-		for (int i = 0; i < Cnt_Player; ++i)
+		/*for (int i = 0; i < Cnt_Player; ++i)
 		{
-			send_move_process(i, c_id);
+			send_move_process(i);
 
-		}
+		}*/
 	}
 }
 

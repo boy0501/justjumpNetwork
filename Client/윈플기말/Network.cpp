@@ -202,7 +202,7 @@ void Network::ProcessPacket(unsigned char* p)
 			mPlayer->state = packet->state;
 			mPlayer->stealth = packet->stealth;
 			mPlayer->dir = packet->dir;
-			mPlayer->bx = packet->bx;
+			//mPlayer->bx = packet->bx;
 		}
 		else {
 			auto& other = mOthers[packet->id];
@@ -212,7 +212,7 @@ void Network::ProcessPacket(unsigned char* p)
 			other.state = packet->state;
 			other.stealth = packet->stealth;
 			other.dir = packet->dir;
-			other.bx = packet->bx;
+			//other.bx = packet->bx;
 		}
 
 		break;

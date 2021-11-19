@@ -16,9 +16,9 @@ public:
 	bool collp2o(class Object* Obj);
 	void adjustPlayer();
 	
-	int obj_t; // for 애니메이션
-	void move(int obj_t, float deltatime);
-	void BitMove();
+	//int obj_t; // for 애니메이션
+	void move(float deltatime);
+	//void BitMove();
 	void initPos();
 	void initBitPos();
 };

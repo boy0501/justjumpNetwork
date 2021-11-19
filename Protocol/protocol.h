@@ -88,7 +88,7 @@ struct sc_packet_move_process {
 	short stealth;
 	//char hp;
 	//char rank;
-	short bx; //애니메이션 위해 -> bitmove()
+	//short bx; //애니메이션 위해 -> bitmove()
 }; 
 
 struct sc_packet_put_object {
@@ -102,6 +102,7 @@ struct sc_packet_put_object {
 	char hp;
 	char dir;
 	bool stealth;
+
 };
 
 struct sc_packet_logout_object {
