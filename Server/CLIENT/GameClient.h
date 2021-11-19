@@ -21,4 +21,6 @@ public:
 	//void BitMove();
 	void initPos();
 	void initBitPos();
+	void hurt();	//로그인은 hurt필요없고, lobby도 사실상 다칠 일이 없기때문에 이곳에만 넣음
+
 };

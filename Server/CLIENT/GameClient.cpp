@@ -1,5 +1,7 @@
 #include <iostream>
+#include <array>
 
+#include "../Network.h"
 #include "../Map.h"
 #include "GameClient.h"
 #include "../Object.h"
@@ -28,25 +30,8 @@ void GameClient::update(float delta_time)
 		std::cout << "게임클라" << std::endl;
 	}
 
-	adjustPlayer();
-
-	//obj_t += 1;
 	move(delta_time);
-	//BitMove();
-
-	////send packet
-	//sc_packet_move_process packet;
-	//packet.size = sizeof(sc_packet_move_process);
-	//packet.type = SC_PACKET_MOVE_PROCESS;
-	//packet.dir = dir;
-	//packet.h = h;
-	//packet.id = c_id;
-	//packet.state = state;
-	//packet.stealth = stealth;
-	//packet.x = x;
-	//packet.y = y;
-	//do_send(&packet, sizeof(packet));
-
+	adjustPlayer();
 	Client::update(delta_time);
 }
 
@@ -435,7 +420,7 @@ void GameClient::adjustPlayer()
 						{
 							COMMAND_move = dir;//보고있는방향으로 앞으로 나가게, 떨어졌는데 가만히있진 않지요
 							state = 6;//피격으로감
-							//player.hurt();
+							hurt();
 							return;
 						}
 					}
@@ -506,7 +491,7 @@ void GameClient::adjustPlayer()
 						else {
 							state = 6;		//피격으로감
 						}
-						//player.hurt();
+						hurt();
 					}
 				}
 				else if (obj->type == 102) //Break Pipe Left
@@ -572,7 +557,7 @@ void GameClient::adjustPlayer()
 								COMMAND_move = 1;//무조건 왼쪽임
 								state = 6;
 							}
-							//player.hurt();
+							hurt();
 						}
 					}
 				}
@@ -615,7 +600,7 @@ void GameClient::adjustPlayer()
 							COMMAND_move = dir;
 							state = 6;		//피격으로감
 						}
-						//player.hurt();
+						hurt();
 					}
 				}
 				else if (obj->type == 107)
@@ -649,7 +634,7 @@ void GameClient::adjustPlayer()
 							COMMAND_move = dir;
 							state = 6;		//피격으로감
 						}
-						//player.hurt();
+						hurt();
 					}
 				}
 			}
@@ -660,8 +645,52 @@ void GameClient::adjustPlayer()
 					if (UPkey == true)
 					{
 
-						mStageNum += 1;
 						
+						//내 상태를 다른 사람들에게 전달 (나랑 같은 stage에 있던사람한테 보냄)
+						for (int i = 0; i < Cnt_Player; ++i)
+						{
+							if (c_id == CLIENTS[i]->c_id)continue;
+							if (mStageNum != CLIENTS[i]->mStageNum) continue;
+							sc_packet_logout_object packet;
+							packet.size = sizeof(sc_packet_logout_object);
+							packet.type = SC_PACKET_LOGOUT_OBJECT;
+							packet.id = c_id;
+							CLIENTS[i]->do_send(&packet, sizeof(packet));
+						}
+
+						//Stage의 변경 
+						mStageNum += 1;
+						initPos();
+						sc_packet_portal packet;
+						packet.size = sizeof(sc_packet_portal);
+						packet.type = SC_PACKET_PORTAL;
+						packet.stagenum = mStageNum;
+						do_send(&packet, sizeof(packet));
+
+						//다른사람들의 상태를 나한테 전달 (바뀐 stage에 있는 사람들걸 가져옴
+						for (int i = 0; i < Cnt_Player; ++i)
+						{
+							if (c_id == CLIENTS[i]->c_id)continue;
+							if (mStageNum != CLIENTS[i]->mStageNum) continue;
+							auto other = CLIENTS[i];
+														 
+							sc_packet_put_object packet;
+							packet.size = sizeof(sc_packet_put_object);
+							packet.type = SC_PACKET_PUT_OBJECT;
+							packet.id = other->c_id;
+							packet.dir = other->dir;
+							packet.h = other->h;
+							packet.hp = other->hp;
+							packet.state = other->state;
+							packet.stealth = other->stealth;
+							strcpy_s(packet.username, 20, other->playername);
+							packet.w = other->w;
+							packet.x = other->x;
+							packet.y = other->y;
+							CLIENTS[c_id]->do_send(&packet, sizeof(packet));
+						}
+
+
 						//맵이 바뀌는 로직 
 
 						//m.setblack_t(50);
@@ -740,4 +769,27 @@ void GameClient::adjustPlayer()
 
 
 	
+}
+
+void GameClient::hurt()
+{
+	std::cout << "다침상태 들어오지 ?" << std::endl;
+	std::cout << "hp는 ? : " << COMMAND_die << "," << hp << std::endl;
+	if (COMMAND_die == false)
+		hp -= 5;
+	if (hp <= 0)	//0 이하라면
+	{
+		hp = 0;
+		COMMAND_die = true;
+		COMMAND_move = false;
+		state = 3;
+		y += 12;
+		h = 13;
+		stealth = 1;
+		LEFTkey = 0;
+		RIGHTkey = 0;
+		UPkey = 0;
+		DOWNkey = 0;
+		diecount++;
+	}
 }

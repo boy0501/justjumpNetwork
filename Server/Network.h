@@ -2,6 +2,8 @@
 
 #include <winsock2.h>
 
+extern std::array<class Client*, 3> CLIENTS;
+extern int Cnt_Player;
 
 void error_display(int err_no);
 class Network
