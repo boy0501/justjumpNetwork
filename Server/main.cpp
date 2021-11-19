@@ -17,15 +17,12 @@
 using namespace std;
 
 Map* mainMap;
-int Cnt_Player = 0;
 LARGE_INTEGER Frequency;
 LARGE_INTEGER BeginTime;
 LARGE_INTEGER Endtime;
 float elapsed_time;
-float change_time;
-bool do_once_change = true;
 int Fps = 0;
-std::array<class Client*, 3> CLIENTS;
+
 
 
 void ChangeLoginToRobby(const int& c_id)
@@ -73,6 +70,8 @@ void ChangeLoginToRobby(const int& c_id)
 			packet.x = CLIENTS[my_id]->x;
 			packet.y = CLIENTS[my_id]->y;
 			packet.w = CLIENTS[my_id]->w;
+			//
+			//packet.bx = CLIENTS[my_id]->bx;
 			c->do_send(&packet, sizeof(packet));
 		}
 	}
@@ -128,19 +127,19 @@ void ChangeRobbyToGame(const int& c_id)
 	CLIENTS[my_id]->do_send(&packet, sizeof(packet));
 
 }
-void send_move_process(int c_id, int mover)
+void send_move_process(int c_id)
 {
 	sc_packet_move_process packet;
 	packet.size = sizeof(sc_packet_move_process);
 	packet.type = SC_PACKET_MOVE_PROCESS;
-	packet.id = mover;
-	packet.x = CLIENTS[mover]->x;
-	packet.y = CLIENTS[mover]->y;
-	packet.h = CLIENTS[mover]->h;
-	packet.state = CLIENTS[mover]->state;
-	packet.stealth = CLIENTS[mover]->stealth;
-	packet.dir = CLIENTS[mover]->dir;
-	packet.bx = CLIENTS[mover]->bx;
+	packet.id = c_id;
+	packet.x = CLIENTS[c_id]->x;
+	packet.y = CLIENTS[c_id]->y;
+	packet.h = CLIENTS[c_id]->h;
+	packet.state = CLIENTS[c_id]->state;
+	packet.stealth = CLIENTS[c_id]->stealth;
+	packet.dir = CLIENTS[c_id]->dir;
+	//packet.bx = CLIENTS[mover]->bx;
 	CLIENTS[c_id]->do_send(&packet, sizeof(packet));
 }
 
@@ -171,15 +170,7 @@ DWORD WINAPI GameLogicThread(LPVOID arg)
 				
 			}
 
-
-			//이런식으로 로그인에서 로비클라로 바꾼다. Scene Change같은 역할을 하는 것.
-			//현재 1번클라 접속하면 10초뒤에 로그인클라에서 로비클라로 보내는 역할을 한다.
-			//예상대로라면 로그인 버튼을 누르면 로그인 클라에서 로비클라로 보내면 되겠지.
-			if (Cnt_Player > 0) {
-				change_time += deltatime;
-
-			}
-			if (change_time > 3 && do_once_change)
+			// Scene Changer
 			for (auto& c : CLIENTS)
 			{
 				if (c->mCss == CSS_LIVE) continue;
@@ -194,17 +185,22 @@ DWORD WINAPI GameLogicThread(LPVOID arg)
 					ChangeLoginToRobby(c->c_id);
 					c->mCss = CSS_LIVE;
 					auto lc = reinterpret_cast<LobbyClient*>(c);
-					lc->robby_cnt++;
+					lc->robby_cnt = Cnt_Player;
+					//cout << "lc로비카운트는"<<lc->robby_cnt << endl;
 
 					SetEvent(c->SceneChangeIsDone);
-					break;
+ 					break;
 				}
 				case SN_INGAME: 
 				{
-					ChangeRobbyToGame(c->c_id);
+					//로비에서 인게임으로 다같이 가자
+					for (int i = 0; i < Cnt_Player; ++i) {
+						ChangeRobbyToGame(i);
+						
+					}
+					
 					c->mCss = CSS_LIVE;
 					SetEvent(c->SceneChangeIsDone);
-
 
 					break;
 				}
@@ -232,8 +228,14 @@ DWORD WINAPI GameLogicThread(LPVOID arg)
 				packet.stealth = c->stealth;
 				packet.x = c->x;
 				packet.y = c->y;
-				for (int i = 0; i < Cnt_Player; ++i)
-					CLIENTS[i]->do_send(&packet, sizeof(packet));
+				for (int j = 0; j < Cnt_Player; ++j)
+				{
+					//맵이 서로 다르면 애초에 보내주질 않음.
+					if (CLIENTS[i]->mStageNum != CLIENTS[j]->mStageNum) continue;
+
+					CLIENTS[j]->do_send(&packet, sizeof(packet));
+				}
+
 			}
 
 			//현재 문제
@@ -261,11 +263,11 @@ DWORD WINAPI ClientInputThread(LPVOID arg)
 			return 0;
 		}
 
-		for (int i = 0; i < Cnt_Player; ++i)
+		/*for (int i = 0; i < Cnt_Player; ++i)
 		{
-			send_move_process(i, c_id);
+			send_move_process(i);
 
-		}
+		}*/
 	}
 }
 

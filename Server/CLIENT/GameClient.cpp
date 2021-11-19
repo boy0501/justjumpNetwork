@@ -1,5 +1,7 @@
 #include <iostream>
+#include <array>
 
+#include "../Network.h"
 #include "../Map.h"
 #include "GameClient.h"
 #include "../Object.h"
@@ -7,7 +9,6 @@
 
 GameClient::GameClient()
 	:elapsedtime(0)
-	,obj_t(0)
 {
 	// stage num 초기화를 생성자에서 하는게 맞나?
 	mStageNum = 1;
@@ -29,25 +30,10 @@ void GameClient::update(float delta_time)
 		std::cout << "게임클라" << std::endl;
 	}
 
-	adjustPlayer();
-
-	obj_t += 1;
-	move(obj_t, delta_time);
-	BitMove();
-
-	////send packet
-	//sc_packet_move_process packet;
-	//packet.size = sizeof(sc_packet_move_process);
-	//packet.type = SC_PACKET_MOVE_PROCESS;
-	//packet.dir = dir;
-	//packet.h = h;
-	//packet.id = c_id;
-	//packet.state = state;
-	//packet.stealth = stealth;
-	//packet.x = x;
-	//packet.y = y;
-	//do_send(&packet, sizeof(packet));
-
+	move(delta_time);
+	adjustPlayer(delta_time);
+	spike_hurttime(delta_time);
+	stealthtime();
 	Client::update(delta_time);
 }
 
@@ -77,22 +63,22 @@ void GameClient::initBitPos()
 }
 
 //비트맵을 바꿔주는함수 (애니메이션)
-void GameClient::BitMove()
-{
-	//std::cout << "bitmove" << std::endl;
-	bx += 1; //인덱스 형식으로 바꿈
-	if (state == 4)
-	{
-		if (bx >= 5) bx = 1;
-	}
-	if (state == 5 || state == 8)
-	{
+//void GameClient::BitMove()
+//{
+//	//std::cout << "bitmove" << std::endl;
+//	bx += 1; //인덱스 형식으로 바꿈
+//	if (state == 4)
+//	{
+//		if (bx >= 5) bx = 1;
+//	}
+//	if (state == 5 || state == 8)
+//	{
+//
+//		if (bx >= 2) bx = 0;
+//	}
+//}
 
-		if (bx >= 2) bx = 0;
-	}
-}
-
-void GameClient::move(int obj_t, float deltatime)
+void GameClient::move(float deltatime)
 {
 	//std::cout << "move호출" << std::endl;
 	if (state == 1)
@@ -202,10 +188,10 @@ void GameClient::move(int obj_t, float deltatime)
 
 		}
 		else {
-			if (obj_t % 5 == 0)
+			/*if (obj_t % 5 == 0)
 			{
 				BitMove();
-			}
+			}*/
 
 			if (COMMAND_move == 1)
 			{
@@ -308,8 +294,8 @@ void GameClient::move(int obj_t, float deltatime)
 	{
 		//std::cout << "state8" << std::endl;
 		savey = y;
-		if (obj_t % 10 == 0)
-			BitMove();
+		/*if (obj_t % 10 == 0)
+			BitMove();*/
 		if (UDkey == true)
 		{
 
@@ -405,7 +391,7 @@ bool GameClient::collp2o(Object* Obj)
 
 
 //플레이어와 오브젝트간 상호작용 판단하고 그에맞게 바꿔줌
-void GameClient::adjustPlayer()
+void GameClient::adjustPlayer(float deltatime)
 {
 	int check_coll = 0;	//하나라도 부딪혔는지 판별하기위함
 	if (x - w < 0)
@@ -436,7 +422,7 @@ void GameClient::adjustPlayer()
 						{
 							COMMAND_move = dir;//보고있는방향으로 앞으로 나가게, 떨어졌는데 가만히있진 않지요
 							state = 6;//피격으로감
-							//player.hurt();
+							hurt();
 							return;
 						}
 					}
@@ -467,11 +453,11 @@ void GameClient::adjustPlayer()
 
 				if (obj->type == 4)
 				{
-					//x = x + beltspeed;
+					x += (int)(beltspeed * deltatime);
 				}
 				if (obj->type == 6)
 				{
-					//x = x - beltspeed;
+					x -= (int)(beltspeed * deltatime);
 				}
 			}
 			else if (obj->type >= 101 && obj->type <= 200)	//장애물에 부딪히면
@@ -507,7 +493,7 @@ void GameClient::adjustPlayer()
 						else {
 							state = 6;		//피격으로감
 						}
-						//player.hurt();
+						hurt();
 					}
 				}
 				else if (obj->type == 102) //Break Pipe Left
@@ -548,8 +534,11 @@ void GameClient::adjustPlayer()
 				}
 				else if (obj->type == 103) //왼쪽 증기, 가시와 비슷함 대신 증기가 완전히 뿜어져  나왔을때 피격판정이 있다.
 				{
+					std::cout << "인덱스" << obj->index << std::endl;
 					if (obj->index == 2) //증기가 완전히 뿜어졌을때만 피격이 발생한다
 					{
+						std::cout << "인덱스 들어옴" << stealth << std::endl;
+
 						if (stealth == 0)
 						{
 							if (state == 5 || state == 8)
@@ -573,7 +562,7 @@ void GameClient::adjustPlayer()
 								COMMAND_move = 1;//무조건 왼쪽임
 								state = 6;
 							}
-							//player.hurt();
+							hurt();
 						}
 					}
 				}
@@ -616,7 +605,7 @@ void GameClient::adjustPlayer()
 							COMMAND_move = dir;
 							state = 6;		//피격으로감
 						}
-						//player.hurt();
+						hurt();
 					}
 				}
 				else if (obj->type == 107)
@@ -650,7 +639,7 @@ void GameClient::adjustPlayer()
 							COMMAND_move = dir;
 							state = 6;		//피격으로감
 						}
-						//player.hurt();
+						hurt();
 					}
 				}
 			}
@@ -661,8 +650,52 @@ void GameClient::adjustPlayer()
 					if (UPkey == true)
 					{
 
-						mStageNum += 1;
 						
+						//내 상태를 다른 사람들에게 전달 (나랑 같은 stage에 있던사람한테 보냄)
+						for (int i = 0; i < Cnt_Player; ++i)
+						{
+							if (c_id == CLIENTS[i]->c_id)continue;
+							if (mStageNum != CLIENTS[i]->mStageNum) continue;
+							sc_packet_logout_object packet;
+							packet.size = sizeof(sc_packet_logout_object);
+							packet.type = SC_PACKET_LOGOUT_OBJECT;
+							packet.id = c_id;
+							CLIENTS[i]->do_send(&packet, sizeof(packet));
+						}
+
+						//Stage의 변경 
+						mStageNum += 1;
+						initPos();
+						sc_packet_portal packet;
+						packet.size = sizeof(sc_packet_portal);
+						packet.type = SC_PACKET_PORTAL;
+						packet.stagenum = mStageNum;
+						do_send(&packet, sizeof(packet));
+
+						//다른사람들의 상태를 나한테 전달 (바뀐 stage에 있는 사람들걸 가져옴
+						for (int i = 0; i < Cnt_Player; ++i)
+						{
+							if (c_id == CLIENTS[i]->c_id)continue;
+							if (mStageNum != CLIENTS[i]->mStageNum) continue;
+							auto other = CLIENTS[i];
+														 
+							sc_packet_put_object packet;
+							packet.size = sizeof(sc_packet_put_object);
+							packet.type = SC_PACKET_PUT_OBJECT;
+							packet.id = other->c_id;
+							packet.dir = other->dir;
+							packet.h = other->h;
+							packet.hp = other->hp;
+							packet.state = other->state;
+							packet.stealth = other->stealth;
+							strcpy_s(packet.username, 20, other->playername);
+							packet.w = other->w;
+							packet.x = other->x;
+							packet.y = other->y;
+							CLIENTS[c_id]->do_send(&packet, sizeof(packet));
+						}
+
+
 						//맵이 바뀌는 로직 
 
 						//m.setblack_t(50);
@@ -741,4 +774,55 @@ void GameClient::adjustPlayer()
 
 
 	
+}
+
+void GameClient::hurt()
+{
+	std::cout << "다침상태 들어오지 ?" << std::endl;
+	std::cout << "hp는 ? : " << COMMAND_die << "," << hp << std::endl;
+	if (COMMAND_die == false)
+		hp -= 5;
+	if (hp <= 0)	//0 이하라면
+	{
+		hp = 0;
+		COMMAND_die = true;
+		COMMAND_move = false;
+		state = 3;
+		y += 12;
+		h = 13;
+		stealth = 1;
+		LEFTkey = 0;
+		RIGHTkey = 0;
+		UPkey = 0;
+		DOWNkey = 0;
+		diecount++;
+	}
+}
+
+void GameClient::spike_hurttime(float deltatime)
+{
+	if (spike_hurt < 0)
+	{
+		spike_hurt++;
+		std::cout << "들어오긴하냐" << std::endl;
+		x -= (int)(200 * deltatime);			//왼쪽으로감
+	}
+	else if (spike_hurt > 0)
+	{
+		spike_hurt--;
+		x += (int)(200 * deltatime);
+	}
+}
+
+void GameClient::stealthtime()
+{
+	if (COMMAND_die == 0)	//죽으면 무적안풀림
+		if (stealth > 0)
+		{
+			stealth--;
+			if (stealth == 0)
+				COMMAND_hurt = 0;
+		}
+	if (jumpignore > 0)
+		jumpignore--;
 }

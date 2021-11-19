@@ -1,13 +1,12 @@
 #include <iostream>
 
+#include "../Network.h"
 #include "LobbyClient.h"
 #include "../Map.h"
 #include "../Object.h"
 
-
 LobbyClient::LobbyClient()
 	:elapsedtime(0)
-	, obj_t(0)
 {
 	
 }
@@ -27,9 +26,10 @@ void LobbyClient::update(float delta_time)
 		
 	
 		elapsedtime = 0;
-		//std::cout << "로비클라" << std::endl;
-		
-		if (robby_cnt == 1)
+		std::cout << "로비클라" << std::endl;
+		std::cout << robby_cnt << std::endl;
+
+		if (robby_cnt == 2)
 		{
 			robby_timer--;
 			if (robby_timer < 0) {
@@ -52,55 +52,51 @@ void LobbyClient::update(float delta_time)
 				COMMAND_move = false;
 				COMMAND_hurt = false;
 				COMMAND_die = false;
-				mStageNum = 1;
+				//mStageNum = 1;
 
 				mCss = CSS_DEAD;
 				mSn = SN_INGAME;
 				SetEvent(SceneChangeTrigger);
 			}
 
-			std::cout << robby_timer << std::endl;
-			sc_packet_robby packet;
-			packet.size = sizeof(sc_packet_robby);
-			packet.type = SC_PACKET_ROBBY;
-			packet.countdown = robby_timer;
-			do_send(&packet, sizeof(packet));
+			for (int i = 0; i < robby_cnt; ++i) {
+				std::cout << robby_timer << std::endl;
+				sc_packet_robby packet;
+				packet.size = sizeof(sc_packet_robby);
+				packet.type = SC_PACKET_ROBBY;
+				packet.countdown = robby_timer;
+				
+				CLIENTS[i]->do_send(&packet, sizeof(packet));
+			}
+			
 		}
 	}
 
-	obj_t += 1;
-	move(obj_t, delta_time);
-	BitMove();
+	//obj_t += 1;
+	move(delta_time);
+	//BitMove();
 	adjustPlayer();
 	//timer();
 	//send packet
 
-	//sc_packet_move_process packet;
-	//packet.size = sizeof(sc_packet_move_process);
-	//packet.type = SC_PACKET_MOVE_PROCESS;
-	//packet.dir = dir;
-	//packet.h = h;
-	//packet.id = c_id;
-	//packet.state = state;
-	//packet.stealth = stealth;
-	//packet.x = x;
-	//packet.y = y;
-	//do_send(&packet, sizeof(packet));
+	/*sc_packet_move_process packet;
+	packet.size = sizeof(sc_packet_move_process);
+	packet.type = SC_PACKET_MOVE_PROCESS;
+	packet.dir = dir;
+	packet.h = h;
+	packet.id = c_id;
+	packet.state = state;
+	packet.stealth = stealth;
+	packet.x = x;
+	packet.y = y;
+	do_send(&packet, sizeof(packet));*/
+
 
 	Client::update(delta_time);
 }
 
 
 
-//void timer()
-//{
-//
-//	if (time == 10)
-//	{
-//		mCss = CSS_DEAD;
-//		mSn = SN_INGAME;
-//	}
-//}
 void LobbyClient::initBitPos()
 {
 	bx = 0;
@@ -131,22 +127,22 @@ void LobbyClient::initPos()
 }
 
 //비트맵을 바꿔주는함수 (애니메이션)
-void LobbyClient::BitMove()
-{
-	//std::cout << "bitmove" << std::endl;
-	bx += 1; //인덱스 형식으로 바꿈
-	if (state == 4)
-	{
-		if (bx >= 5) bx = 1;
-	}
-	if (state == 5 || state == 8)
-	{
+//void LobbyClient::BitMove()
+//{
+//	//std::cout << "bitmove" << std::endl;
+//	bx += 1; //인덱스 형식으로 바꿈
+//	if (state == 4)
+//	{
+//		if (bx >= 5) bx = 1;
+//	}
+//	if (state == 5 || state == 8)
+//	{
+//
+//		if (bx >= 2) bx = 0;
+//	}
+//}
 
-		if (bx >= 2) bx = 0;
-	}
-}
-
-void LobbyClient::move(int obj_t, float deltatime)
+void LobbyClient::move(float deltatime)
 {
 	//std::cout << "move호출" << std::endl;
 	if (state == 1)
@@ -230,10 +226,10 @@ void LobbyClient::move(int obj_t, float deltatime)
 
 		}
 		else {
-			if (obj_t % 5 == 0)
+			/*if (obj_t % 5 == 0)
 			{
 				BitMove();
-			}
+			}*/
 
 			if (COMMAND_move == 1)
 			{
@@ -338,8 +334,8 @@ void LobbyClient::move(int obj_t, float deltatime)
 	{
 		//std::cout << "state8" << std::endl;
 		savey = y;
-		if (obj_t % 10 == 0)
-			BitMove();
+		/*if (obj_t % 10 == 0)
+			BitMove();*/
 		if (UDkey == true)
 		{
 

@@ -24,6 +24,7 @@ const char SC_PACKET_ROBBY = 5;
 const char SC_PACKET_EMPTY = 6;
 const char SC_PACKET_GAMESTART = 7;
 const char SC_PACKET_STAGENUM = 8;
+const char SC_PACKET_PORTAL = 9;
 
 
 #pragma pack (push, 1)
@@ -89,7 +90,8 @@ struct sc_packet_move_process {
 	short stealth;
 	//char hp;
 	char rank;
-	short bx; //애니메이션 위해 -> bitmove()
+
+	//short bx; //애니메이션 위해 -> bitmove()
 }; 
 
 struct sc_packet_put_object {
@@ -103,6 +105,7 @@ struct sc_packet_put_object {
 	char hp;
 	char dir;
 	bool stealth;
+
 };
 
 struct sc_packet_logout_object {
@@ -141,5 +144,11 @@ struct sc_packet_stagenum {
 	char type;
 	int id;
 	int stagenum;
+};
+
+struct sc_packet_portal {
+	unsigned char size;
+	char type;
+	char stagenum;
 };
 #pragma pack(pop)

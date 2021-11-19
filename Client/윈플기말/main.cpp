@@ -105,13 +105,14 @@ void update(float delta_time)
 	//Sound업데이트 끝
 	if (map.getmapnum() == LOGINBG)
 		return;
-	//obj_t += 1;
+	obj_t += 1;
 
 	if (map.getmapnum() != LOGINBG)	//로그인중일땐 캐릭터 상호작용 x 
 	{
 		
 		//player.move(obj_t);
-		adjustPlayer(player, obj, map, ocount, g_hinst);
+		//adjustPlayer(player, obj, map, ocount, g_hinst);
+		//두개 다 서버로 옮겨줬기 때문에, 이제 필요가 없다.
 		if (player.getCMD_die())
 		{
 			if(player.WhenPlayerDied==false)

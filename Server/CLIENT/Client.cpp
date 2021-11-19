@@ -242,7 +242,6 @@ void Client::ProcessPacket(unsigned char* p)
 			}
 			if (state != 2 && state != 7)
 			{
-				//Sound::GetSelf()->Sound_Play(EFFECTSOUND, JUMPEF, EFVOL);
 				falldy = 10;
 				jumpcount++;
 				state = 2;
