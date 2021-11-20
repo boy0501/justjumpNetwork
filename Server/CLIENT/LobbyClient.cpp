@@ -6,7 +6,8 @@
 #include "../Object.h"
 
 LobbyClient::LobbyClient()
-	:elapsedtime(0)
+	:elapsedtime(0),
+	robby_timer(11)
 {
 	
 }
