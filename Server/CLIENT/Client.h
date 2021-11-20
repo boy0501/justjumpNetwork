@@ -41,6 +41,7 @@ public:
 	std::wstring mPlayerwname;	//플레이어이름 wchar방식
 	char playername[20];
 	int mStageNum = 0;	//0: 로비, 1,2,3,4: 스테이지
+	int rank;
 
 	int ROWSPEED = 150;
 	int COLSPEED = 10;

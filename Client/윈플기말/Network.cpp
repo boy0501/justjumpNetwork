@@ -148,6 +148,7 @@ void Network::ProcessPacket(unsigned char* p)
 		mPlayer->player_cid = packet->id;
 		mPlayer->x = packet->x;
 		mPlayer->y = packet->y;
+		
 
 		mMap->setmapnum(9);
 		*mOcount = initObject(mObj, mMap->getmapnum(), g_hinst);
@@ -176,6 +177,7 @@ void Network::ProcessPacket(unsigned char* p)
 		mOthers[id].x=packet->x;
 		mOthers[id].y=packet->y;
 		mOthers[id].w=packet->w;
+		mOthers[id].rank = packet->rank;
 		break;
 	}
 	case SC_PACKET_LOGOUT_OBJECT: {
@@ -232,6 +234,8 @@ void Network::ProcessPacket(unsigned char* p)
 			mPlayer->state = packet->state;
 			mPlayer->stealth = packet->stealth;
 			mPlayer->dir = packet->dir;
+			mPlayer->rank = packet->rank;
+			
 			//mPlayer->bx = packet->bx;
 
 			//------
@@ -246,6 +250,7 @@ void Network::ProcessPacket(unsigned char* p)
 			other.state = packet->state;
 			other.stealth = packet->stealth;
 			other.dir = packet->dir;
+			other.rank = packet->rank;
 			//other.bx = packet->bx;
 		}
 
