@@ -105,7 +105,7 @@ struct sc_packet_put_object {
 	char hp;
 	char dir;
 	bool stealth;
-	char rank;
+	//char rank;
 };
 
 struct sc_packet_logout_object {

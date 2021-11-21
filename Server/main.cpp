@@ -70,7 +70,7 @@ void ChangeLoginToRobby(const int& c_id)
 			packet.x = CLIENTS[my_id]->x;
 			packet.y = CLIENTS[my_id]->y;
 			packet.w = CLIENTS[my_id]->w;
-			packet.rank = CLIENTS[my_id]->rank;
+			//packet.rank = CLIENTS[my_id]->rank;
 			//
 			//packet.bx = CLIENTS[my_id]->bx;
 			c->do_send(&packet, sizeof(packet));
@@ -231,32 +231,15 @@ DWORD WINAPI GameLogicThread(LPVOID arg)
 				packet.stealth = c->stealth;
 				packet.x = c->x;
 				packet.y = c->y;
+				packet.rank = c->rank;
 				for (int j = 0; j < Cnt_Player; ++j)
 				{
-					/*if (CLIENTS[i]->y > CLIENTS[j]->y) 
-					{
-						CLIENTS[i]->rank = 1;
-						CLIENTS[j]->rank = 2;
-					}
-					if (CLIENTS[j]->y > CLIENTS[i]->y)
-					{
-						CLIENTS[i]->rank = 2;
-						CLIENTS[j]->rank = 1;
-					}
-					else
-					{
-						CLIENTS[i]->rank = 0;
-						CLIENTS[j]->rank = 0;
-					}
-					cout << "두번째 클라 순위: " << CLIENTS[j]->rank << endl;*/
 					//맵이 서로 다르면 애초에 보내주질 않음.
 					if (CLIENTS[i]->mStageNum != CLIENTS[j]->mStageNum) continue;
 
 					CLIENTS[j]->do_send(&packet, sizeof(packet));
 					
 				}
-				
-					//cout << "첫번째 클라 순위: "<<CLIENTS[i]->rank << endl;
 			}
 
 			//현재 문제

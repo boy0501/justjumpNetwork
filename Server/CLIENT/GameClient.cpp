@@ -33,7 +33,7 @@ void GameClient::update(float delta_time)
 	adjustPlayer(delta_time);
 	spike_hurttime(delta_time);
 	stealthtime();
-	rank();
+	
 	Client::update(delta_time);
 }
 
@@ -314,40 +314,19 @@ void GameClient::move(float deltatime)
 		}
 	}
 
-	//for (int i = 0; i < Cnt_Player; ++i)
-	//{
-	//	for (int j = 0; j < Cnt_Player; ++j)
-	//	{
-	//		if (CLIENTS[i]->y > CLIENTS[j]->y)
-	//		{
-	//			CLIENTS[i]->rank = 1;
-	//			CLIENTS[j]->rank = 2;
-	//		}
-	//		else if (CLIENTS[j]->y > CLIENTS[i]->y)
-	//		{
-	//			CLIENTS[i]->rank = 2;
-	//			CLIENTS[j]->rank = 1;
-	//		}
-	//		else
-	//			CLIENTS[i]->rank = 0;
-	//		std::cout << CLIENTS[i] << std::endl;
-	//	}
-	//
-	//	//sc_packet_move_process packet;
-	//	//CLIENTS[i]->do_send(&packet, sizeof(packet));
-	//}
-	//for (int i = 0; i < Cnt_Player; ++i)
-	//{
-	//	if (c_id == CLIENTS[i]->c_id) continue;
-	//	auto other = CLIENTS[i];
 
-	//	std::cout << CLIENTS[c_id] << std::endl;
-
-	//	sc_packet_put_object packet;
-	//	packet.rank = other->rank;
-	//	CLIENTS[c_id]->do_send(&packet, sizeof(packet));
-	//}
-
+	//순위 판정-------------------------------------------------
+	
+	for (int i= 0; i < Cnt_Player; ++i)
+	{
+		mRank[i] = 1;
+		for (int j = 0; j < Cnt_Player; ++j)
+		{
+			if (CLIENTS[i]->y < CLIENTS[j]->y)
+				mRank[i] += 1;
+		}
+		CLIENTS[i]->rank = mRank[i];
+	}
 
 }
 //오브젝트와 플레이어 충돌체크 1이면 부닥침
@@ -864,78 +843,3 @@ void GameClient::stealthtime()
 		jumpignore--;
 }
 
-void GameClient::rank()
-{
-
-
-	if (CLIENTS[0]->y > CLIENTS[1]->y)
-	{
-		CLIENTS[0]->rank = 1;
-		CLIENTS[1]->rank = 2;
-
-		std::cout << "player111111" << CLIENTS[0]->rank << std::endl;
-		std::cout << "                            player22222" << CLIENTS[1]->rank << std::endl;
-	}
-	else if (CLIENTS[0]->y < CLIENTS[1]->y)
-	{
-		CLIENTS[0]->rank = 2;
-		CLIENTS[1]->rank = 1;
-
-		std::cout << "player111111" << CLIENTS[0]->rank << std::endl;
-		std::cout << "                            player22222" << CLIENTS[1]->rank << std::endl;
-	}
-	else
-		std::cout << "0" << std::endl;
-	//break;
-
-	//for (int i = 0; i < Cnt_Player; ++i)
-	//{
-	//	
-	//	for (int j = 0; j < Cnt_Player; ++j)
-	//	{
-	//		
-	//		//if (CLIENTS[i]->y >= CLIENTS[j]->y)
-	//		if(CLIENTS[i])
-	//		{
-	//			//CLIENTS[i]->rank = 1;
-	//			//CLIENTS[j]->rank = 2;
-	//			std::cout <<"player111111"<<CLIENTS[i]->y << std::endl;
-	//			//break;
-	//		}
-	//		if(CLIENTS[j])
-	//		//if(CLIENTS[i]->y <= CLIENTS[j]->y)
-	//		{
-	//			//CLIENTS[i]->rank = 2;
-	//			//CLIENTS[j]->rank = 1;
-	//			std::cout << "                            player22222" << CLIENTS[j]->y << std::endl;
-	//			//break;
-	//		}
-	//		else
-	//		{
-	//			std::cout << "0" << std::endl;
-	//		}
-
-	//		
-	//	}
-	//		//std::cout << CLIENTS[i]->rank << std::endl;
-	//
-	//	//sc_packet_move_process packet;
-	//	//CLIENTS[i]->do_send(&packet, sizeof(packet));
-	//}
-
-	//===================================================================
-
-
-	//for (int i = 0; i < Cnt_Player; ++i)
-	//{
-	//	if (c_id == CLIENTS[i]->c_id) continue;
-	//	auto other = CLIENTS[i];
-	//
-	//	std::cout << CLIENTS[c_id] << std::endl;
-	//
-	//	sc_packet_put_object packet;
-	//	packet.rank = other->rank;
-	//	CLIENTS[c_id]->do_send(&packet, sizeof(packet));
-	//}
-	
-}
