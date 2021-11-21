@@ -106,9 +106,33 @@ void update(float delta_time)
 	if (map.getmapnum() == LOGINBG)
 		return;
 	obj_t += 1;
-
 	if (map.getmapnum() != LOGINBG)	//로그인중일땐 캐릭터 상호작용 x 
 	{
+		//애니메이션=============================
+		if (player.state == 4) {
+			if (obj_t % 5 == 0)
+			{
+				player.BitMove();
+			}
+		}
+		if (player.state == 8) {
+			if (obj_t % 10 == 0)
+				player.BitMove();
+		}
+
+		for (auto& o : others) {
+			if (o.state == 4) {
+				if (obj_t % 5 == 0)
+				{
+					o.BitMove();
+				}
+			}
+			if (o.state == 8) {
+				if (obj_t % 10 == 0)
+					o.BitMove();
+			}
+		}
+		//=======================================
 		
 		//player.move(obj_t);
 		//adjustPlayer(player, obj, map, ocount, g_hinst);
@@ -201,8 +225,9 @@ void update(float delta_time)
 	}
 	if (obj_t >= 27000) obj_t = 0;
 
-	//바뀐 랭킹이 잘 넘어오는지 확인
+	//바뀐 랭킹이 잘 넘어오는지 확인---
 	cout << player.rank << endl;
+	//----------------------------
 }
 void render()
 {
@@ -454,7 +479,13 @@ void send_robby_in_packet()
 
 void robby_waiting()
 {
-	map.mStartui->addText(to_string(Network::GetNetwork()->countdown), "countdown", L"메이플스토리 bold", RGB(255, 255, 255), 18, Network::GetNetwork()->init_x, 200, false, 0, 0, camera);
+	map.mStartui->addText("Ready", "countdown", L"메이플스토리 light", RGB(255, 255, 0), 18, 300, 200, false, 0, 0, camera);
+
+	if (Network::GetNetwork()->countdown <= 10) {
+		map.mStartui->addText(to_string(Network::GetNetwork()->countdown), "countdown", L"메이플스토리 bold", RGB(255, 255, 255), 18, Network::GetNetwork()->init_x, 200, false, 0, 0, camera);
+
+	}
+	
 	//cout << Network::GetNetwork()->countdown << endl;
 
 	/*if (Network::GetNetwork()->countdown == 1)
@@ -586,7 +617,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 			//map.mStartui->closeUI();
 			//Network::GetNetwork()->mUI.emplace_back(map.mGameUi);
 		    //Network::GetNetwork()->mUI.emplace_back(map.mGameUi);
-			
+			map.mStartui->addText("5252~ 3p game", "countdown", L"메이플스토리 bold", RGB(255, 0, 0), 18, 120, 250, false, 0, 0, camera);
+
 
 		}, g_hinst, "img/start", 292, 490, 138, 82, RGB(255, 0, 0));
 		startui->addButton([]() {}, g_hinst, "img/help", 215, 300, 400, 200, RGB(60, 60, 60));

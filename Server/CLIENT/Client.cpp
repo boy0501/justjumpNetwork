@@ -31,6 +31,8 @@ Client::Client()
 	SceneChangeTrigger = CreateEvent(NULL, FALSE, FALSE, NULL);
 	SceneChangeIsDone = CreateEvent(NULL, FALSE, FALSE, NULL);
 
+	key_seperate = CreateEvent(NULL, FALSE, TRUE, NULL);
+
 	//
 	//bx = 0;
 }
