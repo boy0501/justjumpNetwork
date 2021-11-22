@@ -198,11 +198,11 @@ void update(float delta_time)
 		}
 		if (obj[i].getType() == 103)
 		{
-			if (obj_t % 30 == 0)
-			{
-				obj[i].IndexChange();
-
-			}
+			//if (obj_t % 30 == 0)
+			//{
+			//	obj[i].IndexChange();
+			//
+			//}
 
 		}
 		if (obj[i].getType() == 106 || obj[i].getType() == 107)
@@ -212,7 +212,7 @@ void update(float delta_time)
 				obj[i].IndexChange();
 
 			}
-			obj[i].move();
+			//obj[i].move();
 		}
 		else if (obj[i].getType() == 201)
 		{
@@ -224,6 +224,10 @@ void update(float delta_time)
 		}
 	}
 	if (obj_t >= 27000) obj_t = 0;
+
+	//바뀐 랭킹이 잘 넘어오는지 확인---
+	//cout << player.rank << endl;
+	//----------------------------
 }
 void render()
 {

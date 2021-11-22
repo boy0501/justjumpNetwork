@@ -70,6 +70,7 @@ void ChangeLoginToRobby(const int& c_id)
 			packet.x = CLIENTS[my_id]->x;
 			packet.y = CLIENTS[my_id]->y;
 			packet.w = CLIENTS[my_id]->w;
+			//packet.rank = CLIENTS[my_id]->rank;
 			//
 			//packet.bx = CLIENTS[my_id]->bx;
 			
@@ -95,6 +96,7 @@ void ChangeLoginToRobby(const int& c_id)
 		packet.x = c->x;
 		packet.y = c->y;
 		packet.w = c->w;
+		//packet.rank = c->rank;
 		CLIENTS[my_id]->do_send(&packet, sizeof(packet));
 	}
 }
@@ -140,6 +142,7 @@ void send_move_process(int c_id)
 	packet.state = CLIENTS[c_id]->state;
 	packet.stealth = CLIENTS[c_id]->stealth;
 	packet.dir = CLIENTS[c_id]->dir;
+	packet.rank = CLIENTS[c_id]->rank;
 	//packet.bx = CLIENTS[mover]->bx;
 	CLIENTS[c_id]->do_send(&packet, sizeof(packet));
 }
@@ -169,6 +172,14 @@ DWORD WINAPI GameLogicThread(LPVOID arg)
 				Fps = 0;
 				elapsed_time = 0;
 				
+			}
+
+			for (auto& c : mainMap->mObjects)
+			{
+				for (auto& t : c)
+				{
+					t->update(deltatime);
+				}
 			}
 
 			// Scene Changer
@@ -220,6 +231,7 @@ DWORD WINAPI GameLogicThread(LPVOID arg)
 			
 			for (int i = 0; i < Cnt_Player; ++i)
 			{
+			
 				CLIENTS[i]->update(deltatime);
 
 				
@@ -236,8 +248,8 @@ DWORD WINAPI GameLogicThread(LPVOID arg)
 				packet.stealth = c->stealth;
 				packet.x = c->x;
 				packet.y = c->y;
+				packet.rank = c->rank;
 				packet.hp = c->hp;
-				
 				for (int j = 0; j < Cnt_Player; ++j)
 				{
 					//맵이 서로 다르면 애초에 보내주질 않음.
@@ -334,6 +346,11 @@ int main()
 		;
 	}
 	
+	for (int i = 0; i < 3; ++i)
+	{
+		if (CLIENTS[i] != nullptr)
+			delete CLIENTS[i];
+	}
 	delete Network::GetNetwork();
 	delete mainMap;
 	return 0;
