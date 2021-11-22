@@ -574,7 +574,6 @@ void PLAYER::PlayerWaiting(WPARAM wParam)
 //플레이어 움직임
 void PLAYER::move(int obj_t)
 {
-	//std::cout << "move 함수 불림" << std::endl;
  	if (state == 1)
 	{
 		adjustspd = 0;		//수직낙하 한 후는 1상태가 되므로 여기서 초기화시켜줌

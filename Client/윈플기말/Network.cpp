@@ -17,6 +17,7 @@ RECT rectview;
 HBITMAP hbit1;
 HINSTANCE g_hinst;
 int obj_t = 0;
+
 void error_display(int err_no)
 {
 	wchar_t* lpMsgBuf;
@@ -33,6 +34,7 @@ Network::Network()
 	: mPlayer(nullptr)
 	, prev_size(0)
 	, mOcount(nullptr)
+	, countdown(11)
 {
 	WSAStartup(MAKEWORD(2, 2), &WSAData);
 	s_socket = socket(AF_INET, SOCK_STREAM, 0);
@@ -134,6 +136,7 @@ void Network::test()
 		cout << mMap->mGameUi << "는 존재하며 인덱스는 " << it - mUI.begin() << " 입니다.\n";
 	}*/
 	cout << "게임 스타트!" << endl;
+	
 }
 
 void Network::ProcessPacket(unsigned char* p)
@@ -148,6 +151,7 @@ void Network::ProcessPacket(unsigned char* p)
 		mPlayer->player_cid = packet->id;
 		mPlayer->x = packet->x;
 		mPlayer->y = packet->y;
+		
 
 		mMap->setmapnum(9);
 		*mOcount = initObject(mObj, mMap->getmapnum(), g_hinst);
@@ -176,6 +180,7 @@ void Network::ProcessPacket(unsigned char* p)
 		mOthers[id].x=packet->x;
 		mOthers[id].y=packet->y;
 		mOthers[id].w=packet->w;
+		//mOthers[id].rank = packet->rank;
 		break;
 	}
 	case SC_PACKET_LOGOUT_OBJECT: {
@@ -203,8 +208,8 @@ void Network::ProcessPacket(unsigned char* p)
 		Sound::GetSelf()->Sound_Play(EFFECTSOUND, PORTALEF, EFVOL);
 		Sound::GetSelf()->Sound_Play(BGMSOUND, FIRSTMAPBGM, BGMVOL);
 		mPlayer->initPos();
-		//---sethp를 패킷으로 넘겨받으면 이 부분 꼭 수정해주세요
-		mPlayer->sethp(5);
+		//---sethp를 패킷으로 넘겨받으면 이 부분 꼭 수정해주세요 
+		mPlayer->sethp(mPlayer->hp); //(jpark 확인)
 		//---
 		break;
 	}
@@ -214,6 +219,7 @@ void Network::ProcessPacket(unsigned char* p)
 		if (countdown != packet->countdown)
 			init_x += 20;
 		countdown = packet->countdown;
+
 		//std::cout << packet->countdown << std::endl;
 		break;
 	}
@@ -232,6 +238,9 @@ void Network::ProcessPacket(unsigned char* p)
 			mPlayer->state = packet->state;
 			mPlayer->stealth = packet->stealth;
 			mPlayer->dir = packet->dir;
+			mPlayer->hp = packet->hp;
+			mPlayer->rank = packet->rank;
+			
 			//mPlayer->bx = packet->bx;
 
 			//------
@@ -246,6 +255,8 @@ void Network::ProcessPacket(unsigned char* p)
 			other.state = packet->state;
 			other.stealth = packet->stealth;
 			other.dir = packet->dir;
+			other.hp = packet->hp;
+			other.rank = packet->rank;
 			//other.bx = packet->bx;
 		}
 

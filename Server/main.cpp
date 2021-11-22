@@ -70,8 +70,10 @@ void ChangeLoginToRobby(const int& c_id)
 			packet.x = CLIENTS[my_id]->x;
 			packet.y = CLIENTS[my_id]->y;
 			packet.w = CLIENTS[my_id]->w;
+			//packet.rank = CLIENTS[my_id]->rank;
 			//
 			//packet.bx = CLIENTS[my_id]->bx;
+			
 			c->do_send(&packet, sizeof(packet));
 		}
 	}
@@ -94,6 +96,7 @@ void ChangeLoginToRobby(const int& c_id)
 		packet.x = c->x;
 		packet.y = c->y;
 		packet.w = c->w;
+		//packet.rank = c->rank;
 		CLIENTS[my_id]->do_send(&packet, sizeof(packet));
 	}
 }
@@ -139,6 +142,7 @@ void send_move_process(int c_id)
 	packet.state = CLIENTS[c_id]->state;
 	packet.stealth = CLIENTS[c_id]->stealth;
 	packet.dir = CLIENTS[c_id]->dir;
+	packet.rank = CLIENTS[c_id]->rank;
 	//packet.bx = CLIENTS[mover]->bx;
 	CLIENTS[c_id]->do_send(&packet, sizeof(packet));
 }
@@ -195,8 +199,11 @@ DWORD WINAPI GameLogicThread(LPVOID arg)
 				{
 					//로비에서 인게임으로 다같이 가자
 					for (int i = 0; i < Cnt_Player; ++i) {
+						//WaitForSingleObject(c->key_seperate, 10);
+
 						ChangeRobbyToGame(i);
-						
+						//SetEvent(c->key_seperate);
+
 					}
 					
 					c->mCss = CSS_LIVE;
@@ -217,6 +224,7 @@ DWORD WINAPI GameLogicThread(LPVOID arg)
 				CLIENTS[i]->update(deltatime);
 
 				
+
 				auto& c = CLIENTS[i];
 				//send packet
 				sc_packet_move_process packet;
@@ -229,14 +237,18 @@ DWORD WINAPI GameLogicThread(LPVOID arg)
 				packet.stealth = c->stealth;
 				packet.x = c->x;
 				packet.y = c->y;
+				packet.rank = c->rank;
+				packet.hp = c->hp;
 				for (int j = 0; j < Cnt_Player; ++j)
 				{
 					//맵이 서로 다르면 애초에 보내주질 않음.
 					if (CLIENTS[i]->mStageNum != CLIENTS[j]->mStageNum) continue;
 
-					CLIENTS[j]->do_send(&packet, sizeof(packet));
-				}
+					//WaitForSingleObject(c->key_seperate, 10);
 
+					CLIENTS[j]->do_send(&packet, sizeof(packet));
+					
+				}
 			}
 
 			//현재 문제
@@ -255,6 +267,8 @@ DWORD WINAPI ClientInputThread(LPVOID arg)
 	int c_id = (int)arg;
 	while (1)
 	{
+		//cout << c_id << "의 x값: " << CLIENTS[c_id]->x << endl;
+
 		int ret = CLIENTS[c_id]->do_recv();
 		if (ret == SOCKET_ERROR)
 		{

@@ -12,7 +12,6 @@ GameClient::GameClient()
 {
 	// stage num 초기화를 생성자에서 하는게 맞나?
 	mStageNum = 1;
-	std::cout << "Stage Num: " << mStageNum << std::endl;
 }
 
 
@@ -34,6 +33,7 @@ void GameClient::update(float delta_time)
 	adjustPlayer(delta_time);
 	spike_hurttime(delta_time);
 	stealthtime();
+	
 	Client::update(delta_time);
 }
 
@@ -313,6 +313,21 @@ void GameClient::move(float deltatime)
 			}
 		}
 	}
+
+
+	//순위 판정-------------------------------------------------
+	
+	for (int i= 0; i < Cnt_Player; ++i)
+	{
+		mRank[i] = 1;
+		for (int j = 0; j < Cnt_Player; ++j)
+		{
+			if (CLIENTS[i]->y < CLIENTS[j]->y)
+				mRank[i] += 1;
+		}
+		CLIENTS[i]->rank = mRank[i];
+	}
+
 }
 //오브젝트와 플레이어 충돌체크 1이면 부닥침
 //----------------------------------------
@@ -692,6 +707,7 @@ void GameClient::adjustPlayer(float deltatime)
 							packet.w = other->w;
 							packet.x = other->x;
 							packet.y = other->y;
+							//packet.rank = other->rank;
 							CLIENTS[c_id]->do_send(&packet, sizeof(packet));
 						}
 
@@ -826,3 +842,4 @@ void GameClient::stealthtime()
 	if (jumpignore > 0)
 		jumpignore--;
 }
+

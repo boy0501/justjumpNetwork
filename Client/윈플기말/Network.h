@@ -13,6 +13,7 @@ extern RECT rectview;
 extern HBITMAP hbit1;
 extern HINSTANCE g_hinst;
 extern int obj_t;
+
 void error_display(int err_no);
 
 static CAMERA camera;
@@ -57,7 +58,7 @@ public:
 	int net_bx;
 
 	int countdown;
-	int init_x = 300;
+	int init_x = 340;
 
 	int rank;
 
