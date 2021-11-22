@@ -258,8 +258,22 @@ DWORD WINAPI GameLogicThread(LPVOID arg)
 					//WaitForSingleObject(c->key_seperate, 10);
 
 					CLIENTS[j]->do_send(&packet, sizeof(packet));
-					
+					//SetEvent(c->key_seperate);
 				}
+
+				//jpark logout 작업중..
+				if (c->is_logout == true) {
+
+					for (int i = 0; i < Cnt_Player; ++i)
+					{
+						sc_packet_logout_object packet;
+						packet.size = sizeof(sc_packet_logout_object);
+						packet.type = SC_PACKET_LOGOUT_OBJECT;
+						packet.id = c->c_id;
+						CLIENTS[i]->do_send(&packet, sizeof(packet));
+					}
+				}
+
 			}
 
 			//현재 문제
