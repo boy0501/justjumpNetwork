@@ -23,7 +23,7 @@ public:
 	void initPos();
 
 	int robby_timer;
-	int robby_cnt = 0;
+	
 
 	bool is_robby = false;
 

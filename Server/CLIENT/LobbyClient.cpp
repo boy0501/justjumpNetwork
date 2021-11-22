@@ -32,6 +32,7 @@ void LobbyClient::update(float delta_time)
 
 		if (robby_cnt == 2)
 		{
+
 			robby_timer--;
 			if (robby_timer < 0) {
 				//mCss = CSS_DEAD;
@@ -58,6 +59,7 @@ void LobbyClient::update(float delta_time)
 				mCss = CSS_DEAD;
 				mSn = SN_INGAME;
 				SetEvent(SceneChangeTrigger);
+
 			}
 
 			for (int i = 0; i < robby_cnt; ++i) {
@@ -68,6 +70,7 @@ void LobbyClient::update(float delta_time)
 				packet.countdown = robby_timer;
 				
 				CLIENTS[i]->do_send(&packet, sizeof(packet));
+
 			}
 			
 		}

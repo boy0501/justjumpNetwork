@@ -179,6 +179,7 @@ DWORD WINAPI GameLogicThread(LPVOID arg)
 				// mCss가 바뀌고 mSn이 바뀌기 전에(순서가 존재함) 이 아래 코드를 실행하면 동기화문제가 생기니
 				// Event를 사용하여 동기화문제를 해결한다.
 				WaitForSingleObject(c->SceneChangeTrigger, INFINITE);
+
 				switch (c->mSn)
 				{
 				case SN_LOBBY:
@@ -186,8 +187,10 @@ DWORD WINAPI GameLogicThread(LPVOID arg)
 					ChangeLoginToRobby(c->c_id);
 					c->mCss = CSS_LIVE;
 					auto lc = reinterpret_cast<LobbyClient*>(c);
-					lc->robby_cnt = Cnt_Player;
-					//cout << "lc로비카운트는"<<lc->robby_cnt << endl;
+					//WaitForSingleObject(lc->CountSendController, INFINITE);
+
+					robby_cnt += 1;
+					//cout << "lc로비카운트는"<<robby_cnt << endl;
 
 					SetEvent(c->SceneChangeIsDone);
  					break;
@@ -303,6 +306,8 @@ int main()
 	HANDLE hThread;
 	HANDLE LogicThread;
 	LogicThread = CreateThread(NULL, 0, GameLogicThread, 0, 0, NULL);
+
+
 	for (int i = 0; i < 3; ++i,++Cnt_Player)
 	{
 		CLIENTS[i]->c_socket = mNet->AcceptClient(CLIENTS[i]->c_addr);

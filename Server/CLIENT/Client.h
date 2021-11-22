@@ -59,7 +59,7 @@ public:
 	Scene_Name mSn;
 	HANDLE SceneChangeTrigger;
 	HANDLE SceneChangeIsDone;
-	HANDLE key_seperate;
+	HANDLE CountSendController;
 	SOCKET c_socket;
 	bool is_active;
 	int c_id;
