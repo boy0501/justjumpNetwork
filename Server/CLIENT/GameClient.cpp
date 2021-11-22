@@ -5,6 +5,7 @@
 #include "../Map.h"
 #include "GameClient.h"
 #include "../Object.h"
+#include "../OBSTACLE/AttackObstacle.h"
 
 
 GameClient::GameClient()
@@ -33,7 +34,36 @@ void GameClient::update(float delta_time)
 	adjustPlayer(delta_time);
 	spike_hurttime(delta_time);
 	stealthtime();
-	
+
+	int objNum = 0;
+	for (auto& obj : mMap->mObjects[mStageNum])
+	{
+		switch (obj->type)
+		{
+		case 103: {
+			auto steamobj = reinterpret_cast<AttackObstacle*>(obj);
+			sc_packet_object_sync packet;
+			packet.size = sizeof(sc_packet_object_sync);
+			packet.type = SC_PACKET_OBJECT_SYNC;
+			packet.objnum = objNum;
+			packet.index = steamobj->index;
+			do_send(&packet, sizeof(packet));
+			break;
+		}
+		case 106:
+		case 107: {
+			sc_packet_object_sync packet;
+			packet.size = sizeof(sc_packet_object_sync);
+			packet.type = SC_PACKET_OBJECT_SYNC;
+			packet.objnum = objNum;
+			packet.mx = obj->mx;
+			packet.my = obj->my;
+			do_send(&packet, sizeof(packet));
+			break;
+		}
+		}
+		objNum++;
+	}
 	Client::update(delta_time);
 }
 
@@ -549,8 +579,9 @@ void GameClient::adjustPlayer(float deltatime)
 				}
 				else if (obj->type == 103) //왼쪽 증기, 가시와 비슷함 대신 증기가 완전히 뿜어져  나왔을때 피격판정이 있다.
 				{
-					std::cout << "인덱스" << obj->index << std::endl;
-					if (obj->index == 2) //증기가 완전히 뿜어졌을때만 피격이 발생한다
+					auto steamobj = reinterpret_cast<AttackObstacle*>(obj);
+					std::cout << "인덱스" << steamobj->index << std::endl;
+					if (steamobj->index == 2) //증기가 완전히 뿜어졌을때만 피격이 발생한다
 					{
 						std::cout << "인덱스 들어옴" << stealth << std::endl;
 

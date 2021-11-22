@@ -174,6 +174,14 @@ DWORD WINAPI GameLogicThread(LPVOID arg)
 				
 			}
 
+			for (auto& c : mainMap->mObjects)
+			{
+				for (auto& t : c)
+				{
+					t->update(deltatime);
+				}
+			}
+
 			// Scene Changer
 			for (auto& c : CLIENTS)
 			{

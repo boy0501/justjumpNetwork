@@ -143,10 +143,15 @@
     <ClCompile Include="CLIENT\LoginClient.cpp" />
     <ClCompile Include="CLIENT\LobbyClient.cpp" />
     <ClCompile Include="CLIENT\GameClient.cpp" />
+    <ClCompile Include="INTERACT\Interact.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Map.cpp" />
     <ClCompile Include="Network.cpp" />
     <ClCompile Include="Object.cpp" />
+    <ClCompile Include="OBSTACLE\AttackObstacle.cpp" />
+    <ClCompile Include="OBSTACLE\MoveObstacle.cpp" />
+    <ClCompile Include="OBSTACLE\Obstacle.cpp" />
+    <ClCompile Include="OBSTACLE\PlatformObstacle.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Protocol\protocol.h" />
@@ -154,9 +159,14 @@
     <ClInclude Include="CLIENT\LoginClient.h" />
     <ClInclude Include="CLIENT\LobbyClient.h" />
     <ClInclude Include="CLIENT\GameClient.h" />
+    <ClInclude Include="INTERACT\Interact.h" />
     <ClInclude Include="Map.h" />
     <ClInclude Include="Network.h" />
     <ClInclude Include="Object.h" />
+    <ClInclude Include="OBSTACLE\AttackObstacle.h" />
+    <ClInclude Include="OBSTACLE\MoveObstacle.h" />
+    <ClInclude Include="OBSTACLE\Obstacle.h" />
+    <ClInclude Include="OBSTACLE\PlatformObstacle.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -25,7 +25,7 @@ const char SC_PACKET_EMPTY = 6;
 const char SC_PACKET_GAMESTART = 7;
 const char SC_PACKET_STAGENUM = 8;
 const char SC_PACKET_PORTAL = 9;
-
+const char SC_PACKET_OBJECT_SYNC = 10;
 
 #pragma pack (push, 1)
 //---------------------client packet
@@ -150,5 +150,13 @@ struct sc_packet_portal {
 	unsigned char size;
 	char type;
 	char stagenum;
+};
+
+struct sc_packet_object_sync {
+	unsigned char size;
+	char type;
+	char objnum;
+	short mx, my;
+	char index;
 };
 #pragma pack(pop)
