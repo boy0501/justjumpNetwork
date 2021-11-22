@@ -375,16 +375,6 @@ void Client::ProcessPacket(unsigned char* p)
 		}		
 		break;
 	}
-	case CS_PACKET_GAMEJOIN: {
-		cs_packet_gamejoin* packet = reinterpret_cast<cs_packet_gamejoin*>(p);
-
-		//한 번 게임접속하면 더이상 게임접속 패킷은 받지않음.
-		if (mSn == SN_INGAME) break;
-
-		
-		WaitForSingleObject(SceneChangeIsDone, INFINITE);
-		break;
-	}
 	case CS_PACKET_ROBBY: {
 		cs_packet_robby* packet = reinterpret_cast<cs_packet_robby*>(p);
 		break;

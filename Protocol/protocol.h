@@ -10,7 +10,6 @@ const int  MAX_USER = 10;
 const char CS_PACKET_LOGIN = 1;
 const char CS_PACKET_MOVE = 2;
 const char CS_PACKET_SCENE_CHANGE = 3;
-const char CS_PACKET_GAMEJOIN = 4;
 const char CS_PACKET_KEYUP = 5;
 const char CS_PACEKT_LOGOUT = 6;
 
@@ -66,11 +65,6 @@ struct cs_packet_scene_change {
 	char stage;
 };
 
-struct cs_packet_gamejoin {
-	unsigned char size;
-	char type;
-	int		id;
-};
 struct cs_packet_robby {
 	unsigned char size;
 	char type;
