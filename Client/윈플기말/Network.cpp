@@ -326,6 +326,25 @@ void Network::ProcessPacket(unsigned char* p)
 		break;
 
 	}
+	case SC_PACKET_OBJECT_SYNC: {
+		sc_packet_object_sync* packet = reinterpret_cast<sc_packet_object_sync*>(p);
+		auto& obj = mObj[packet->objnum];
+		switch (obj.type)
+		{
+		case 103: {
+			obj.index = packet->index;
+			break;
+		}
+		case 106:
+		case 107: {
+
+			obj.mx = packet->mx;
+			obj.my = packet->my;
+			break;
+		}
+		}
+		break;
+	}
 	}
 	
 }
