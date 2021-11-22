@@ -379,15 +379,15 @@ void Client::ProcessPacket(unsigned char* p)
 		cs_packet_robby* packet = reinterpret_cast<cs_packet_robby*>(p);
 		break;
 	}
-	case CS_PACEKT_LOGOUT: {
-		cs_packet_logout* packet = reinterpret_cast<cs_packet_logout*>(p);
-		//std::cout << "값은: " << (int)packet->out << std::endl;
-		if ((int)packet->out == 2) {
-			is_logout = true;
-		}
+	//case CS_PACEKT_LOGOUT: {
+	//	cs_packet_logout* packet = reinterpret_cast<cs_packet_logout*>(p);
+	//	//std::cout << "값은: " << (int)packet->out << std::endl;
+	//	if ((int)packet->out == 2) {
+	//		is_logout = true;
+	//	}
 
-		break;
-	}
+	//	break;
+	//}
 		
 	}
 
@@ -399,6 +399,7 @@ int Client::do_recv()
 	received = recv(c_socket, ptr, MAX_BUF_SIZE - prev_size, 0);
 	if (received == SOCKET_ERROR)
 	{
+		is_logout = true;
 		return SOCKET_ERROR;
 	}
 	int remain_data = received + prev_size;
