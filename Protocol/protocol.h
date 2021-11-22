@@ -12,7 +12,7 @@ const char CS_PACKET_MOVE = 2;
 const char CS_PACKET_SCENE_CHANGE = 3;
 const char CS_PACKET_GAMEJOIN = 4;
 const char CS_PACKET_KEYUP = 5;
-const char CS_PACEKT_LOGOUT = 6;
+//const char CS_PACEKT_LOGOUT = 6;
 
 const char CS_PACKET_ROBBY = 98;
 const char CS_PACKET_TEST = 99;
@@ -36,11 +36,11 @@ struct cs_packet_login {
 	char	username[MAX_NAME_SIZE];
 	
 };
-struct cs_packet_logout {
-	unsigned char size;
-	char	type;
-	char    out;
-};
+//struct cs_packet_logout {
+//	unsigned char size;
+//	char	type;
+//	char    out;
+//};
 
 struct cs_packet_move {
 	unsigned char size;

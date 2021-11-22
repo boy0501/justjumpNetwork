@@ -474,15 +474,15 @@ void send_robby_in_packet()
 
 	Network::GetNetwork()->C_Send(&packet, sizeof(packet));
 }
-void send_logout_packet(char button)
-{
-	cs_packet_logout packet;
-	packet.size = sizeof(packet);
-	packet.type = CS_PACEKT_LOGOUT;
-	packet.out = button;
-
-	Network::GetNetwork()->C_Send(&packet, sizeof(packet));
-}
+//void send_logout_packet(char button)
+//{
+//	cs_packet_logout packet;
+//	packet.size = sizeof(packet);
+//	packet.type = CS_PACEKT_LOGOUT;
+//	packet.out = button;
+//
+//	Network::GetNetwork()->C_Send(&packet, sizeof(packet));
+//}
 
 
 void robby_waiting()
@@ -815,7 +815,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		DestroyCaret();
 		return 0;
 	case WM_DESTROY:
-		send_logout_packet(WM_DESTROY);
+		//send_logout_packet(WM_DESTROY);
 
 		for (int i = 0; i < 5; ++i)	FMOD_Sound_Release(Sound::GetSelf()->effectSound[i]);
 		for (int i = 0; i < 5; ++i)	FMOD_Sound_Release(Sound::GetSelf()->bgmSound[i]);
