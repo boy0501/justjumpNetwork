@@ -64,6 +64,7 @@ public:
 	bool is_active;
 	int c_id;
 	int prev_size;
+	bool is_logout = false;
 
 	unsigned char buf[MAX_BUF_SIZE];
 	SOCKADDR_IN c_addr;

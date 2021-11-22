@@ -183,6 +183,7 @@ void Network::ProcessPacket(unsigned char* p)
 	case SC_PACKET_LOGOUT_OBJECT: {
 		sc_packet_logout_object* packet = reinterpret_cast<sc_packet_logout_object*>(p);
 		mOthers[packet->id].is_active = false;
+		
 		break;
 	}
 	case SC_PACKET_PORTAL: {

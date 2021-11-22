@@ -4,7 +4,6 @@
 
 #include <iostream>
 
-
 Client::Client()
 	:prev_size(0)
 	,mCss(CSS_LIVE)
@@ -386,10 +385,22 @@ void Client::ProcessPacket(unsigned char* p)
 		WaitForSingleObject(SceneChangeIsDone, INFINITE);
 		break;
 	}
-	case CS_PACKET_ROBBY:
+	case CS_PACKET_ROBBY: {
 		cs_packet_robby* packet = reinterpret_cast<cs_packet_robby*>(p);
 		break;
 	}
+	case CS_PACEKT_LOGOUT: {
+		cs_packet_logout* packet = reinterpret_cast<cs_packet_logout*>(p);
+		//std::cout << "값은: " << (int)packet->out << std::endl;
+		if ((int)packet->out == 2) {
+			is_logout = true;
+		}
+
+		break;
+	}
+		
+	}
+
 }
 int Client::do_recv()
 {
