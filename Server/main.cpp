@@ -213,6 +213,7 @@ DWORD WINAPI GameLogicThread(LPVOID arg)
 			
 			for (int i = 0; i < Cnt_Player; ++i)
 			{
+			
 				CLIENTS[i]->update(deltatime);
 
 				
@@ -304,6 +305,11 @@ int main()
 		;
 	}
 	
+	for (int i = 0; i < 3; ++i)
+	{
+		if (CLIENTS[i] != nullptr)
+			delete CLIENTS[i];
+	}
 	delete Network::GetNetwork();
 	delete mainMap;
 	return 0;

@@ -6,6 +6,7 @@ Object::Object()
 	: x(0),y(0),w(0),h(0)
 	,type(0)
 	,dir(0)
+	,index(0)
 {
 }
 
