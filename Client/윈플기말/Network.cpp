@@ -136,6 +136,7 @@ void Network::test()
 		cout << mMap->mGameUi << "는 존재하며 인덱스는 " << it - mUI.begin() << " 입니다.\n";
 	}*/
 	cout << "게임 스타트!" << endl;
+	
 }
 
 void Network::ProcessPacket(unsigned char* p)
@@ -150,6 +151,7 @@ void Network::ProcessPacket(unsigned char* p)
 		mPlayer->player_cid = packet->id;
 		mPlayer->x = packet->x;
 		mPlayer->y = packet->y;
+		
 
 		mMap->setmapnum(9);
 		*mOcount = initObject(mObj, mMap->getmapnum(), g_hinst);
@@ -178,6 +180,7 @@ void Network::ProcessPacket(unsigned char* p)
 		mOthers[id].x=packet->x;
 		mOthers[id].y=packet->y;
 		mOthers[id].w=packet->w;
+		//mOthers[id].rank = packet->rank;
 		break;
 	}
 	case SC_PACKET_LOGOUT_OBJECT: {
@@ -236,6 +239,8 @@ void Network::ProcessPacket(unsigned char* p)
 			mPlayer->stealth = packet->stealth;
 			mPlayer->dir = packet->dir;
 			mPlayer->hp = packet->hp;
+			mPlayer->rank = packet->rank;
+			
 			//mPlayer->bx = packet->bx;
 
 			//------
@@ -251,6 +256,7 @@ void Network::ProcessPacket(unsigned char* p)
 			other.stealth = packet->stealth;
 			other.dir = packet->dir;
 			other.hp = packet->hp;
+			other.rank = packet->rank;
 			//other.bx = packet->bx;
 		}
 
@@ -319,6 +325,25 @@ void Network::ProcessPacket(unsigned char* p)
 		
 		break;
 
+	}
+	case SC_PACKET_OBJECT_SYNC: {
+		sc_packet_object_sync* packet = reinterpret_cast<sc_packet_object_sync*>(p);
+		auto& obj = mObj[packet->objnum];
+		switch (obj.type)
+		{
+		case 103: {
+			obj.index = packet->index;
+			break;
+		}
+		case 106:
+		case 107: {
+
+			obj.mx = packet->mx;
+			obj.my = packet->my;
+			break;
+		}
+		}
+		break;
 	}
 	}
 	
