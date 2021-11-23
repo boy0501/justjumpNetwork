@@ -148,6 +148,7 @@ void LobbyClient::initPos()
 
 void LobbyClient::move(float deltatime)
 {
+
 	//std::cout << "moveÈ£Ãâ" << std::endl;
 	if (state == 1)
 	{
@@ -167,20 +168,19 @@ void LobbyClient::move(float deltatime)
 			dir = 1;
 			state = 4;
 		}
+
 	}
 	else if (state == 2)
 	{
+		//std::cout << "state2" << std::endl;
 		if (COMMAND_hurt == true)
 		{
 			if (COMMAND_move == 1)
 			{
-
-				std::cout << "1¹ø±ðÀÓ" << std::endl;
 				x -= (int)(ROWSPEED * deltatime);
 			}
 			else if (COMMAND_move == 2)
 			{
-				
 				x += (int)(ROWSPEED * deltatime);
 			}
 			//y -= 1;
@@ -200,31 +200,34 @@ void LobbyClient::move(float deltatime)
 		{
 			if (COMMAND_move == 1)
 			{
+
 				x -= (int)(ROWSPEED * deltatime);
 			}
 			else if (COMMAND_move == 2)
 			{
-				x += ROWSPEED  * deltatime;
+				x += (int)(ROWSPEED * deltatime);
 			}
 
 
 			if (falldy > -5)
-				falldy -= GroundAccel;
+				falldy -= GroundAccel * deltatime * 50;
 			if (falldy < 0)
 			{
 				//std::cout << "state7·Î change" << std::endl;
 				state = 7;
 			}
-			y -= falldy;
+			y -= (int)(falldy * deltatime * 60);
 		}
 
 
 	}
 	else if (state == 3)
 	{
+		//std::cout << "state3" << std::endl;
 	}
 	else if (state == 4)
 	{
+		//std::cout << "state4" << std::endl;
 		if (LRkey == true)
 		{
 
@@ -238,15 +241,18 @@ void LobbyClient::move(float deltatime)
 			if (COMMAND_move == 1)
 			{
 				x -= (int)(ROWSPEED * deltatime);
+
 			}
 			else if (COMMAND_move == 2)
 			{
 				x += (int)(ROWSPEED * deltatime);
+
 			}
 		}
 	}
 	else if (state == 5)
 	{
+		//std::cout << "state5" << std::endl;
 		savey = y;
 		if (UDkey == true)
 		{
@@ -267,6 +273,7 @@ void LobbyClient::move(float deltatime)
 	}
 	else if (state == 6)
 	{
+		//std::cout << "state6" << std::endl;
 		ROWSPEED *= 3;
 		stealth = 100;
 		savey = y;
@@ -276,36 +283,30 @@ void LobbyClient::move(float deltatime)
 	}
 	else if (state == 7)
 	{
-		y += COLSPEED;
+		//std::cout << "state7µé¾î¿È" << std::endl;
+		y += (int)(COLSPEED * deltatime);
+		//std::cout << y << std::endl;
 		if (adjustspd < 1000)
 			adjustspd++;
 		if (LEFTkey == true)
 			if (adjustspd % 30 == 0)
-			{
 				x -= (int)(ROWSPEED * deltatime);
-			}
 		if (RIGHTkey == true)
 			if (adjustspd % 30 == 0)
 				x += (int)(ROWSPEED * deltatime);
 		if (COMMAND_move == 1)
 		{
 			if (adjustspd <= 10)
-			{
 				x -= (int)(ROWSPEED * deltatime);
-			}
 			if (adjustspd > 10)
 			{
 				if (adjustspd % 2 == 0)
-				{
 					x -= (int)(ROWSPEED * deltatime);
-				}
 			}
 			else if (adjustspd > 30)
 			{
 				if (adjustspd % 5 == 0)
-				{
 					x -= (int)(ROWSPEED * deltatime);
-				}
 			}
 
 			if (LEFTkey == 0)
@@ -349,11 +350,11 @@ void LobbyClient::move(float deltatime)
 
 			if (COMMAND_move == 3)
 			{
-				y -= ROPESPEED;
+				y -= (int)(ROPESPEED * deltatime);
 			}
 			else if (COMMAND_move == 4)
 			{
-				y += ROPESPEED;
+				y += (int)(ROPESPEED * deltatime);
 			}
 		}
 	}
