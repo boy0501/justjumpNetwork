@@ -1,4 +1,4 @@
-
+#include <atlconv.h>
 #include "Network.h"
 
 #include "../../Protocol/protocol.h"
@@ -175,7 +175,8 @@ void Network::ProcessPacket(unsigned char* p)
 		mOthers[id].state=packet->state;
 		mOthers[id].stealth=packet->stealth;
 		mOthers[id].mPlayername = packet->username;
-		mOthers[id].mPlayerwname.assign(mOthers[id].mPlayername.begin(), mOthers[id].mPlayername.end());
+		USES_CONVERSION;
+		mOthers[id].mPlayerwname = wstring(A2W(mOthers[id].mPlayername.c_str()));
 		mOthers[id].x=packet->x;
 		mOthers[id].y=packet->y;
 		mOthers[id].w=packet->w;

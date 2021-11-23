@@ -23,7 +23,7 @@ public:
 	const SIZE& getFontLen() const { return mFontLength; }
 	const std::string getNameTag() const { return mNameTag; }
 	const std::wstring getText() const { return mText; }
-	const std::string getTextForString() const { return std::string(mText.begin(),mText.end()); }
+	const std::string getTextForString() const;
 private:
 	int mPosx;
 	int mPosy;
