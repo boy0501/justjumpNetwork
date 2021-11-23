@@ -170,10 +170,10 @@ void GameClient::move(float deltatime)
 			}
 			//y -= 1;
 			if (abs(y - savey) > 40) {
-				y -= 3;
+				y -= (int)(3 * 50 * deltatime);
 			}
 			else {
-				y -= COLSPEED / 2;
+				y -= (int)(COLSPEED / 2 * deltatime);
 			}
 			if (abs((y - savey)) >= 40)
 			{
@@ -195,13 +195,13 @@ void GameClient::move(float deltatime)
 
 
 			if (falldy > -5)
-				falldy -= GroundAccel;
+				falldy -= GroundAccel * deltatime * 50 ;
 			if (falldy < 0)
 			{
 				//std::cout << "state7·Î change" << std::endl;
 				state = 7;
 			}
-			y -= falldy;
+			y -= (int)(falldy * deltatime * 60);
 		}
 
 
@@ -269,7 +269,7 @@ void GameClient::move(float deltatime)
 	else if (state == 7)
 	{
 		//std::cout << "state7µé¾î¿È" << std::endl;
-		y += COLSPEED;
+		y += (int)(COLSPEED * deltatime);
 		//std::cout << y << std::endl;
 		if (adjustspd < 1000)
 			adjustspd++;
@@ -335,11 +335,11 @@ void GameClient::move(float deltatime)
 
 			if (COMMAND_move == 3)
 			{
-				y -= ROPESPEED;
+				y -= (int)(ROPESPEED * deltatime);
 			}
 			else if (COMMAND_move == 4)
 			{
-				y += ROPESPEED;
+				y += (int)(ROPESPEED * deltatime);
 			}
 		}
 	}
