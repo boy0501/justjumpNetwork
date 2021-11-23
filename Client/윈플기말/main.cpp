@@ -226,7 +226,7 @@ void update(float delta_time)
 	if (obj_t >= 27000) obj_t = 0;
 
 	//바뀐 랭킹이 잘 넘어오는지 확인---
-	cout << player.rank << endl;
+	//cout << player.rank << endl;
 	//----------------------------
 }
 void render()
