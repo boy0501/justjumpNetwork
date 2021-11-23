@@ -484,14 +484,16 @@ void send_robby_in_packet()
 //	Network::GetNetwork()->C_Send(&packet, sizeof(packet));
 //}
 
-
+static bool only_once = false;
 void robby_waiting()
 {
-	map.mStartui->addText("Ready", "countdown", L"메이플스토리 light", RGB(255, 255, 0), 18, 300, 200, false, 0, 0, camera);
-
+	
+	if (only_once == false) {
+		map.mStartui->addText("Ready", "countdown", L"메이플스토리 bold", RGB(255, 255, 0), 18, 300, 200, false, 0, 0, camera);
+		only_once = true;
+	}
 	if (Network::GetNetwork()->countdown <= 10) {
 		map.mStartui->addText(to_string(Network::GetNetwork()->countdown), "countdown", L"메이플스토리 bold", RGB(255, 255, 255), 18, Network::GetNetwork()->init_x, 200, false, 0, 0, camera);
-
 	}
 	
 	//cout << Network::GetNetwork()->countdown << endl;
