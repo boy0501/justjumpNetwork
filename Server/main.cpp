@@ -264,7 +264,7 @@ DWORD WINAPI GameLogicThread(LPVOID arg)
 				}
 
 				//jpark logout ÀÛ¾÷Áß..
-				if (c->is_logout == true) {
+				/*if (c->is_logout == true) {
 
 					for (int i = 0; i < Cnt_Player; ++i)
 					{
@@ -274,7 +274,7 @@ DWORD WINAPI GameLogicThread(LPVOID arg)
 						packet.id = c->c_id;
 						CLIENTS[i]->do_send(&packet, sizeof(packet));
 					}
-				}
+				}*/
 
 			}
 
