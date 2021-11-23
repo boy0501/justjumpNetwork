@@ -198,11 +198,11 @@ void update(float delta_time)
 		}
 		if (obj[i].getType() == 103)
 		{
-			if (obj_t % 30 == 0)
-			{
-				obj[i].IndexChange();
-
-			}
+			//if (obj_t % 30 == 0)
+			//{
+			//	obj[i].IndexChange();
+			//
+			//}
 
 		}
 		if (obj[i].getType() == 106 || obj[i].getType() == 107)
@@ -212,7 +212,7 @@ void update(float delta_time)
 				obj[i].IndexChange();
 
 			}
-			obj[i].move();
+			//obj[i].move();
 		}
 		else if (obj[i].getType() == 201)
 		{
@@ -226,7 +226,7 @@ void update(float delta_time)
 	if (obj_t >= 27000) obj_t = 0;
 
 	//바뀐 랭킹이 잘 넘어오는지 확인---
-	cout << player.rank << endl;
+	//cout << player.rank << endl;
 	//----------------------------
 }
 void render()
@@ -474,7 +474,15 @@ void send_robby_in_packet()
 
 	Network::GetNetwork()->C_Send(&packet, sizeof(packet));
 }
-
+//void send_logout_packet(char button)
+//{
+//	cs_packet_logout packet;
+//	packet.size = sizeof(packet);
+//	packet.type = CS_PACEKT_LOGOUT;
+//	packet.out = button;
+//
+//	Network::GetNetwork()->C_Send(&packet, sizeof(packet));
+//}
 
 
 void robby_waiting()
@@ -807,6 +815,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		DestroyCaret();
 		return 0;
 	case WM_DESTROY:
+		//send_logout_packet(WM_DESTROY);
+
 		for (int i = 0; i < 5; ++i)	FMOD_Sound_Release(Sound::GetSelf()->effectSound[i]);
 		for (int i = 0; i < 5; ++i)	FMOD_Sound_Release(Sound::GetSelf()->bgmSound[i]);
 		FMOD_System_Release(Sound::GetSelf()->System);

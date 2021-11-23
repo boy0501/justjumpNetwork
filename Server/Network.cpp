@@ -7,6 +7,7 @@
 std::array<class Client*, 3> CLIENTS;
 Network* Network::mNetwork = nullptr;
 int Cnt_Player = 0;
+int robby_cnt = 0;
 
 void error_display(int err_no)
 {

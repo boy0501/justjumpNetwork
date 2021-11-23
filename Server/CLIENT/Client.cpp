@@ -4,7 +4,6 @@
 
 #include <iostream>
 
-
 Client::Client()
 	:prev_size(0)
 	,mCss(CSS_LIVE)
@@ -31,7 +30,7 @@ Client::Client()
 	SceneChangeTrigger = CreateEvent(NULL, FALSE, FALSE, NULL);
 	SceneChangeIsDone = CreateEvent(NULL, FALSE, FALSE, NULL);
 
-	key_seperate = CreateEvent(NULL, FALSE, TRUE, NULL);
+	//CountSendController = CreateEvent(NULL, FALSE, TRUE, NULL);
 
 	//
 	//bx = 0;
@@ -376,20 +375,22 @@ void Client::ProcessPacket(unsigned char* p)
 		}		
 		break;
 	}
-	case CS_PACKET_GAMEJOIN: {
-		cs_packet_gamejoin* packet = reinterpret_cast<cs_packet_gamejoin*>(p);
-
-		//한 번 게임접속하면 더이상 게임접속 패킷은 받지않음.
-		if (mSn == SN_INGAME) break;
-
-		
-		WaitForSingleObject(SceneChangeIsDone, INFINITE);
-		break;
-	}
-	case CS_PACKET_ROBBY:
+	case CS_PACKET_ROBBY: {
 		cs_packet_robby* packet = reinterpret_cast<cs_packet_robby*>(p);
 		break;
 	}
+	//case CS_PACEKT_LOGOUT: {
+	//	cs_packet_logout* packet = reinterpret_cast<cs_packet_logout*>(p);
+	//	//std::cout << "값은: " << (int)packet->out << std::endl;
+	//	if ((int)packet->out == 2) {
+	//		is_logout = true;
+	//	}
+
+	//	break;
+	//}
+		
+	}
+
 }
 int Client::do_recv()
 {
@@ -398,6 +399,7 @@ int Client::do_recv()
 	received = recv(c_socket, ptr, MAX_BUF_SIZE - prev_size, 0);
 	if (received == SOCKET_ERROR)
 	{
+		is_logout = true;
 		return SOCKET_ERROR;
 	}
 	int remain_data = received + prev_size;

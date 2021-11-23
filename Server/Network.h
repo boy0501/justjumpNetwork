@@ -4,6 +4,7 @@
 
 extern std::array<class Client*, 3> CLIENTS;
 extern int Cnt_Player;
+extern int robby_cnt;
 
 void error_display(int err_no);
 class Network

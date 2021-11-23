@@ -46,7 +46,6 @@ Network::~Network()
 {
 	closesocket(s_socket);
 	WSACleanup();
-	delete mNetwork;
 }
 
 
@@ -186,6 +185,7 @@ void Network::ProcessPacket(unsigned char* p)
 	case SC_PACKET_LOGOUT_OBJECT: {
 		sc_packet_logout_object* packet = reinterpret_cast<sc_packet_logout_object*>(p);
 		mOthers[packet->id].is_active = false;
+		
 		break;
 	}
 	case SC_PACKET_PORTAL: {
@@ -223,8 +223,7 @@ void Network::ProcessPacket(unsigned char* p)
 		//std::cout << packet->countdown << std::endl;
 		break;
 	}
-	case SC_PACKET_MOVE_PROCESS: 
-	{
+	case SC_PACKET_MOVE_PROCESS: {
 		if (isLogin == true) break;
 		sc_packet_move_process* packet = reinterpret_cast<sc_packet_move_process*>(p);
 		
@@ -262,8 +261,7 @@ void Network::ProcessPacket(unsigned char* p)
 
 		break;
 	}
-	case SC_PACKET_GAMESTART:
-	{
+	case SC_PACKET_GAMESTART:{
 		sc_packet_gamestart* packet = reinterpret_cast<sc_packet_gamestart*>(p);
 		mPlayer->dir = packet->dir;
 		mPlayer->h = packet->h;
@@ -325,6 +323,25 @@ void Network::ProcessPacket(unsigned char* p)
 		
 		break;
 
+	}
+	case SC_PACKET_OBJECT_SYNC: {
+		sc_packet_object_sync* packet = reinterpret_cast<sc_packet_object_sync*>(p);
+		auto& obj = mObj[packet->objnum];
+		switch (obj.type)
+		{
+		case 103: {
+			obj.index = packet->index;
+			break;
+		}
+		case 106:
+		case 107: {
+
+			obj.mx = packet->mx;
+			obj.my = packet->my;
+			break;
+		}
+		}
+		break;
 	}
 	}
 	
