@@ -3,6 +3,7 @@
 #include "../CLIENT/LobbyClient.h"
 
 #include <iostream>
+#include "../Network.h"
 
 Client::Client()
 	:prev_size(0)
@@ -409,7 +410,25 @@ int Client::do_recv()
 	received = recv(c_socket, ptr, MAX_BUF_SIZE - prev_size, 0);
 	if (received == SOCKET_ERROR)
 	{
+		//jpark logout 작업 수정
 		is_logout = true;
+
+		for (int i = 0; i < Cnt_Player; ++i) {
+
+			auto& c = CLIENTS[i];
+			if (c->is_logout == true) {
+
+				for (int i = 0; i < Cnt_Player; ++i)
+				{
+					sc_packet_logout_object packet;
+					packet.size = sizeof(sc_packet_logout_object);
+					packet.type = SC_PACKET_LOGOUT_OBJECT;
+					packet.id = c->c_id;
+					CLIENTS[i]->do_send(&packet, sizeof(packet));
+				}
+			}
+		}
+		
 		return SOCKET_ERROR;
 	}
 	int remain_data = received + prev_size;
