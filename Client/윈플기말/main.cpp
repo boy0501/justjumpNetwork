@@ -565,12 +565,13 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		ui->addButton([hwnd,ui]() {
 
 			//
-
+			player.mPlayername = ui->FindTextByNameTag("id")->getTextForString();
+			player.mPlayerwname = ui->FindTextByNameTag("id")->getText();
 			cs_packet_login packet;
 			strcpy_s(packet.username, 20, ui->FindTextByNameTag("id")->getTextForString().c_str());
 			packet.size = sizeof(cs_packet_login);
 			packet.type = CS_PACKET_LOGIN;
-			
+			strcpy_s(packet.username, 20, player.mPlayername.c_str());
 			Network::GetNetwork()->C_Send(&packet, sizeof(packet));
 
 
@@ -582,8 +583,6 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 
 			//player.setx(80);
 			//player.sety(655);
-			player.mPlayername = ui->FindTextByNameTag("id")->getTextForString();
-			player.mPlayerwname = ui->FindTextByNameTag("id")->getText();
 			ui->closeUI();
 			Network::GetNetwork()->mUI.emplace_back(map.mStartui);
 

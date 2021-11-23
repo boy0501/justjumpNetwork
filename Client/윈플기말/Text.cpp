@@ -1,3 +1,4 @@
+#include <atlconv.h>
 #include "Text.h"
 #include "Camera.h"
 Text::Text(const std::string& text, const std::string& NameTag, const std::wstring& fontName,const COLORREF& fontColor,const int& FontHeight, const int& x, const int& y,const bool& isUserUi,const int& StringBoxWidth,const int& StringBoxHeight, CAMERA& camera)
@@ -72,3 +73,8 @@ void Text::UpdateFontSize(HWND& hwnd)
 	ReleaseDC(hwnd, mem1dc);		//Create Çß´ø°Í Delete
 }
 
+const std::string Text::getTextForString() const {
+
+	USES_CONVERSION;
+	return std::string(W2A(mText.c_str()));
+}
