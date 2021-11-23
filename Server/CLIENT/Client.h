@@ -44,9 +44,9 @@ public:
 	int rank;
 
 	int ROWSPEED = 150;
-	int COLSPEED = 10;
+	int COLSPEED = 500;
 	int beltspeed = 100;
-	int ROPESPEED = 2;
+	int ROPESPEED = 150;
 	//bool LEFTkey = 0;
 	//bool RIGHTkey = 0;
 	//bool UPkey = 0;
