@@ -6,6 +6,10 @@ const int WORLD_HEIGHT = 8;
 const int WORLD_WIDTH = 8;
 const int  MAX_NAME_SIZE = 20;
 const int  MAX_USER = 10;
+const int GEARCYCLE = 180;
+const int GEARSPEED = 9500;
+
+const float PI = 3.14159265;
 
 const char CS_PACKET_LOGIN = 1;
 const char CS_PACKET_MOVE = 2;
@@ -90,7 +94,7 @@ struct sc_packet_move_process {
 	short stealth;
 	short hp;
 	char rank;
-
+	float senddeltatime;	//서버에서 보내줄때 1프레임당 시간
 	//short bx; //애니메이션 위해 -> bitmove()
 }; 
 
@@ -158,5 +162,7 @@ struct sc_packet_object_sync {
 	char objnum;
 	short mx, my;
 	char index;
+	float degree;
+	float senddeltatime;	//서버에서 보내줄때 1프레임당 시간
 };
 #pragma pack(pop)

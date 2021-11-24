@@ -1,4 +1,4 @@
-#include <windows.h>
+ï»¿#include <windows.h>
 #include <tchar.h>
 #include <random>
 #include <chrono>
@@ -34,7 +34,7 @@ LPCTSTR lpszWinodwName = L"Just Jump";
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam);
 static PAINTSTRUCT ps;
-static HDC /*hdc, mem1dc,*/ mem2dc, loaddc, playerdc, odc, /*pdc,*/ ui_dc, hp_dc, die_dc, start_dc, help_dc, login_dc; // odc = ¿ÀºêÁ§Æ® dc, pdc = player dc,ui_Dc : ¾Æ·¡ ÀüÃ¼ÀûÀÎ ui hp_Dc: hpÅë¸¸ ³ª¿À´Â°Å dic_dc : »ç¸Á ui 
+static HDC /*hdc, mem1dc,*/ mem2dc, loaddc, playerdc, odc, /*pdc,*/ ui_dc, hp_dc, die_dc, start_dc, help_dc, login_dc; // odc = ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ® dc, pdc = player dc,ui_Dc : ï¿½Æ·ï¿½ ï¿½ï¿½Ã¼ï¿½ï¿½ï¿½ï¿½ ui hp_Dc: hpï¿½ë¸¸ ï¿½ï¿½ï¿½ï¿½ï¿½Â°ï¿½ dic_dc : ï¿½ï¿½ï¿½ ui 
 /*static RECT rectview;*/
 static HBITMAP /*hbit1,*/ loadbit, oldload, oldbit1, hbitobj[100];
 static PLAYER player;
@@ -49,12 +49,12 @@ static BLENDFUNCTION loadbf;
 bool isComposit = false;
 
 /*HWND hWnd;*/
-static int nCaretPosx, nCaretPosy;	//ÆùÆ® x,yÅ©±â , Ä³·µ x y À§Ä¡
-/*static int obj_t = 0;*/ //¿ÀºêÁ§Æ® ¾Ö´Ï¸ŞÀÌ¼ÇÀ» 1¹øÅ¸ÀÌ¸Ó¿¡ ³Ö±âÀ§ÇØ Ãß°¡ÇÑ º¯¼ö
-static int ocount;		//obj °³¼ö¸¦ ¼¼ÁÖ´Â º¯¼ö
-static int help_button = 0, start_button = 0; //Á¶ÀÛ¹ı ¿Â¿ÀÇÁ
-//static bool occur_button = 0;	//»ç¸ÁÇßÀ»¶§ÀÇ buttonÀÌ È°¼ºÈ­µÇ¾ú´ÂÁö 
-static bool gamemode = 0;	//0ÀÌ¸é ±âº» 1ÀÌ¸é ÀÚÀ¯¸ğµå
+static int nCaretPosx, nCaretPosy;	//í°íŠ¸ x,yí¬ê¸° , ìºëŸ¿ x y ìœ„ì¹˜
+/*static int obj_t = 0;*/ //ì˜¤ë¸Œì íŠ¸ ì• ë‹ˆë©”ì´ì…˜ì„ 1ë²ˆíƒ€ì´ë¨¸ì— ë„£ê¸°ìœ„í•´ ì¶”ê°€í•œ ë³€ìˆ˜
+static int ocount;		//obj ê°œìˆ˜ë¥¼ ì„¸ì£¼ëŠ” ë³€ìˆ˜
+static int help_button = 0, start_button = 0; //ì¡°ì‘ë²• ì˜¨ì˜¤í”„
+//static bool occur_button = 0;	//ì‚¬ë§í–ˆì„ë•Œì˜ buttonì´ í™œì„±í™”ë˜ì—ˆëŠ”ì§€ 
+static bool gamemode = 0;	//0ì´ë©´ ê¸°ë³¸ 1ì´ë©´ ììœ ëª¨ë“œ
 static float deltatime = 0;
 static float elapsedtime = 0;
 static int Fps = 0;
@@ -69,6 +69,14 @@ using namespace std;
 //float elapsedt;
 //int Nameunsigan= 10;
 
+
+DWORD WINAPI ClientRecvThread(LPVOID arg)
+{
+	while (1)
+	{
+		Network::GetNetwork()->C_Recv();
+	}
+}
 bool IsKeyPressed(char key)
 {
 	return keyboard[key];
@@ -83,9 +91,9 @@ void update(float delta_time)
 	player_keyProcess();
 	robby_waiting();
 
-	Network::GetNetwork()->C_Recv();
+	//Network::GetNetwork()->C_Recv();
 
-	//»©Áà¾ß ÇÒ Ui°¡ ÀÖ´Ù¸é Ui »èÁ¦
+	//ë¹¼ì¤˜ì•¼ í•  Uiê°€ ìˆë‹¤ë©´ Ui ì‚­ì œ
 	auto iter = Network::GetNetwork()->mUI.begin();
 	while (iter != Network::GetNetwork()->mUI.end())
 	{
@@ -98,17 +106,17 @@ void update(float delta_time)
 			++iter;
 		}
 	}
-	//UiClear ³¡
+	//UiClear ë
 
-	//Sound¾÷µ¥ÀÌÆ®
+	//Soundì—…ë°ì´íŠ¸
 	FMOD_System_Update(Sound::GetSelf()->System);
-	//Sound¾÷µ¥ÀÌÆ® ³¡
+	//Soundì—…ë°ì´íŠ¸ ë
 	if (map.getmapnum() == LOGINBG)
 		return;
 	obj_t += 1;
-	if (map.getmapnum() != LOGINBG)	//·Î±×ÀÎÁßÀÏ¶© Ä³¸¯ÅÍ »óÈ£ÀÛ¿ë x 
+	if (map.getmapnum() != LOGINBG)	//ë¡œê·¸ì¸ì¤‘ì¼ë• ìºë¦­í„° ìƒí˜¸ì‘ìš© x 
 	{
-		//¾Ö´Ï¸ŞÀÌ¼Ç=============================
+		//ì• ë‹ˆë©”ì´ì…˜=============================
 		if (player.state == 4) {
 			if (obj_t % 5 == 0)
 			{
@@ -134,9 +142,15 @@ void update(float delta_time)
 		}
 		//=======================================
 		
-		//player.move(obj_t);
-		//adjustPlayer(player, obj, map, ocount, g_hinst);
-		//µÎ°³ ´Ù ¼­¹ö·Î ¿Å°ÜÁá±â ¶§¹®¿¡, ÀÌÁ¦ ÇÊ¿ä°¡ ¾ø´Ù.
+		player.move(delta_time);
+		adjustPlayer(player, obj, map, ocount, g_hinst);
+		//cout << player.y << endl;
+		for (auto& other : others)
+		{
+			other.move(delta_time);
+			//adjustPlayer(other, obj, map, ocount, g_hinst);
+		}
+		//ë‘ê°œ ë‹¤ ì„œë²„ë¡œ ì˜®ê²¨ì¤¬ê¸° ë•Œë¬¸ì—, ì´ì œ í•„ìš”ê°€ ì—†ë‹¤.
 		if (player.getCMD_die())
 		{
 			if(player.WhenPlayerDied==false)
@@ -155,7 +169,7 @@ void update(float delta_time)
 		}
 	}
 	else {
-		//Ä³¸¯ÅÍ°¡ ·ÎµùÁßÀÏ¶© Ä«¸Ş¶ó ÀÌµ¿ ±İÁö , ÀÏ¹İ¸ğµåÀÏ¶§¸¸ Ä«¸Ş¶ó ¿òÁ÷ÀÓ
+		//ìºë¦­í„°ê°€ ë¡œë”©ì¤‘ì¼ë• ì¹´ë©”ë¼ ì´ë™ ê¸ˆì§€ , ì¼ë°˜ëª¨ë“œì¼ë•Œë§Œ ì¹´ë©”ë¼ ì›€ì§ì„
 		if (player.getGamemode() == 0)
 			adjustCamera(camera, player);
 	}
@@ -166,7 +180,7 @@ void update(float delta_time)
 	for (auto& o : others)
 		o.selectBit();
 
-	// ÀÌ°Å¸¦ µû·Î ³Ö´Â°Ô ³ªÀ»µí ¿ÀºêÁ§Æ® ¸â¹öÇÔ¼ö·Î´Ù°¡
+	// ì´ê±°ë¥¼ ë”°ë¡œ ë„£ëŠ”ê²Œ ë‚˜ì„ë“¯ ì˜¤ë¸Œì íŠ¸ ë©¤ë²„í•¨ìˆ˜ë¡œë‹¤ê°€
 	for (int i = 0; i <= ocount; i++)
 	{
 		if (obj[i].getType() == 0)
@@ -212,7 +226,7 @@ void update(float delta_time)
 				obj[i].IndexChange();
 
 			}
-			//obj[i].move();
+			obj[i].move(delta_time);
 		}
 		else if (obj[i].getType() == 201)
 		{
@@ -225,7 +239,7 @@ void update(float delta_time)
 	}
 	if (obj_t >= 27000) obj_t = 0;
 
-	//¹Ù²ï ·©Å·ÀÌ Àß ³Ñ¾î¿À´ÂÁö È®ÀÎ---
+	//ë°”ë€ ë­í‚¹ì´ ì˜ ë„˜ì–´ì˜¤ëŠ”ì§€ í™•ì¸---
 	//cout << player.rank << endl;
 	//----------------------------
 }
@@ -256,7 +270,7 @@ void render()
 		other.draw(mem1dc, pdc);
 	for (const auto& ui : Network::GetNetwork()->mUI)
 		ui->draw(mem1dc);
-	//Áö¿ìÁö ¸¶¼¼¿ä------
+	//ì§€ìš°ì§€ ë§ˆì„¸ìš”------
 	if (map.getmapnum() == 13) {
 		for (const auto& ui : Network::GetNetwork()->mUI)
 			ui->drawExit(mem1dc);
@@ -296,7 +310,7 @@ void ProcessingLoop()
 	}
 }
 
-HIMC m_hIMC = NULL;   // IME ÇÚµé
+HIMC m_hIMC = NULL;   // IME í•¸ë“¤
 wchar_t wszComp[256] = { 0, };
 wchar_t wsz1Comp[256] = { 0, };
 
@@ -306,12 +320,12 @@ int GetText(HWND hWnd, UINT msg, WPARAM wparam, LPARAM lparam)
 	switch (msg)
 	{
 	case WM_IME_COMPOSITION:
-		m_hIMC = ImmGetContext(hWnd);	// imeÇÚµéÀ» ¾ò´Â°Í
+		m_hIMC = ImmGetContext(hWnd);	// imeí•¸ë“¤ì„ ì–»ëŠ”ê²ƒ
 		if (lparam & GCS_RESULTSTR)
 		{
 			if ((len = ImmGetCompositionString(m_hIMC, GCS_RESULTSTR, NULL, 0)) > 0)
 			{
-				// ¿Ï¼ºµÈ ±ÛÀÚ°¡ ÀÖ´Ù.
+				// ì™„ì„±ëœ ê¸€ìê°€ ìˆë‹¤.
 				ImmGetCompositionString(m_hIMC, GCS_RESULTSTR, wszComp, len);
 
 				if (map.LoginInputFlag == false)
@@ -338,10 +352,10 @@ int GetText(HWND hWnd, UINT msg, WPARAM wparam, LPARAM lparam)
 		}
 		else if (lparam & GCS_COMPSTR)
 		{
-			// ÇöÀç ±ÛÀÚ¸¦ Á¶ÇÕ ÁßÀÌ´Ù.
+			// í˜„ì¬ ê¸€ìë¥¼ ì¡°í•© ì¤‘ì´ë‹¤.
 
-			// Á¶ÇÕÁßÀÎ ±æÀÌ¸¦ ¾ò´Â´Ù.
-			// str¿¡  Á¶ÇÕÁßÀÎ ¹®ÀÚ¸¦ ¾ò´Â´Ù.
+			// ì¡°í•©ì¤‘ì¸ ê¸¸ì´ë¥¼ ì–»ëŠ”ë‹¤.
+			// strì—  ì¡°í•©ì¤‘ì¸ ë¬¸ìë¥¼ ì–»ëŠ”ë‹¤.
 			len = ImmGetCompositionString(m_hIMC, GCS_COMPSTR, NULL, 0);
 			ImmGetCompositionString(m_hIMC, GCS_COMPSTR, wsz1Comp, len);
 			wsz1Comp[len] = 0;
@@ -373,18 +387,18 @@ int GetText(HWND hWnd, UINT msg, WPARAM wparam, LPARAM lparam)
 				nCaretPosx = 380 + Network::GetNetwork()->mUI.back()->FindTextByNameTag("pass")->getFontLen().cx;
 			}
 
-			
+
 		}
 
-		ImmReleaseContext(hWnd, m_hIMC);	// IME ÇÚµé ¹İÈ¯!!
+		ImmReleaseContext(hWnd, m_hIMC);	// IME í•¸ë“¤ ë°˜í™˜!!
 		return 0;
 
 
-	case WM_CHAR:				// 1byte ¹®ÀÚ (ex : ¿µ¾î)
+	case WM_CHAR:				// 1byte ë¬¸ì (ex : ì˜ì–´)
 		return 1;
-	case WM_IME_NOTIFY:			// ÇÑÀÚÀÔ·Â...
+	case WM_IME_NOTIFY:			// í•œìì…ë ¥...
 		return 0;
-	case WM_KEYDOWN:			// Å°´Ù¿î..
+	case WM_KEYDOWN:			// í‚¤ë‹¤ìš´..
 		return 1;
 	}
 	return 1;
@@ -431,7 +445,7 @@ int WINAPI WinMain(HINSTANCE hinstance, HINSTANCE hPrevinstance, LPSTR lpszCmdPa
 	{
 		if (PeekMessage(&Message, nullptr, 0, 0, PM_REMOVE))
 		{
-			//cout << "¸Ş¼¼ÁöÄİ" << endl;
+			//cout << "ë©”ì„¸ì§€ì½œ" << endl;
 			TranslateMessage(&Message);
 			DispatchMessage(&Message);
 		}
@@ -454,7 +468,7 @@ void send_move_packet(char dr)
 	packet.dir = dr;
 
 	Network::GetNetwork()->C_Send(&packet, sizeof(packet));
-	//cout << "sendÆĞÅ¶ º¸³¿" << endl;
+	//cout << "sendíŒ¨í‚· ë³´ëƒ„" << endl;
 }
 
 void send_keyup_packet(char vk_key)
@@ -489,11 +503,11 @@ void robby_waiting()
 {
 	
 	if (only_once == false) {
-		map.mStartui->addText("Ready", "countdown", L"¸ŞÀÌÇÃ½ºÅä¸® bold", RGB(255, 255, 0), 18, 300, 200, false, 0, 0, camera);
+		map.mStartui->addText("Ready", "countdown", L"ë©”ì´í”ŒìŠ¤í† ë¦¬ bold", RGB(255, 255, 0), 18, 300, 200, false, 0, 0, camera);
 		only_once = true;
 	}
 	if (Network::GetNetwork()->countdown <= 10) {
-		map.mStartui->addText(to_string(Network::GetNetwork()->countdown), "countdown", L"¸ŞÀÌÇÃ½ºÅä¸® bold", RGB(255, 255, 255), 18, Network::GetNetwork()->init_x, 200, false, 0, 0, camera);
+		map.mStartui->addText(to_string(Network::GetNetwork()->countdown), "countdown", L"ë©”ì´í”ŒìŠ¤í† ë¦¬ bold", RGB(255, 255, 255), 18, Network::GetNetwork()->init_x, 200, false, 0, 0, camera);
 	}
 	
 	//cout << Network::GetNetwork()->countdown << endl;
@@ -558,13 +572,19 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		Network::GetNetwork()->mCamera = &camera;
 		Network::GetNetwork()->mOthers = others;
 		Network::GetNetwork()->ConnectServer("127.0.0.1");
-		
+
+		HANDLE hThread = CreateThread(NULL, 0, ClientRecvThread, (LPVOID)0, 0, NULL);
+		if (hThread == NULL)
+		{
+			cerr << "ë¹„ ì •ìƒì ì¸ ìŠ¤ë ˆë“œ ìƒì„±" << endl;
+			exit(-1);
+		}
 
 		auto ui = make_shared<LoginHUD>(1);
 		ui->LoadUiBitmap(g_hinst, "img/idpassword.bmp", 340, 250, 332, 282, RGB(255, 0, 0));
-		ui->addText("kk", "id", L"¸ŞÀÌÇÃ½ºÅä¸® bold", RGB(255, 108, 168), 18, 380, 330,false,0,0,camera);
-		ui->addText("", "pass", L"¸ŞÀÌÇÃ½ºÅä¸® bold", RGB(255, 108, 168), 18, 380, 380,false,0,0,camera);
-		ui->addButton([hwnd,ui]() {
+		ui->addText("kk", "id", L"ë©”ì´í”ŒìŠ¤í† ë¦¬ bold", RGB(255, 108, 168), 18, 380, 330, false, 0, 0, camera);
+		ui->addText("", "pass", L"ë©”ì´í”ŒìŠ¤í† ë¦¬ bold", RGB(255, 108, 168), 18, 380, 380, false, 0, 0, camera);
+		ui->addButton([hwnd, ui]() {
 
 			//
 			player.mPlayername = ui->FindTextByNameTag("id")->getTextForString();
@@ -578,7 +598,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 
 
 
-			//·Îºñ Ä«¿îÆ® start===================================================
+			//ë¡œë¹„ ì¹´ìš´íŠ¸ start===================================================
 			send_robby_in_packet();
 
 			//====================================================================
@@ -588,14 +608,14 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 			ui->closeUI();
 			Network::GetNetwork()->mUI.emplace_back(map.mStartui);
 
-			//gameui´Â ·Î±×ÀÎÀ» ÇßÀ»¶§ UserID°¡ ÇÊ¿äÇÏ¹Ç·Î ·Î±×ÀÎ ¹öÆ°ÀÌ ´­·ÈÀ» ¶§ Ã³¸®ÇÑ´Ù.
-			//³ªÁß ·Î±×ÀÎÆĞÅ¶±îÁö ¿Â´Ù°í °¡Á¤ÇßÀ»¶§, ·Î±×ÀÎÆĞÅ¶ ok½Ã¿¡ ui¸¦ ¸¸µé¾îµµ ÁÁ´Ù.
-			auto gameui = make_shared<GameHUD>(1,player);
+			//gameuiëŠ” ë¡œê·¸ì¸ì„ í–ˆì„ë•Œ UserIDê°€ í•„ìš”í•˜ë¯€ë¡œ ë¡œê·¸ì¸ ë²„íŠ¼ì´ ëˆŒë ¸ì„ ë•Œ ì²˜ë¦¬í•œë‹¤.
+			//ë‚˜ì¤‘ ë¡œê·¸ì¸íŒ¨í‚·ê¹Œì§€ ì˜¨ë‹¤ê³  ê°€ì •í–ˆì„ë•Œ, ë¡œê·¸ì¸íŒ¨í‚· okì‹œì— uië¥¼ ë§Œë“¤ì–´ë„ ì¢‹ë‹¤.
+			auto gameui = make_shared<GameHUD>(1, player);
 			gameui->LoadUiBitmap(g_hinst, "img/NoNameUi.bmp", 400, 700, 199, 65, RGB(0, 255, 0), camera);
-			gameui->addText(player.mPlayerwname, "NickName", L"¸ŞÀÌÇÃ½ºÅä¸® light", RGB(255, 255, 255), 14, 475, 705, true, 100, 65, camera);
+			gameui->addText(player.mPlayerwname, "NickName", L"ë©”ì´í”ŒìŠ¤í† ë¦¬ light", RGB(255, 255, 255), 14, 475, 705, true, 100, 65, camera);
 			gameui->LoadHpUiBitmap(g_hinst, "img/Ui_HP.bmp", 421, 728, 100, 65, RGB(0, 0, 255), camera);
 			map.mGameUi = gameui;
-			//gameUi¼³Á¤ ³¡ 
+			//gameUiì„¤ì • ë 
 
 			
 
@@ -603,10 +623,10 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		}, g_hinst, "img/LoginButton", 365, 440, 278, 53, RGB(255, 0, 0));
 		
 		auto startui = make_shared<StartHUD>(0);
-		//hbit = (HBITMAP)LoadImage(g_hinst, TEXT("img/NoNameUi.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION); //»ó´ë°æ·Î·Î º¯°æ
+		//hbit = (HBITMAP)LoadImage(g_hinst, TEXT("img/NoNameUi.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION); //ìƒëŒ€ê²½ë¡œë¡œ ë³€ê²½
 		startui->addButton([startui]() {
 			//Network::GetNetwork()->test();
-			//cout << "µé¾î¿È" << endl;
+			//cout << "ë“¤ì–´ì˜´" << endl;
 
 			//bool occur_button = 0;
 			//map.setblack_t(50);
@@ -625,8 +645,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 			//camera.sety(3232);
 			//map.mStartui->closeUI();
 			//Network::GetNetwork()->mUI.emplace_back(map.mGameUi);
-		    //Network::GetNetwork()->mUI.emplace_back(map.mGameUi);
-			map.mStartui->addText("5252~ 3p game", "countdown", L"¸ŞÀÌÇÃ½ºÅä¸® bold", RGB(255, 0, 0), 18, 120, 250, false, 0, 0, camera);
+			//Network::GetNetwork()->mUI.emplace_back(map.mGameUi);
+			map.mStartui->addText("5252~ 3p game", "countdown", L"ë©”ì´í”ŒìŠ¤í† ë¦¬ bold", RGB(255, 0, 0), 18, 120, 250, false, 0, 0, camera);
 
 
 		}, g_hinst, "img/start", 292, 490, 138, 82, RGB(255, 0, 0));
@@ -639,9 +659,9 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		//map.mStartui = startui;
 
 
-		
-		auto dieui = make_shared<DieHUD>(1,player,camera);
-		
+
+		auto dieui = make_shared<DieHUD>(1, player, camera);
+
 		dieui->addButton([dieui]() {
 			player.initPos();
 			player.sethp(100);
@@ -680,6 +700,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 			break;
 		if (player.getGamemode() == 0) {
 			keyboard[wParam] = true;
+			player.PlayerSetting(wParam);
 			//send_move_packet(wParam);
 		}	
 		else if (player.getGamemode() == 1)
@@ -689,6 +710,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		if (player.getCMD_die() == 1)
 			break;
 		if (player.getGamemode() == 0) {
+			player.PlayerWaiting(wParam);
 			keyboard[wParam] = false;
 			send_keyup_packet(wParam);
 		}
@@ -737,11 +759,11 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		
 		break;
 	case WM_CHAR:
-	if (map.getmapnum() == LOGINBG)
+		if (map.getmapnum() == LOGINBG)
 		{
-			//±²~ÀåÈ÷ map ¾ÈÀÇ ³»ºÎ ÇÔ¼ö·Î ³Ñ°Ü¼­ Å°º¸µåÀÔ·ÂÃ³¸® µû·Î ÇØÁÖ°í½ÍÀºµ¥,,, ³ªÁß¿¡ ±¸Á¶¸¦ µû·Î ¿Å±â±â À§ÇØ ÀÏ´Ü »©µÒ
-			//wParam 0x08 - ¹é½ºÆäÀÌ½º 
-			//0x09 - ÅÇ , 0x0A - Line Feed , 0x0D - ¿£ÅÍ, 0x1B - esc ÀÌ°Å»©°ï ³ª¸ÓÁö ´Ù ÀÔ·Â°¡´ÉÇÑ °Í. ³ªÁß¿¡ Ã¤ÆÃÃ¢ ¾µ¶§ »ç¿ëÇÏµµ·Ï 
+			//êµ‰~ì¥íˆ map ì•ˆì˜ ë‚´ë¶€ í•¨ìˆ˜ë¡œ ë„˜ê²¨ì„œ í‚¤ë³´ë“œì…ë ¥ì²˜ë¦¬ ë”°ë¡œ í•´ì£¼ê³ ì‹¶ì€ë°,,, ë‚˜ì¤‘ì— êµ¬ì¡°ë¥¼ ë”°ë¡œ ì˜®ê¸°ê¸° ìœ„í•´ ì¼ë‹¨ ë¹¼ë‘ 
+			//wParam 0x08 - ë°±ìŠ¤í˜ì´ìŠ¤ 
+			//0x09 - íƒ­ , 0x0A - Line Feed , 0x0D - ì—”í„°, 0x1B - esc ì´ê±°ë¹¼ê³¤ ë‚˜ë¨¸ì§€ ë‹¤ ì…ë ¥ê°€ëŠ¥í•œ ê²ƒ. ë‚˜ì¤‘ì— ì±„íŒ…ì°½ ì“¸ë•Œ ì‚¬ìš©í•˜ë„ë¡ 
 			HideCaret(hwnd);
 			switch (wParam)
 			{
@@ -789,7 +811,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		}
 		/*if (wParam == 'r')
 		{
-			cout << "rÅ° ´©¸§" << endl;
+			cout << "rí‚¤ ëˆ„ë¦„" << endl;
 			player.setx(obj[ocount - 1].getX() + 10);
 			player.sety(obj[ocount - 1].getY() - 25);
 			break;
@@ -826,7 +848,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		if (hbit1) DeleteObject(hbit1);
 		if (loadbit) DeleteObject(loadbit);
 		for (int i = 0; i < 100; ++i)
-			if (hbitobj[i]) DeleteObject(hbitobj[i]);		
+			if (hbitobj[i]) DeleteObject(hbitobj[i]);
 		RemoveFontResourceA("font/Maplestory Bold.ttf");
 		RemoveFontResourceA("font/Maplestory Light.ttf");
 		delete Sound::GetSelf();

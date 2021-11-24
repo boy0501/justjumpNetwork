@@ -1,8 +1,20 @@
 #pragma comment (lib, "Msimg32.lib")
 #include "object.h"
 #include "Load.h"
+#include "../../Protocol/protocol.h"
 #include <iostream>
 
+OBJECT::OBJECT()
+	:degree(0), oldDegree(0.0f)
+	, velocityDegree(0.0f)
+{
+
+}
+
+OBJECT::~OBJECT()
+{
+
+}
 int OBJECT::getX()
 {
 	return x;
@@ -192,24 +204,35 @@ void OBJECT::DrawObj(HDC& mem1dc, HDC& odc)
 	DeleteObject(odc);
 }
 
-void OBJECT::move()
+void OBJECT::move(float deltatime)
 {
-	
+
+	//degree += deltatime * GEARCYCLE;
+	//마찬가지로 degree를 데드레커닝
+	degree += (velocityDegree * deltatime) + ((0 * deltatime * deltatime) / 2);/*
+	if (degree < 0)
+	{
+		std::cout << "here comin" << std::endl;
+	}*/
 	if (dir == 0) //Left or Down
 	{
-		if (mx > 150) s = -1;
-		else if (mx < -150) s = 1;
-		mx += s * gearrowspeed;
+		mx = sin(degree * PI / 180) * GEARSPEED * deltatime;
+		//if (mx > 150) s = -1;
+		//else if (mx < -150) s = 1;
+		//mx += s * gearrowspeed;
 		
 	}
 	else if (dir == 1) //Up or Down
 	{
-		if (my > 100) s = -1;
-		else if (my < -100) s = 1;
-		my += s * gearcolspeed;
+		my = sin(degree * PI / 180) * GEARSPEED * deltatime;
+		//if (my > 100) s = -1;
+		//else if (my < -100) s = 1;
+		//my += s * gearcolspeed;
 
 	}
-	
+	//std::cout << degree << std::endl;
+	//if (degree > 360)
+	//	degree = 0;
 }
 //땅바닥과 플레이어 충돌체크 1이면 부닥침
 //

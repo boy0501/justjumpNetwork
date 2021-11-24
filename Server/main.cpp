@@ -11,6 +11,8 @@
 #include "CLIENT/GameClient.h"
 #include "Object.h"
 #include "Map.h"
+#include "OBSTACLE/AttackObstacle.h"
+#include "OBSTACLE/MoveObstacle.h"
 #include "../Protocol/protocol.h"
 #include <time.h>
 #pragma comment(lib, "ws2_32")
@@ -20,6 +22,8 @@ Map* mainMap;
 LARGE_INTEGER Frequency;
 LARGE_INTEGER BeginTime;
 LARGE_INTEGER Endtime;
+LARGE_INTEGER SendBeginTime;
+LARGE_INTEGER SendEndtime;
 float elapsed_time;
 int Fps = 0;
 
@@ -158,8 +162,98 @@ DWORD WINAPI GameLogicThread(LPVOID arg)
 {
 	QueryPerformanceFrequency(&Frequency);
 	QueryPerformanceCounter(&Endtime);
+	QueryPerformanceCounter(&SendEndtime);
 	while (1) {
-		
+
+		QueryPerformanceCounter(&SendBeginTime);
+		auto sendelapsed = SendBeginTime.QuadPart - SendEndtime.QuadPart;
+		auto senddeltatime = (double)sendelapsed / (double)Frequency.QuadPart;
+
+		if (senddeltatime >= 0.032f)
+		{
+
+			SendEndtime = SendBeginTime;
+			for (int i = 0; i < Cnt_Player; ++i)
+			{
+				auto& c = CLIENTS[i];
+				if (c->mSn == Scene_Name::SN_INGAME)
+				{
+					auto game = reinterpret_cast<GameClient*>(CLIENTS[i]);
+					int objNum = 0;
+					for (auto& obj : game->mMap->mObjects[game->mStageNum])
+					{
+						switch (obj->type)
+						{
+						case 103: {
+							auto steamobj = reinterpret_cast<AttackObstacle*>(obj);
+							sc_packet_object_sync packet;
+							packet.size = sizeof(sc_packet_object_sync);
+							packet.type = SC_PACKET_OBJECT_SYNC;
+							packet.objnum = objNum;
+							packet.index = steamobj->index;
+							game->do_send(&packet, sizeof(packet));
+							break;
+						}
+						case 106:
+						case 107: {
+							sc_packet_object_sync packet;
+							packet.size = sizeof(sc_packet_object_sync);
+							packet.type = SC_PACKET_OBJECT_SYNC;
+							auto moveobj = reinterpret_cast<MoveObstacle*>(obj);
+							packet.objnum = objNum;
+							packet.mx = moveobj->mx;
+							packet.my = moveobj->my;
+							packet.degree = moveobj->degree;
+							packet.senddeltatime = senddeltatime;
+							game->do_send(&packet, sizeof(packet));
+							break;
+						}
+						}
+						objNum++;
+					}
+				}
+				//send packet
+				sc_packet_move_process packet;
+				packet.size = sizeof(sc_packet_move_process);
+				packet.type = SC_PACKET_MOVE_PROCESS;
+				packet.dir = c->dir;
+				packet.h = c->h;
+				packet.id = c->c_id;
+				packet.state = c->state;
+				packet.stealth = c->stealth;
+				packet.x = c->x;
+				packet.y = c->y;
+				packet.rank = c->rank;
+				packet.hp = c->hp;
+				packet.senddeltatime = senddeltatime;
+				for (int j = 0; j < Cnt_Player; ++j)
+				{
+					//맵이 서로 다르면 애초에 보내주질 않음.
+					if (CLIENTS[i]->mStageNum != CLIENTS[j]->mStageNum) continue;
+
+					//WaitForSingleObject(c->key_seperate, 10);
+
+					CLIENTS[j]->do_send(&packet, sizeof(packet));
+					//SetEvent(c->key_seperate);
+				}
+
+				//jpark logout 작업중..
+				/*if (c->is_logout == true) {
+
+					for (int i = 0; i < Cnt_Player; ++i)
+					{
+						sc_packet_logout_object packet;
+						packet.size = sizeof(sc_packet_logout_object);
+						packet.type = SC_PACKET_LOGOUT_OBJECT;
+						packet.id = c->c_id;
+						CLIENTS[i]->do_send(&packet, sizeof(packet));
+					}
+				}*/
+
+			}
+
+		}
+
 		QueryPerformanceCounter(&BeginTime);
 		auto elapsed = BeginTime.QuadPart - Endtime.QuadPart;
 		auto deltatime = (double)elapsed / (double)Frequency.QuadPart;
@@ -170,7 +264,7 @@ DWORD WINAPI GameLogicThread(LPVOID arg)
 			Fps++;
 			if (elapsed_time > 1.0f)
 			{
-				//cout << "FPS:" << Fps << endl;
+				cout << "FPS:" << Fps << endl;
 				Fps = 0;
 				elapsed_time = 0;
 				
@@ -238,43 +332,43 @@ DWORD WINAPI GameLogicThread(LPVOID arg)
 
 				
 
-				auto& c = CLIENTS[i];
-				//send packet
-				sc_packet_move_process packet;
-				packet.size = sizeof(sc_packet_move_process);
-				packet.type = SC_PACKET_MOVE_PROCESS;
-				packet.dir = c->dir;
-				packet.h = c->h;
-				packet.id = c->c_id;
-				packet.state = c->state;
-				packet.stealth = c->stealth;
-				packet.x = c->x;
-				packet.y = c->y;
-				packet.rank = c->rank;
-				packet.hp = c->hp;
-				for (int j = 0; j < Cnt_Player; ++j)
-				{
-					//맵이 서로 다르면 애초에 보내주질 않음.
-					if (CLIENTS[i]->mStageNum != CLIENTS[j]->mStageNum) continue;
-
-					//WaitForSingleObject(c->key_seperate, 10);
-
-					CLIENTS[j]->do_send(&packet, sizeof(packet));
-					//SetEvent(c->key_seperate);
-				}
-
-				//jpark logout 작업중..
-				/*if (c->is_logout == true) {
-
-					for (int i = 0; i < Cnt_Player; ++i)
-					{
-						sc_packet_logout_object packet;
-						packet.size = sizeof(sc_packet_logout_object);
-						packet.type = SC_PACKET_LOGOUT_OBJECT;
-						packet.id = c->c_id;
-						CLIENTS[i]->do_send(&packet, sizeof(packet));
-					}
-				}*/
+				//auto& c = CLIENTS[i];
+				////send packet
+				//sc_packet_move_process packet;
+				//packet.size = sizeof(sc_packet_move_process);
+				//packet.type = SC_PACKET_MOVE_PROCESS;
+				//packet.dir = c->dir;
+				//packet.h = c->h;
+				//packet.id = c->c_id;
+				//packet.state = c->state;
+				//packet.stealth = c->stealth;
+				//packet.x = c->x;
+				//packet.y = c->y;
+				//packet.rank = c->rank;
+				//packet.hp = c->hp;
+				//for (int j = 0; j < Cnt_Player; ++j)
+				//{
+				//	//맵이 서로 다르면 애초에 보내주질 않음.
+				//	if (CLIENTS[i]->mStageNum != CLIENTS[j]->mStageNum) continue;
+				//
+				//	//WaitForSingleObject(c->key_seperate, 10);
+				//
+				//	CLIENTS[j]->do_send(&packet, sizeof(packet));
+				//	//SetEvent(c->key_seperate);
+				//}
+				//
+				////jpark logout 작업중..
+				///*if (c->is_logout == true) {
+				//
+				//	for (int i = 0; i < Cnt_Player; ++i)
+				//	{
+				//		sc_packet_logout_object packet;
+				//		packet.size = sizeof(sc_packet_logout_object);
+				//		packet.type = SC_PACKET_LOGOUT_OBJECT;
+				//		packet.id = c->c_id;
+				//		CLIENTS[i]->do_send(&packet, sizeof(packet));
+				//	}
+				//}*/
 
 			}
 
@@ -283,7 +377,6 @@ DWORD WINAPI GameLogicThread(LPVOID arg)
 			//2. 점프 시 obj와 충돌처리가 되어야 함. v
 			//3. initpos?
 		}
-
 		
 	}
 	return 0;

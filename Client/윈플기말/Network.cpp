@@ -151,8 +151,8 @@ void Network::ProcessPacket(unsigned char* p)
 		mPlayer->player_cid = packet->id;
 		mPlayer->x = packet->x;
 		mPlayer->y = packet->y;
-		
-
+		mPlayer->oldY = packet->y;
+		mPlayer->oldX = packet->x;
 		mMap->setmapnum(9);
 		*mOcount = initObject(mObj, mMap->getmapnum(), g_hinst);
 		mMap->CreateMap(g_hinst);
@@ -181,6 +181,7 @@ void Network::ProcessPacket(unsigned char* p)
 		mOthers[id].x=packet->x;
 		mOthers[id].y=packet->y;
 		mOthers[id].w=packet->w;
+		mOthers[id].oldY = packet->y;
 		//mOthers[id].rank = packet->rank;
 		break;
 	}
@@ -210,6 +211,8 @@ void Network::ProcessPacket(unsigned char* p)
 		Sound::GetSelf()->Sound_Play(EFFECTSOUND, PORTALEF, EFVOL);
 		Sound::GetSelf()->Sound_Play(BGMSOUND, FIRSTMAPBGM, BGMVOL);
 		mPlayer->initPos();
+		mPlayer->oldY = mPlayer->y;
+		mPlayer->oldX = mPlayer->x;
 		//---sethp를 패킷으로 넘겨받으면 이 부분 꼭 수정해주세요 
 		mPlayer->sethp(mPlayer->hp); //(jpark 확인)
 		//---
@@ -240,9 +243,12 @@ void Network::ProcessPacket(unsigned char* p)
 			mPlayer->stealth = packet->stealth;
 			mPlayer->dir = packet->dir;
 			mPlayer->hp = packet->hp;
-			mPlayer->rank = packet->rank;
-			
-			//mPlayer->bx = packet->bx;
+			mPlayer->rank = packet->rank; 
+			//속도구하는 공식 = 거리 /시간 => (지금패킷위치 - 예전패킷위치) / 걸린시간  
+			mPlayer->velocityX = (mPlayer->x - mPlayer->oldX) / (packet->senddeltatime);
+			mPlayer->velocityY = (mPlayer->y - mPlayer->oldY) / (packet->senddeltatime);
+			mPlayer->oldX = mPlayer->x;
+			mPlayer->oldY = mPlayer->y;
 
 			//------
 			//rank = packet->rank;
@@ -258,6 +264,13 @@ void Network::ProcessPacket(unsigned char* p)
 			other.dir = packet->dir;
 			other.hp = packet->hp;
 			other.rank = packet->rank;
+			//속도구하는 공식 = 거리 /시간 => (지금패킷위치 - 예전패킷위치) / 걸린시간  
+			other.velocityX = (other.x - other.oldX) / (packet->senddeltatime);
+			other.velocityY = (other.y - other.oldY) / (packet->senddeltatime);
+			//mPlayer->reckoningY = (mPlayer->y - mPlayer->oldY) / 2;
+			other.oldX = other.x;
+			other.oldY = other.y;
+			//std::cout << "아덜좌표 y : " << other.y << std::endl;
 			//other.bx = packet->bx;
 		}
 
@@ -272,6 +285,7 @@ void Network::ProcessPacket(unsigned char* p)
 		mPlayer->stealth = packet->stealth;
 		mPlayer->x = packet->x;
 		mPlayer->y = packet->y;
+		mPlayer->oldY = packet->y;
 		mPlayer->COMMAND_die = packet->COMMAND_die;
 
 		//auto gameui = make_shared<GameHUD>(1, *mPlayer);
@@ -293,6 +307,7 @@ void Network::ProcessPacket(unsigned char* p)
 		Sound::GetSelf()->Sound_Play(BGMSOUND, FIRSTMAPBGM, BGMVOL);
 		mPlayer->initPos();
 		mPlayer->sethp(5);
+		mPlayer->oldY = mPlayer->y;
 		//cout << mCamera->getx() << ", " << mCamera->gety() << endl;
 		
 		//cout << mPlayer->x <<", "<< mPlayer->y<<endl;
@@ -335,11 +350,18 @@ void Network::ProcessPacket(unsigned char* p)
 			obj.index = packet->index;
 			break;
 		}
-		case 106:
+		case 106: 
 		case 107: {
-
-			obj.mx = packet->mx;
-			obj.my = packet->my;
+			obj.degree = packet->degree;
+			obj.velocityDegree = (obj.degree - obj.oldDegree) / (packet->senddeltatime);
+			if (obj.velocityDegree < 0)
+			{
+				//각도는 0 = 360인데 old는 360에서 362로 갈것으로 기대하고있지만, 실제 degree는 0으로 가서 생기는 - 값 보정
+				obj.velocityDegree = (obj.degree + 360 - obj.oldDegree) / (packet->senddeltatime);
+			}
+			obj.oldDegree = obj.degree;
+			//obj.mx = packet->mx;
+			//obj.my = packet->my;
 			break;
 		}
 		}

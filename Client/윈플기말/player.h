@@ -25,6 +25,8 @@ public:
 	HBITMAP hbitex;		//점프,숙이기 줄타기 비트맵
 	int bx, by, bw, bh; //비트맵의 스프라이트위치를 바꾸기위한 좌표 변수
 	bool is_active;		//캐릭터가 그려져야하는지 아닌지 판단변수(other player를 그려주기 위함.)
+	int oldY, oldX;		//데드레커닝용
+	float velocityX, velocityY;	//데드레커닝용
 public:
 	//HDC hdc, pdc, mem1dc;
 	int ready_players = 0;
@@ -140,7 +142,7 @@ public:
 	//떨어지는 시점의 y좌표 기억
 	void fall2save();
 	//플레이어 무브
-	void move(int);
+	void move(float deltatime);
 	//플레이어 스프라이트선택
 	void selectBit();	   
 	//애니메이션
