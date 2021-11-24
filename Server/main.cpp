@@ -305,14 +305,8 @@ DWORD WINAPI GameLogicThread(LPVOID arg)
 				case SN_INGAME: 
 				{
 					//로비에서 인게임으로 다같이 가자
-					for (int i = 0; i < Cnt_Player; ++i) {
-						//WaitForSingleObject(c->key_seperate, 10);
-
-						ChangeRobbyToGame(i);
-						//SetEvent(c->key_seperate);
-
-					}
 					
+					ChangeRobbyToGame(c->c_id);
 					c->mCss = CSS_LIVE;
 					SetEvent(c->SceneChangeIsDone);
 
