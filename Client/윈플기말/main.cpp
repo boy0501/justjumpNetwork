@@ -34,7 +34,7 @@ LPCTSTR lpszWinodwName = L"Just Jump";
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam);
 static PAINTSTRUCT ps;
-static HDC /*hdc, mem1dc,*/ mem2dc, loaddc, playerdc, odc, /*pdc,*/ ui_dc, hp_dc, die_dc, start_dc, help_dc, login_dc; // odc = ������Ʈ dc, pdc = player dc,ui_Dc : �Ʒ� ��ü���� ui hp_Dc: hp�븸 �����°� dic_dc : ��� ui 
+static HDC /*hdc, mem1dc,*/ mem2dc, loaddc, playerdc, odc, /*pdc,*/ ui_dc, hp_dc, die_dc, start_dc, help_dc, login_dc; // odc = 오브젝트 dc, pdc = player dc,ui_Dc : 아래 전체적인 ui hp_Dc: hp통만 나오는거 dic_dc : 사망 ui 
 /*static RECT rectview;*/
 static HBITMAP /*hbit1,*/ loadbit, oldload, oldbit1, hbitobj[100];
 static PLAYER player;
@@ -240,7 +240,7 @@ void update(float delta_time)
 	if (obj_t >= 27000) obj_t = 0;
 
 	//바뀐 랭킹이 잘 넘어오는지 확인---
-	//cout << player.rank << endl;
+	cout << player.rank << endl;
 	//----------------------------
 }
 void render()
@@ -316,7 +316,10 @@ wchar_t wsz1Comp[256] = { 0, };
 
 int GetText(HWND hWnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
+	if (map.getmapnum() != LOGINBG)
+		return 1;
 	int len;
+
 	switch (msg)
 	{
 	case WM_IME_COMPOSITION:
