@@ -49,12 +49,12 @@ static BLENDFUNCTION loadbf;
 bool isComposit = false;
 
 /*HWND hWnd;*/
-static int nCaretPosx, nCaretPosy;	//��Ʈ x,yũ�� , ĳ�� x y ��ġ
-/*static int obj_t = 0;*/ //������Ʈ �ִϸ��̼��� 1��Ÿ�̸ӿ� �ֱ����� �߰��� ����
-static int ocount;		//obj ������ ���ִ� ����
-static int help_button = 0, start_button = 0; //���۹� �¿���
-//static bool occur_button = 0;	//����������� button�� Ȱ��ȭ�Ǿ����� 
-static bool gamemode = 0;	//0�̸� �⺻ 1�̸� �������
+static int nCaretPosx, nCaretPosy;	//폰트 x,y크기 , 캐럿 x y 위치
+/*static int obj_t = 0;*/ //오브젝트 애니메이션을 1번타이머에 넣기위해 추가한 변수
+static int ocount;		//obj 개수를 세주는 변수
+static int help_button = 0, start_button = 0; //조작법 온오프
+//static bool occur_button = 0;	//사망했을때의 button이 활성화되었는지 
+static bool gamemode = 0;	//0이면 기본 1이면 자유모드
 static float deltatime = 0;
 static float elapsedtime = 0;
 static int Fps = 0;
@@ -93,7 +93,7 @@ void update(float delta_time)
 
 	//Network::GetNetwork()->C_Recv();
 
-	//����� �� Ui�� �ִٸ� Ui ����
+	//빼줘야 할 Ui가 있다면 Ui 삭제
 	auto iter = Network::GetNetwork()->mUI.begin();
 	while (iter != Network::GetNetwork()->mUI.end())
 	{
@@ -106,17 +106,17 @@ void update(float delta_time)
 			++iter;
 		}
 	}
-	//UiClear ��
+	//UiClear 끝
 
-	//Sound������Ʈ
+	//Sound업데이트
 	FMOD_System_Update(Sound::GetSelf()->System);
-	//Sound������Ʈ ��
+	//Sound업데이트 끝
 	if (map.getmapnum() == LOGINBG)
 		return;
 	obj_t += 1;
-	if (map.getmapnum() != LOGINBG)	//�α������϶� ĳ���� ��ȣ�ۿ� x 
+	if (map.getmapnum() != LOGINBG)	//로그인중일땐 캐릭터 상호작용 x 
 	{
-		//�ִϸ��̼�=============================
+		//애니메이션=============================
 		if (player.state == 4) {
 			if (obj_t % 5 == 0)
 			{
@@ -150,7 +150,7 @@ void update(float delta_time)
 			other.move(delta_time);
 			//adjustPlayer(other, obj, map, ocount, g_hinst);
 		}
-		//�ΰ� �� ������ �Ű���� ������, ���� �ʿ䰡 ����.
+		//두개 다 서버로 옮겨줬기 때문에, 이제 필요가 없다.
 		if (player.getCMD_die())
 		{
 			if(player.WhenPlayerDied==false)
@@ -169,7 +169,7 @@ void update(float delta_time)
 		}
 	}
 	else {
-		//ĳ���Ͱ� �ε����϶� ī�޶� �̵� ���� , �Ϲݸ���϶��� ī�޶� ������
+		//캐릭터가 로딩중일땐 카메라 이동 금지 , 일반모드일때만 카메라 움직임
 		if (player.getGamemode() == 0)
 			adjustCamera(camera, player);
 	}
@@ -180,7 +180,7 @@ void update(float delta_time)
 	for (auto& o : others)
 		o.selectBit();
 
-	// �̰Ÿ� ���� �ִ°� ������ ������Ʈ ����Լ��δٰ�
+	// 이거를 따로 넣는게 나을듯 오브젝트 멤버함수로다가
 	for (int i = 0; i <= ocount; i++)
 	{
 		if (obj[i].getType() == 0)
@@ -239,7 +239,7 @@ void update(float delta_time)
 	}
 	if (obj_t >= 27000) obj_t = 0;
 
-	//�ٲ� ��ŷ�� �� �Ѿ������ Ȯ��---
+	//바뀐 랭킹이 잘 넘어오는지 확인---
 	//cout << player.rank << endl;
 	//----------------------------
 }
@@ -270,7 +270,7 @@ void render()
 		other.draw(mem1dc, pdc);
 	for (const auto& ui : Network::GetNetwork()->mUI)
 		ui->draw(mem1dc);
-	//������ ������------
+	//지우지 마세요------
 	if (map.getmapnum() == 13) {
 		for (const auto& ui : Network::GetNetwork()->mUI)
 			ui->drawExit(mem1dc);
@@ -310,7 +310,7 @@ void ProcessingLoop()
 	}
 }
 
-HIMC m_hIMC = NULL;   // IME �ڵ�
+HIMC m_hIMC = NULL;   // IME 핸들
 wchar_t wszComp[256] = { 0, };
 wchar_t wsz1Comp[256] = { 0, };
 
@@ -320,12 +320,12 @@ int GetText(HWND hWnd, UINT msg, WPARAM wparam, LPARAM lparam)
 	switch (msg)
 	{
 	case WM_IME_COMPOSITION:
-		m_hIMC = ImmGetContext(hWnd);	// ime�ڵ��� ��°�
+		m_hIMC = ImmGetContext(hWnd);	// ime핸들을 얻는것
 		if (lparam & GCS_RESULTSTR)
 		{
 			if ((len = ImmGetCompositionString(m_hIMC, GCS_RESULTSTR, NULL, 0)) > 0)
 			{
-				// �ϼ��� ���ڰ� �ִ�.
+				// 완성된 글자가 있다.
 				ImmGetCompositionString(m_hIMC, GCS_RESULTSTR, wszComp, len);
 
 				if (map.LoginInputFlag == false)
@@ -352,10 +352,10 @@ int GetText(HWND hWnd, UINT msg, WPARAM wparam, LPARAM lparam)
 		}
 		else if (lparam & GCS_COMPSTR)
 		{
-			// ���� ���ڸ� ���� ���̴�.
+			// 현재 글자를 조합 중이다.
 
-			// �������� ���̸� ��´�.
-			// str��  �������� ���ڸ� ��´�.
+			// 조합중인 길이를 얻는다.
+			// str에  조합중인 문자를 얻는다.
 			len = ImmGetCompositionString(m_hIMC, GCS_COMPSTR, NULL, 0);
 			ImmGetCompositionString(m_hIMC, GCS_COMPSTR, wsz1Comp, len);
 			wsz1Comp[len] = 0;
@@ -387,18 +387,18 @@ int GetText(HWND hWnd, UINT msg, WPARAM wparam, LPARAM lparam)
 				nCaretPosx = 380 + Network::GetNetwork()->mUI.back()->FindTextByNameTag("pass")->getFontLen().cx;
 			}
 
-			
+
 		}
 
-		ImmReleaseContext(hWnd, m_hIMC);	// IME �ڵ� ��ȯ!!
+		ImmReleaseContext(hWnd, m_hIMC);	// IME 핸들 반환!!
 		return 0;
 
 
-	case WM_CHAR:				// 1byte ���� (ex : ����)
+	case WM_CHAR:				// 1byte 문자 (ex : 영어)
 		return 1;
-	case WM_IME_NOTIFY:			// �����Է�...
+	case WM_IME_NOTIFY:			// 한자입력...
 		return 0;
-	case WM_KEYDOWN:			// Ű�ٿ�..
+	case WM_KEYDOWN:			// 키다운..
 		return 1;
 	}
 	return 1;
@@ -445,7 +445,7 @@ int WINAPI WinMain(HINSTANCE hinstance, HINSTANCE hPrevinstance, LPSTR lpszCmdPa
 	{
 		if (PeekMessage(&Message, nullptr, 0, 0, PM_REMOVE))
 		{
-			//cout << "�޼�����" << endl;
+			//cout << "메세지콜" << endl;
 			TranslateMessage(&Message);
 			DispatchMessage(&Message);
 		}
@@ -468,7 +468,7 @@ void send_move_packet(char dr)
 	packet.dir = dr;
 
 	Network::GetNetwork()->C_Send(&packet, sizeof(packet));
-	//cout << "send��Ŷ ����" << endl;
+	//cout << "send패킷 보냄" << endl;
 }
 
 void send_keyup_packet(char vk_key)
@@ -507,7 +507,7 @@ void robby_waiting()
 		only_once = true;
 	}
 	if (Network::GetNetwork()->countdown <= 10) {
-		map.mStartui->addText(to_string(Network::GetNetwork()->countdown), "countdown", L"�����ý��丮 bold", RGB(255, 255, 255), 18, Network::GetNetwork()->init_x, 200, false, 0, 0, camera);
+		map.mStartui->addText(to_string(Network::GetNetwork()->countdown), "countdown", L"메이플스토리 bold", RGB(255, 255, 255), 18, Network::GetNetwork()->init_x, 200, false, 0, 0, camera);
 	}
 	
 	//cout << Network::GetNetwork()->countdown << endl;
@@ -576,15 +576,15 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		HANDLE hThread = CreateThread(NULL, 0, ClientRecvThread, (LPVOID)0, 0, NULL);
 		if (hThread == NULL)
 		{
-			cerr << "�� �������� ������ ����" << endl;
+			cerr << "비 정상적인 스레드 생성" << endl;
 			exit(-1);
 		}
 
 		auto ui = make_shared<LoginHUD>(1);
 		ui->LoadUiBitmap(g_hinst, "img/idpassword.bmp", 340, 250, 332, 282, RGB(255, 0, 0));
-		ui->addText("kk", "id", L"�����ý��丮 bold", RGB(255, 108, 168), 18, 380, 330,false,0,0,camera);
-		ui->addText("", "pass", L"�����ý��丮 bold", RGB(255, 108, 168), 18, 380, 380,false,0,0,camera);
-		ui->addButton([hwnd,ui]() {
+		ui->addText("kk", "id", L"메이플스토리 bold", RGB(255, 108, 168), 18, 380, 330, false, 0, 0, camera);
+		ui->addText("", "pass", L"메이플스토리 bold", RGB(255, 108, 168), 18, 380, 380, false, 0, 0, camera);
+		ui->addButton([hwnd, ui]() {
 
 			//
 			player.mPlayername = ui->FindTextByNameTag("id")->getTextForString();
@@ -598,7 +598,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 
 
 
-			//�κ� ī��Ʈ start===================================================
+			//로비 카운트 start===================================================
 			send_robby_in_packet();
 
 			//====================================================================
@@ -608,14 +608,14 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 			ui->closeUI();
 			Network::GetNetwork()->mUI.emplace_back(map.mStartui);
 
-			//gameui�� �α����� ������ UserID�� �ʿ��ϹǷ� �α��� ��ư�� ������ �� ó���Ѵ�.
-			//���� �α�����Ŷ���� �´ٰ� ����������, �α�����Ŷ ok�ÿ� ui�� ���� ����.
-			auto gameui = make_shared<GameHUD>(1,player);
+			//gameui는 로그인을 했을때 UserID가 필요하므로 로그인 버튼이 눌렸을 때 처리한다.
+			//나중 로그인패킷까지 온다고 가정했을때, 로그인패킷 ok시에 ui를 만들어도 좋다.
+			auto gameui = make_shared<GameHUD>(1, player);
 			gameui->LoadUiBitmap(g_hinst, "img/NoNameUi.bmp", 400, 700, 199, 65, RGB(0, 255, 0), camera);
-			gameui->addText(player.mPlayerwname, "NickName", L"�����ý��丮 light", RGB(255, 255, 255), 14, 475, 705, true, 100, 65, camera);
+			gameui->addText(player.mPlayerwname, "NickName", L"메이플스토리 light", RGB(255, 255, 255), 14, 475, 705, true, 100, 65, camera);
 			gameui->LoadHpUiBitmap(g_hinst, "img/Ui_HP.bmp", 421, 728, 100, 65, RGB(0, 0, 255), camera);
 			map.mGameUi = gameui;
-			//gameUi���� �� 
+			//gameUi설정 끝 
 
 			
 
@@ -623,10 +623,10 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		}, g_hinst, "img/LoginButton", 365, 440, 278, 53, RGB(255, 0, 0));
 		
 		auto startui = make_shared<StartHUD>(0);
-		//hbit = (HBITMAP)LoadImage(g_hinst, TEXT("img/NoNameUi.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION); //����η� ����
+		//hbit = (HBITMAP)LoadImage(g_hinst, TEXT("img/NoNameUi.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION); //상대경로로 변경
 		startui->addButton([startui]() {
 			//Network::GetNetwork()->test();
-			//cout << "����" << endl;
+			//cout << "들어옴" << endl;
 
 			//bool occur_button = 0;
 			//map.setblack_t(50);
@@ -645,8 +645,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 			//camera.sety(3232);
 			//map.mStartui->closeUI();
 			//Network::GetNetwork()->mUI.emplace_back(map.mGameUi);
-		    //Network::GetNetwork()->mUI.emplace_back(map.mGameUi);
-			map.mStartui->addText("5252~ 3p game", "countdown", L"�����ý��丮 bold", RGB(255, 0, 0), 18, 120, 250, false, 0, 0, camera);
+			//Network::GetNetwork()->mUI.emplace_back(map.mGameUi);
+			map.mStartui->addText("5252~ 3p game", "countdown", L"메이플스토리 bold", RGB(255, 0, 0), 18, 120, 250, false, 0, 0, camera);
 
 
 		}, g_hinst, "img/start", 292, 490, 138, 82, RGB(255, 0, 0));
@@ -659,9 +659,9 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		//map.mStartui = startui;
 
 
-		
-		auto dieui = make_shared<DieHUD>(1,player,camera);
-		
+
+		auto dieui = make_shared<DieHUD>(1, player, camera);
+
 		dieui->addButton([dieui]() {
 			player.initPos();
 			player.sethp(100);
@@ -759,11 +759,11 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		
 		break;
 	case WM_CHAR:
-	if (map.getmapnum() == LOGINBG)
+		if (map.getmapnum() == LOGINBG)
 		{
-			//��~���� map ���� ���� �Լ��� �Ѱܼ� Ű�����Է�ó�� ���� ���ְ������,,, ���߿� ������ ���� �ű�� ���� �ϴ� ����
-			//wParam 0x08 - �齺���̽� 
-			//0x09 - �� , 0x0A - Line Feed , 0x0D - ����, 0x1B - esc �̰Ż��� ������ �� �Է°����� ��. ���߿� ä��â ���� ����ϵ��� 
+			//굉~장히 map 안의 내부 함수로 넘겨서 키보드입력처리 따로 해주고싶은데,,, 나중에 구조를 따로 옮기기 위해 일단 빼둠
+			//wParam 0x08 - 백스페이스 
+			//0x09 - 탭 , 0x0A - Line Feed , 0x0D - 엔터, 0x1B - esc 이거빼곤 나머지 다 입력가능한 것. 나중에 채팅창 쓸때 사용하도록 
 			HideCaret(hwnd);
 			switch (wParam)
 			{
@@ -811,7 +811,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		}
 		/*if (wParam == 'r')
 		{
-			cout << "rŰ ����" << endl;
+			cout << "r키 누름" << endl;
 			player.setx(obj[ocount - 1].getX() + 10);
 			player.sety(obj[ocount - 1].getY() - 25);
 			break;
@@ -848,7 +848,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		if (hbit1) DeleteObject(hbit1);
 		if (loadbit) DeleteObject(loadbit);
 		for (int i = 0; i < 100; ++i)
-			if (hbitobj[i]) DeleteObject(hbitobj[i]);		
+			if (hbitobj[i]) DeleteObject(hbitobj[i]);
 		RemoveFontResourceA("font/Maplestory Bold.ttf");
 		RemoveFontResourceA("font/Maplestory Light.ttf");
 		delete Sound::GetSelf();
