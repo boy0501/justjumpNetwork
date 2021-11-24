@@ -7,14 +7,20 @@
 #define gearcolspeed 3 // col gear speed
 class OBJECT {
 public:
+	OBJECT();
+	~OBJECT();
 	int x, y;					//오브젝트의 x y 는 왼쪽상단이 기준이다.
 	int w, h;
 	int type;					//1.바닥 2.기본 발판 3.작은발판 4.컨베이어 벨트 5.투명바닥 101.나사못 102.깨진파이프 103.증기 106,107.톱니바퀴 201.포탈 301.로프
 	int index;					//애니메이션 돌릴때 배열의 인덱스를 바꿔주어 이미지를 바꾼다
 	int mx, my;					//Variables that increase/decrease based on the object's x,y coordinates
+	int oldX, oldY;				//데드레커닝용
+	float oldDegree;			//데드레커닝용
+	float velocityDegree, velocityY;	//데드레커닝용
 	int s;						//sign bit
 	int dir;					//object's moving direction 0 == left , right / 1 == up , down
 	HBITMAP hbit;				
+	float degree;
 public:
 	//오브젝트의 x y 는 왼쪽상단이 기준이다.
 	int getX();
@@ -45,7 +51,7 @@ public:
 	// All objects reset
 	void ResetObject();
 	//Move gear object
-	void move();
+	void move(float deltatime);
 	//오브젝트 애니메이션 쓸때 사용하는함수
 	void IndexChange();
 	//오브젝트를 그려줌

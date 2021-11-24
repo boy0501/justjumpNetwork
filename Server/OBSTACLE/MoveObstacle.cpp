@@ -1,5 +1,6 @@
 #include "MoveObstacle.h"
 #include <iostream>
+#include "../../Protocol/protocol.h"
 
 MoveObstacle::MoveObstacle(MoveObstacle::MoveType movetype)
 	:mMoveType(movetype)

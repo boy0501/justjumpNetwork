@@ -1,8 +1,5 @@
 #pragma once
 #include "Obstacle.h"
-#define PI 3.14159265
-#define GEARSPEED 9500
-#define GEARCYCLE 180
 
 class MoveObstacle : public Obstacle
 {

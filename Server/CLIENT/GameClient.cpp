@@ -27,7 +27,7 @@ void GameClient::update(float delta_time)
 	if (elapsedtime > 1)
 	{
 		elapsedtime = 0;
-		std::cout << "게임클라" << std::endl;
+		//std::cout << "게임클라" << std::endl;
 	}
 
 	move(delta_time);
@@ -36,34 +36,34 @@ void GameClient::update(float delta_time)
 	stealthtime();
 
 	int objNum = 0;
-	for (auto& obj : mMap->mObjects[mStageNum])
-	{
-		switch (obj->type)
-		{
-		case 103: {
-			auto steamobj = reinterpret_cast<AttackObstacle*>(obj);
-			sc_packet_object_sync packet;
-			packet.size = sizeof(sc_packet_object_sync);
-			packet.type = SC_PACKET_OBJECT_SYNC;
-			packet.objnum = objNum;
-			packet.index = steamobj->index;
-			do_send(&packet, sizeof(packet));
-			break;
-		}
-		case 106:
-		case 107: {
-			sc_packet_object_sync packet;
-			packet.size = sizeof(sc_packet_object_sync);
-			packet.type = SC_PACKET_OBJECT_SYNC;
-			packet.objnum = objNum;
-			packet.mx = obj->mx;
-			packet.my = obj->my;
-			do_send(&packet, sizeof(packet));
-			break;
-		}
-		}
-		objNum++;
-	}
+	//for (auto& obj : mMap->mObjects[mStageNum])
+	//{
+	//	switch (obj->type)
+	//	{
+	//	case 103: {
+	//		auto steamobj = reinterpret_cast<AttackObstacle*>(obj);
+	//		sc_packet_object_sync packet;
+	//		packet.size = sizeof(sc_packet_object_sync);
+	//		packet.type = SC_PACKET_OBJECT_SYNC;
+	//		packet.objnum = objNum;
+	//		packet.index = steamobj->index;
+	//		do_send(&packet, sizeof(packet));
+	//		break;
+	//	}
+	//	case 106:
+	//	case 107: {
+	//		sc_packet_object_sync packet;
+	//		packet.size = sizeof(sc_packet_object_sync);
+	//		packet.type = SC_PACKET_OBJECT_SYNC;
+	//		packet.objnum = objNum;
+	//		packet.mx = obj->mx;
+	//		packet.my = obj->my;
+	//		do_send(&packet, sizeof(packet));
+	//		break;
+	//	}
+	//	}
+	//	objNum++;
+	//}
 	Client::update(delta_time);
 }
 

@@ -69,6 +69,14 @@ using namespace std;
 //float elapsedt;
 //int Nameunsigan= 10;
 
+
+DWORD WINAPI ClientRecvThread(LPVOID arg)
+{
+	while (1)
+	{
+		Network::GetNetwork()->C_Recv();
+	}
+}
 bool IsKeyPressed(char key)
 {
 	return keyboard[key];
@@ -83,7 +91,7 @@ void update(float delta_time)
 	player_keyProcess();
 	robby_waiting();
 
-	Network::GetNetwork()->C_Recv();
+	//Network::GetNetwork()->C_Recv();
 
 	//빼줘야 할 Ui가 있다면 Ui 삭제
 	auto iter = Network::GetNetwork()->mUI.begin();
@@ -134,8 +142,14 @@ void update(float delta_time)
 		}
 		//=======================================
 		
-		//player.move(obj_t);
-		//adjustPlayer(player, obj, map, ocount, g_hinst);
+		player.move(delta_time);
+		adjustPlayer(player, obj, map, ocount, g_hinst);
+		//cout << player.y << endl;
+		for (auto& other : others)
+		{
+			other.move(delta_time);
+			//adjustPlayer(other, obj, map, ocount, g_hinst);
+		}
 		//두개 다 서버로 옮겨줬기 때문에, 이제 필요가 없다.
 		if (player.getCMD_die())
 		{
@@ -212,7 +226,7 @@ void update(float delta_time)
 				obj[i].IndexChange();
 
 			}
-			//obj[i].move();
+			obj[i].move(delta_time);
 		}
 		else if (obj[i].getType() == 201)
 		{
@@ -487,7 +501,7 @@ void send_robby_in_packet()
 
 void robby_waiting()
 {
-	map.mStartui->addText("Ready", "countdown", L"메이플스토리 light", RGB(255, 255, 0), 18, 300, 200, false, 0, 0, camera);
+	//map.mStartui->addText("Ready", "countdown", L"메이플스토리 light", RGB(255, 255, 0), 18, 300, 200, false, 0, 0, camera);
 
 	if (Network::GetNetwork()->countdown <= 10) {
 		map.mStartui->addText(to_string(Network::GetNetwork()->countdown), "countdown", L"메이플스토리 bold", RGB(255, 255, 255), 18, Network::GetNetwork()->init_x, 200, false, 0, 0, camera);
@@ -556,7 +570,13 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		Network::GetNetwork()->mCamera = &camera;
 		Network::GetNetwork()->mOthers = others;
 		Network::GetNetwork()->ConnectServer("127.0.0.1");
-		
+
+		HANDLE hThread = CreateThread(NULL, 0, ClientRecvThread, (LPVOID)0, 0, NULL);
+		if (hThread == NULL)
+		{
+			cerr << "비 정상적인 스레드 생성" << endl;
+			exit(-1);
+		}
 
 		auto ui = make_shared<LoginHUD>(1);
 		ui->LoadUiBitmap(g_hinst, "img/idpassword.bmp", 340, 250, 332, 282, RGB(255, 0, 0));
@@ -678,6 +698,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 			break;
 		if (player.getGamemode() == 0) {
 			keyboard[wParam] = true;
+			player.PlayerSetting(wParam);
 			//send_move_packet(wParam);
 		}	
 		else if (player.getGamemode() == 1)
@@ -687,6 +708,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		if (player.getCMD_die() == 1)
 			break;
 		if (player.getGamemode() == 0) {
+			player.PlayerWaiting(wParam);
 			keyboard[wParam] = false;
 			send_keyup_packet(wParam);
 		}

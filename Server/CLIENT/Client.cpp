@@ -380,6 +380,7 @@ void Client::ProcessPacket(unsigned char* p)
 		cs_packet_robby* packet = reinterpret_cast<cs_packet_robby*>(p);
 		break;
 	}
+
 	//case CS_PACEKT_LOGOUT: {
 	//	cs_packet_logout* packet = reinterpret_cast<cs_packet_logout*>(p);
 	//	//std::cout << "값은: " << (int)packet->out << std::endl;
