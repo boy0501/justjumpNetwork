@@ -30,7 +30,7 @@ void LobbyClient::update(float delta_time)
 		std::cout << "로비클라" << std::endl;
 		std::cout << robby_cnt << std::endl;
 
-		if (robby_cnt == 2)
+		if (robby_cnt == 3)
 		{
 
 			robby_timer--;
@@ -60,9 +60,10 @@ void LobbyClient::update(float delta_time)
 				{
 					c->mCss = CSS_DEAD;
 					c->mSn = SN_INGAME;
+					SetEvent(c->SceneChangeTrigger);
 				}
 
-				SetEvent(SceneChangeTrigger);
+			
 
 			}
 
