@@ -346,15 +346,34 @@ void GameClient::move(float deltatime)
 
 
 	//순위 판정-------------------------------------------------
-	
+	int n = 1;
 	for (int i= 0; i < Cnt_Player; ++i)
 	{
-		mRank[i] = 1;
-		for (int j = 0; j < Cnt_Player; ++j)
-		{
-			if (CLIENTS[i]->y < CLIENTS[j]->y)
-				mRank[i] += 1;
-		}
+		if(CLIENTS[i]->mStageNum==1)
+			mRank[i] = 1;
+		if (CLIENTS[i]->mStageNum == 2)
+			mRank[i] = 3;
+		if (CLIENTS[i]->mStageNum == 3)
+			mRank[i] = 5;
+		//if (CLIENTS[i]->mStageNum == 3)
+			//mRank[i] +=1;
+
+		if (CLIENTS[i]->mStageNum < 4) {
+			for (int j = 0; j < Cnt_Player; ++j)
+			{
+				if (i == j) continue;	// 넣는게 맞나?
+				if (CLIENTS[i]->mStageNum == CLIENTS[j]->mStageNum)
+				{
+					if (CLIENTS[i]->y < CLIENTS[j]->y)
+					{
+						mRank[i] += 1;
+
+					}
+					//else continue;
+				}
+
+			}
+		}		
 		CLIENTS[i]->rank = mRank[i];
 	}
 

@@ -41,8 +41,9 @@ void GameHUD::drawExit(HDC& mem1dc)
 	
 		if (try_once == false) {
 			this->addButton([this]() {
+				exit(1);
 				}
-			, NULL, "img/Exit", 315, 500, 138, 82, RGB(255, 0, 0));
+			, NULL, "img/Exit", 800,500, 138, 82, RGB(255, 0, 0));
 			try_once = true;
 		}
 
