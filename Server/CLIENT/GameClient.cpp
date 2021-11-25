@@ -717,6 +717,7 @@ void GameClient::adjustPlayer(float deltatime)
 
 						
 						//내 상태를 다른 사람들에게 전달 (나랑 같은 stage에 있던사람한테 보냄)
+						//이후 다른사람껄 지움. 
 						for (int i = 0; i < Cnt_Player; ++i)
 						{
 							if (c_id == CLIENTS[i]->c_id)continue;
@@ -726,6 +727,12 @@ void GameClient::adjustPlayer(float deltatime)
 							packet.type = SC_PACKET_LOGOUT_OBJECT;
 							packet.id = c_id;
 							CLIENTS[i]->do_send(&packet, sizeof(packet));
+							
+							sc_packet_logout_object mypacket;
+							mypacket.size = sizeof(sc_packet_logout_object);
+							mypacket.type = SC_PACKET_LOGOUT_OBJECT;
+							mypacket.id = i;
+							do_send(&mypacket, sizeof(mypacket));
 						}
 
 						//Stage의 변경 
@@ -738,6 +745,7 @@ void GameClient::adjustPlayer(float deltatime)
 						do_send(&packet, sizeof(packet));
 
 						//다른사람들의 상태를 나한테 전달 (바뀐 stage에 있는 사람들걸 가져옴
+						//이후 나도 다른사람들한테 보냄.
 						for (int i = 0; i < Cnt_Player; ++i)
 						{
 							if (c_id == CLIENTS[i]->c_id)continue;
@@ -758,7 +766,22 @@ void GameClient::adjustPlayer(float deltatime)
 							packet.x = other->x;
 							packet.y = other->y;
 							//packet.rank = other->rank;
-							CLIENTS[c_id]->do_send(&packet, sizeof(packet));
+							do_send(&packet, sizeof(packet));
+
+							sc_packet_put_object otherpacket;
+							otherpacket.size = sizeof(sc_packet_put_object);
+							otherpacket.type = SC_PACKET_PUT_OBJECT;
+							otherpacket.id = c_id;
+							otherpacket.dir = dir;
+							otherpacket.h = h;
+							otherpacket.hp = hp;
+							otherpacket.state = state;
+							otherpacket.stealth = stealth;
+							strcpy_s(otherpacket.username, 20, playername);
+							otherpacket.w = w;
+							otherpacket.x = x;
+							otherpacket.y = y;
+							CLIENTS[i]->do_send(&otherpacket, sizeof(otherpacket));
 						}
 
 
