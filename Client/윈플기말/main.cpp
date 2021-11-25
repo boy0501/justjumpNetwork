@@ -143,7 +143,7 @@ void update(float delta_time)
 			}
 		}
 		//=======================================
-		
+
 		player.move(delta_time);
 		adjustPlayer(player, obj, map, ocount, g_hinst);
 		//cout << player.y << endl;
@@ -155,7 +155,7 @@ void update(float delta_time)
 		//두개 다 서버로 옮겨줬기 때문에, 이제 필요가 없다.
 		if (player.getCMD_die())
 		{
-			if(player.WhenPlayerDied==false)
+			if (player.WhenPlayerDied == false)
 				Network::GetNetwork()->mUI.emplace_back(map.mDieUi);
 			player.WhenPlayerDied = true;
 		}
@@ -241,13 +241,34 @@ void update(float delta_time)
 	}
 	if (obj_t >= 27000) obj_t = 0;
 
-	
-	//rankingUI[].drawRanking(mem1dc);
+
+	//for (auto& other : others)
+	//{
+	//	if (player.mPlayername == other.mPlayername) continue;
+	//	if (player.rank < other.rank)
+	//		other.rank = 10;
+	//	if (player.rank > other.rank)
+	//		other.rank = -10;
+	//}
+
+	//for (int i = 0; i < 3; ++i)
+	//{
+	//	for (int j = 0; j < 3; ++j)
+	//	{
+	//		if (others[i].rank > others[j].rank)
+	//			others[i].rank = 10;
+
+	//		if (others[i].rank < others[j].rank)
+	//			others[i].rank = -10;
+	//	}
+	//}
 
 	//바뀐 랭킹이 잘 넘어오는지 확인---
 	cout << player.mPlayername << " : "<<player.rank << "      " <<
 		others[0].mPlayername << " : " << others[0].rank << "        "  
-		<<others[1].mPlayername<<" : "<< others[1].rank << endl;
+		<<others[1].mPlayername<<" : "<< others[1].rank << "        " 
+		<<others[2].mPlayername << " : " << others[2].rank<<endl;
+	
 	//----------------------------
 }
 void render()
