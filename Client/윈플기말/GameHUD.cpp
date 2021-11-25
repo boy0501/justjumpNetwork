@@ -2,6 +2,8 @@
 #include "player.h"
 #include "Camera.h"
 #include"Button.h"
+#include<atlstr.h>
+#include"Network.h"
 GameHUD::GameHUD(const int& cnt,PLAYER& player) 
 	:UI(cnt)
 	,mPlayer(&player)
@@ -25,7 +27,7 @@ void GameHUD::draw(HDC& mem1dc)
 		button->drawByScreenButton(mem1dc);
 	}
 	UI::draw(mem1dc);
-
+	drawRanking(mem1dc);
 }
 
 void GameHUD::drawExit(HDC& mem1dc)
@@ -48,6 +50,28 @@ void GameHUD::drawExit(HDC& mem1dc)
 		}
 
 }
+
+void GameHUD::drawRanking(HDC& mem1dc)
+{
+	int ranking = mPlayer->getRanking();
+	TCHAR playerName[100];
+	//TCHAR otherPlayerName[100];
+	_tcscpy_s(playerName, CA2T(mPlayer->mPlayername.c_str()));
+	//_tcscpy_s(otherPlayerName, CA2T(others[0]->mPlayername.c_str()));
+	TCHAR rankingNum[100];
+	HFONT hfont = CreateFont(14, 0, 0, 0, 0, 0, 0, 0, HANGEUL_CHARSET, 0, 0, 0, VARIABLE_PITCH | FF_ROMAN, TEXT("메이플스토리 bold"));
+	HFONT oldfont = (HFONT)SelectObject(mem1dc, hfont);
+	SetTextColor(mem1dc, RGB(255, 255, 255));
+	TextOut(mem1dc, mCamera->getx() + 50, mCamera->gety() + 50, playerName, lstrlenW(playerName));
+	
+	//TextOut(mem1dc, mCamera->getx() + 50, mCamera->gety() + 60, otherPlayerName, lstrlenW(playerName));
+
+	SelectObject(mem1dc, oldfont);
+	DeleteObject(hfont);
+
+	//UI::drawRanking(mem1dc);
+}
+
 
 
 void GameHUD::update(float deltatime)
@@ -87,6 +111,7 @@ void GameHUD::drawHP(HDC& mem1dc)
 
 	
 }
+
 
 
 

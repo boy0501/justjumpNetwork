@@ -76,7 +76,7 @@ void ChangeLoginToRobby(const int& c_id)
 			packet.x = CLIENTS[my_id]->x;
 			packet.y = CLIENTS[my_id]->y;
 			packet.w = CLIENTS[my_id]->w;
-			//packet.rank = CLIENTS[my_id]->rank;
+			packet.rank = CLIENTS[my_id]->rank;
 			//
 			//packet.bx = CLIENTS[my_id]->bx;
 			
@@ -102,7 +102,7 @@ void ChangeLoginToRobby(const int& c_id)
 		packet.x = c->x;
 		packet.y = c->y;
 		packet.w = c->w;
-		//packet.rank = c->rank;
+		packet.rank = c->rank;
 		CLIENTS[my_id]->do_send(&packet, sizeof(packet));
 	}
 }

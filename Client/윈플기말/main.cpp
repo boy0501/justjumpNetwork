@@ -21,6 +21,7 @@
 #include "../../Protocol/protocol.h"
 #include <string>
 
+
 #pragma comment(lib,"Winmm.lib")
 #pragma comment(lib,"imm32.lib")
 #pragma comment(lib, "ws2_32")
@@ -47,6 +48,7 @@ static MAP map;
 static OBJECT obj[150];
 static BLENDFUNCTION loadbf;
 bool isComposit = false;
+
 
 /*HWND hWnd;*/
 static int nCaretPosx, nCaretPosy;	//폰트 x,y크기 , 캐럿 x y 위치
@@ -239,8 +241,13 @@ void update(float delta_time)
 	}
 	if (obj_t >= 27000) obj_t = 0;
 
+	
+	//rankingUI[].drawRanking(mem1dc);
+
 	//바뀐 랭킹이 잘 넘어오는지 확인---
-	cout << player.rank << endl;
+	cout << player.mPlayername << " : "<<player.rank << "      " <<
+		others[0].mPlayername << " : " << others[0].rank << "        "  
+		<<others[1].mPlayername<<" : "<< others[1].rank << endl;
 	//----------------------------
 }
 void render()
@@ -268,21 +275,20 @@ void render()
 	player.draw(mem1dc, pdc);
 	for (auto& other : others)
 		other.draw(mem1dc, pdc);
-	for (const auto& ui : Network::GetNetwork()->mUI)
+	for (const auto& ui : Network::GetNetwork()->mUI) 
 		ui->draw(mem1dc);
-	//지우지 마세요------
+		
+	
 	if (map.getmapnum() == 13) {
 		for (const auto& ui : Network::GetNetwork()->mUI)
 			ui->drawExit(mem1dc);
 	}
-	//-------------------
+	
 
 	if (map.getblack_t() > 0) map.DrawLoadBK(mem1dc, mem2dc, loadbf);
 
 
 	BitBlt(hdc, 0, 0, 1024, 768, mem1dc, camera.getx(), camera.gety(), SRCCOPY);
-
-
 
 	DeleteObject(mem1dc);
 	ReleaseDC(hWnd, hdc);

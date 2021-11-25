@@ -94,8 +94,6 @@ void MAP :: DrawBK(HDC& mem1dc, HDC& mem2dc, RECT& rectview)
 
 		
 	}
-
-
 	DeleteObject(mem2dc);
 }
 

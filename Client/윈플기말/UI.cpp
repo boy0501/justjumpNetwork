@@ -101,6 +101,14 @@ void UI::update(float deltatime)
 {
 
 }
+void UI::drawRanking(HDC& mem1dc)
+{
+	for (const auto& txt : mText)
+	{
+		txt->draw(mem1dc);
+	}
+
+}
 void UI::draw(HDC& mem1dc)
 {
 	for (const auto& txt : mText)
