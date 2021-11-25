@@ -127,6 +127,9 @@ void update(float delta_time)
 			if (obj_t % 10 == 0)
 				player.BitMove();
 		}
+		if (player.state == 5) {
+			player.bx = 0;
+		}
 
 		for (auto& o : others) {
 			if (o.state == 4) {
@@ -139,9 +142,12 @@ void update(float delta_time)
 				if (obj_t % 10 == 0)
 					o.BitMove();
 			}
+			if (o.state == 5) {
+				o.bx = 0;
+			}
 		}
 		//=======================================
-		
+		cout << player.state << endl;
 		player.move(delta_time);
 		adjustPlayer(player, obj, map, ocount, g_hinst);
 		//cout << player.y << endl;
@@ -240,7 +246,7 @@ void update(float delta_time)
 	if (obj_t >= 27000) obj_t = 0;
 
 	//바뀐 랭킹이 잘 넘어오는지 확인---
-	cout << player.rank << endl;
+	//cout << player.rank << endl;
 	//----------------------------
 }
 void render()
