@@ -31,6 +31,7 @@ void UI::LoadUiBitmap(HINSTANCE& g_hinst,std::string name,const int& x,const int
 	if (hbits.size() >= mUiCount)
 	{
 		std::cout << "허용 ui카운트 보다 많은 ui를 삽입하려고 시도함" << std::endl;
+		std::cout << "make_shared<class>(cnt) 에서 cnt의 인자가 잘못 설정되어있는 경우. " << std::endl;
 		return;
 	}
 	auto tmp = std::wstring(name.begin(), name.end());
@@ -44,6 +45,7 @@ void UI::LoadUiBitmap(HINSTANCE& g_hinst, std::string name, const int& x, const 
 	if (hbits.size() > mUiCount)
 	{
 		std::cout << "허용 ui카운트 보다 많은 ui를 삽입하려고 시도함" << std::endl;
+		std::cout << "make_shared<class>(cnt) 에서 cnt의 인자가 잘못 설정되어있는 경우. " << std::endl;
 		return;
 	}
 	auto tmp = std::wstring(name.begin(), name.end());

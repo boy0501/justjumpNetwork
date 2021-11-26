@@ -599,7 +599,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		ui->addText("127.0.0.1", "ip", L"메이플스토리 bold", RGB(255, 108, 168), 18, 380, 380, false, 0, 0, camera);
 		ui->addButton([hwnd, ui]() {
 			//
-			if (-1 == Network::GetNetwork()->ConnectServer(ui->FindTextByNameTag("ip")->getTextForString().c_str()))
+			if (CONN_FAIL == Network::GetNetwork()->ConnectServer(ui->FindTextByNameTag("ip")->getTextForString().c_str()))
 			{
 				HideCaret(hwnd);
 				auto okui = make_shared<OkHUD>(1);
@@ -754,40 +754,9 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 	case WM_LBUTTONDOWN:
 		SetCursor(LoadCursorFromFile(TEXT("cursor/cursor4.cur")));
 		Network::GetNetwork()->mUI.back()->processInput(LOWORD(lParam), HIWORD(lParam), WM_LBUTTONDOWN);
-		
-		/*if (map.getmapnum() == LOGINBG)
-		{
-			if (LOWORD(lParam) > 365 && LOWORD(lParam) < 565)
-			{
-				if (HIWORD(lParam) > 320 && HIWORD(lParam) < 360)
-				{
-					map.LoginInputFlag = false;
-					Network::GetNetwork()->mUI.back()->FindTextByNameTag("id")->UpdateFontSize(hwnd);
-					nCaretPosx = 380 + Network::GetNetwork()->mUI.back()->FindTextByNameTag("id")->getFontLen().cx;
-					nCaretPosy = 330;
-					SetCaretPos(nCaretPosx, nCaretPosy);
-				}
-				if (HIWORD(lParam) > 360 && HIWORD(lParam) < 400)
-				{
-
-					map.LoginInputFlag = true;
-					Network::GetNetwork()->mUI.back()->FindTextByNameTag("ip")->UpdateFontSize(hwnd);
-					nCaretPosx = 380 + Network::GetNetwork()->mUI.back()->FindTextByNameTag("ip")->getFontLen().cx;
-					nCaretPosy = 380;
-					SetCaretPos(nCaretPosx, nCaretPosy);
-				}
-			}
-
-			break;
-		}*/
-		
-		//std::cout << LOWORD(lParam) << endl;
-		//std::cout << HIWORD(lParam) + camera.gety() << endl;
 		break;
-	case WM_LBUTTONUP:
-		
-		Network::GetNetwork()->mUI.back()->processInput(LOWORD(lParam), HIWORD(lParam), WM_LBUTTONUP);
-		
+	case WM_LBUTTONUP:		
+		Network::GetNetwork()->mUI.back()->processInput(LOWORD(lParam), HIWORD(lParam), WM_LBUTTONUP);		
 		break;
 	case WM_CHAR:
 		if (map.getmapnum() == LOGINBG)
