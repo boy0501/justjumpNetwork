@@ -58,6 +58,7 @@ public:
 	int net_bx;
 
 	int countdown;
+	bool cntdown_controller = false;
 	int init_x = 340;
 
 	int rank;
