@@ -820,10 +820,9 @@ void PLAYER::move(float deltatime)
 	// S = V0 * t + a* (t^2) / 2 등가속도운동 공식을 적용하여 클라 1프레임에 걸린 시간 후의 위치를 계산하여
 	// 서버에서 패킷을 안보내주더라도 다음위치를 예상하여 보정해준다.
 	// x축으로 움직일때는 가속도가 0이다. 등속도운동임.
+
+	//임계영역 자리 
 	x += (int)((velocityX * deltatime) + ((0 * deltatime * deltatime) / 2));
-	//std::cout << x << std::endl;
-
-
 	if (state == 2)
 	{
 		//우리 게임의 물리엔진은 점프뛸때와 위에서 떨어질때의 가속도가 달라서 이건 구분해줘야함 .
@@ -841,6 +840,7 @@ void PLAYER::move(float deltatime)
 		//가속도 = 0 (떨어질땐 등속도운동)
 		y += (int)((velocityY * deltatime) + ((0 * deltatime * deltatime) / 2));
 	}
+	//임계영역 자리 
 	//std::cout << y << std::endl;
 }
 

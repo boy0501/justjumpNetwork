@@ -151,7 +151,7 @@ void update(float delta_time)
 		//=======================================
 		cout << player.state << endl;
 		player.move(delta_time);
-		adjustPlayer(player, obj, map, ocount, g_hinst);
+		//adjustPlayer(player, obj, map, ocount, g_hinst);
 		//cout << player.y << endl;
 		for (auto& other : others)
 		{
@@ -183,8 +183,8 @@ void update(float delta_time)
 	}
 
 	player.selectBit();
-	player.stealthtime();
-	player.spike_hurttime();
+	//player.stealthtime();
+	//player.spike_hurttime();
 	for (auto& o : others)
 		o.selectBit();
 
