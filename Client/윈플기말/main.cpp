@@ -20,7 +20,7 @@
 #include "Network.h"
 #include "../../Protocol/protocol.h"
 #include <string>
-
+#include<atlstr.h>
 
 #pragma comment(lib,"Winmm.lib")
 #pragma comment(lib,"imm32.lib")
@@ -264,11 +264,11 @@ void update(float delta_time)
 	//}
 
 	//바뀐 랭킹이 잘 넘어오는지 확인---
-	cout << player.mPlayername << " : "<<player.rank << "      " <<
-		others[0].mPlayername << " : " << others[0].rank << "        "  
-		<<others[1].mPlayername<<" : "<< others[1].rank << "        " 
-		<<others[2].mPlayername << " : " << others[2].rank<<endl;
-	
+	//cout << player.mPlayername << " : "<<player.rank << "      " <<
+	//	others[0].mPlayername << " : " << others[0].rank << "        "  
+	//	<<others[1].mPlayername<<" : "<< others[1].rank << "        " 
+	//	<<others[2].mPlayername << " : " << others[2].rank<<endl;
+	//
 	//----------------------------
 }
 void render()
@@ -640,11 +640,26 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 
 			//gameui는 로그인을 했을때 UserID가 필요하므로 로그인 버튼이 눌렸을 때 처리한다.
 			//나중 로그인패킷까지 온다고 가정했을때, 로그인패킷 ok시에 ui를 만들어도 좋다.
-			auto gameui = make_shared<GameHUD>(1, player);
+			auto gameui = make_shared<GameHUD>(1, player,others);
 			gameui->LoadUiBitmap(g_hinst, "img/NoNameUi.bmp", 400, 700, 199, 65, RGB(0, 255, 0), camera);
-			gameui->addText(player.mPlayerwname, "NickName", L"메이플스토리 light", RGB(255, 255, 255), 14, 475, 705, true, 100, 65, camera);
+			gameui->addText(player.mPlayerwname, "NickName", L"메이플스토리 bold", RGB(255, 255, 255), 14, 475, 705, true, 100, 65, camera);
 			gameui->LoadHpUiBitmap(g_hinst, "img/Ui_HP.bmp", 421, 728, 100, 65, RGB(0, 0, 255), camera);
-			map.mGameUi = gameui;
+			//gameui->addText(player.mPlayerwname, "NickName", L"메이플스토리 bold", RGB(255, 255, 255), 14, 50, 10, true, 500, 325, camera);
+
+			//for (int i = 0; i < 3; ++i)
+			//{
+			//	if (others[i].player_cid != player.player_cid)
+			//	{
+			//		//ranking = mOthers[i].getRanking();
+			//		
+			//		if (others[i].player_cid)
+			//			gameui->addText(others[i].mPlayerwname, "NickName", L"메이플스토리 bold", RGB(255, 255, 255), 14, 50, 30, true, 500, 325, camera);
+			//		if (!others[i].player_cid)
+			//			gameui->addText(others[i].mPlayerwname, "NickName", L"메이플스토리 bold", RGB(255, 255, 255), 14, 50, 50, true, 500, 325, camera);
+			//	}
+			//}
+				map.mGameUi = gameui;
+			//map.mGameUi = othergameui;
 			//gameUi설정 끝 
 
 			

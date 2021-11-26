@@ -4,9 +4,10 @@
 #include"Button.h"
 #include<atlstr.h>
 #include"Network.h"
-GameHUD::GameHUD(const int& cnt,PLAYER& player) 
+GameHUD::GameHUD(const int& cnt,PLAYER& player, PLAYER* others) 
 	:UI(cnt)
 	,mPlayer(&player)
+	,mOthers(others)
 {
 	//mapNum = 0;
 }
@@ -14,6 +15,8 @@ GameHUD::GameHUD(const int& cnt,PLAYER& player)
 GameHUD::~GameHUD()
 {
 	if (mHpBitmap) DeleteObject(mHpBitmap);
+
+	
 }
 
 
@@ -21,13 +24,29 @@ GameHUD::~GameHUD()
 void GameHUD::draw(HDC& mem1dc)
 {
 	drawByUserUi(mem1dc );
+	
 	drawHP(mem1dc);
 	for (const auto& button : mButtons)
 	{
 		button->drawByScreenButton(mem1dc);
 	}
+
+	drawMyRanking(mem1dc);
+	for (int i = 0; i < 3; ++i)
+	{
+		if (mOthers[i].player_cid != mPlayer->player_cid)
+		{
+
+			drawPlayer1Ranking(mem1dc);
+		}
+		if(mOthers[i].player_cid == mPlayer->player_cid)
+		{
+			//player
+		}
+	}
+			
 	UI::draw(mem1dc);
-	drawRanking(mem1dc);
+	
 }
 
 void GameHUD::drawExit(HDC& mem1dc)
@@ -48,36 +67,70 @@ void GameHUD::drawExit(HDC& mem1dc)
 			, NULL, "img/Exit", 800,500, 138, 82, RGB(255, 0, 0));
 			try_once = true;
 		}
-
-}
-
-void GameHUD::drawRanking(HDC& mem1dc)
-{
-	int ranking = mPlayer->getRanking();
-	TCHAR playerName[100];
-	//TCHAR otherPlayerName[100];
-	_tcscpy_s(playerName, CA2T(mPlayer->mPlayername.c_str()));
-	//_tcscpy_s(otherPlayerName, CA2T(others[0]->mPlayername.c_str()));
-	TCHAR rankingNum[100];
-	HFONT hfont = CreateFont(14, 0, 0, 0, 0, 0, 0, 0, HANGEUL_CHARSET, 0, 0, 0, VARIABLE_PITCH | FF_ROMAN, TEXT("메이플스토리 bold"));
-	HFONT oldfont = (HFONT)SelectObject(mem1dc, hfont);
-	SetTextColor(mem1dc, RGB(255, 255, 255));
-	TextOut(mem1dc, mCamera->getx() + 50, mCamera->gety() + 50, playerName, lstrlenW(playerName));
-	
-	//TextOut(mem1dc, mCamera->getx() + 50, mCamera->gety() + 60, otherPlayerName, lstrlenW(playerName));
-
-	SelectObject(mem1dc, oldfont);
-	DeleteObject(hfont);
-
-	//UI::drawRanking(mem1dc);
 }
 
 
 
 void GameHUD::update(float deltatime)
 {
-	
+
 }
+
+
+void GameHUD::drawMyRanking(HDC& mem1dc)
+{
+	//int ranking = mPlayer->getRanking();
+
+	TCHAR playerName[100];
+
+	HFONT hfont = CreateFont(14, 0, 0, 0, 0, 0, 0, 0, HANGEUL_CHARSET, 0, 0, 0, VARIABLE_PITCH | FF_ROMAN, TEXT("메이플스토리 bold"));
+	HFONT oldfont = (HFONT)SelectObject(mem1dc, hfont);
+	SetTextColor(mem1dc, RGB(255, 255, 255));
+
+	_tcscpy_s(playerName, CA2T(mPlayer->mPlayername.c_str()));
+	TextOut(mem1dc, mCamera->getx() + 50, mCamera->gety() + 20, playerName, lstrlenW(playerName));
+
+	
+	SelectObject(mem1dc, oldfont);
+	DeleteObject(hfont);
+}
+
+void GameHUD::drawPlayer1Ranking(HDC& mem1dc)
+{
+	//int ranking;
+	TCHAR otherPlayerName[100];
+
+	HFONT hfont = CreateFont(14, 0, 0, 0, 0, 0, 0, 0, HANGEUL_CHARSET, 0, 0, 0, VARIABLE_PITCH | FF_ROMAN, TEXT("메이플스토리 bold"));
+	HFONT oldfont = (HFONT)SelectObject(mem1dc, hfont);
+	SetTextColor(mem1dc, RGB(255, 255, 255));
+
+	
+	for (int i = 0; i < 3; ++i)
+	{
+		if (mOthers[i].player_cid != mPlayer->player_cid)
+		{
+			//ranking = mOthers[i].getRanking();
+			_tcscpy_s(otherPlayerName, CA2T(mOthers[i].mPlayername.c_str()));
+			if (mOthers[i].player_cid)
+				TextOut(mem1dc, mCamera->getx() + 50, mCamera->gety() + 70, otherPlayerName, lstrlenW(otherPlayerName));
+			if (!mOthers[i].player_cid)
+				TextOut(mem1dc, mCamera->getx() + 50, mCamera->gety() + 90, otherPlayerName, lstrlenW(otherPlayerName));
+			
+		}
+
+
+
+	}
+	
+
+	
+
+	SelectObject(mem1dc, oldfont);
+	DeleteObject(hfont);
+}
+
+
+
 
 void GameHUD::drawHP(HDC& mem1dc)
 {

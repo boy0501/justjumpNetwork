@@ -62,4 +62,5 @@ protected:
 public:
 	std::shared_ptr<class Text> FindTextByNameTag(std::string NameTag);
 	UIState getState() const { return mState; }
+
 };
