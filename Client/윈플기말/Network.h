@@ -6,7 +6,7 @@
 //#include "object.h"
 #include "Camera.h"
 //#include "Map.h"
-
+#define CONN_FAIL -1
 extern HDC mem1dc, pdc, hdc;
 extern HWND hWnd;
 extern RECT rectview;

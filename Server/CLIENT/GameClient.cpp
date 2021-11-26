@@ -1,5 +1,6 @@
 #include <iostream>
 #include <array>
+#include <algorithm>
 
 #include "../Network.h"
 #include "../Map.h"
@@ -29,12 +30,10 @@ void GameClient::update(float delta_time)
 		elapsedtime = 0;
 		//std::cout << "게임클라" << std::endl;
 	}
-
 	move(delta_time);
 	adjustPlayer(delta_time);
 	spike_hurttime(delta_time);
-	stealthtime();
-
+	stealthtime(delta_time);
 	int objNum = 0;
 	//for (auto& obj : mMap->mObjects[mStageNum])
 	//{
@@ -259,11 +258,11 @@ void GameClient::move(float deltatime)
 	else if (state == 6)
 	{
 		//std::cout << "state6" << std::endl;
-		ROWSPEED *= 3;
-		stealth = 100;
-		savey = y;
-		COMMAND_hurt = true;
-		state = 2;
+		//ROWSPEED *= 3;
+		//stealth = 100;
+		//COMMAND_hurt = true;
+		//savey = y;
+		//state = 2;
 
 	}
 	else if (state == 7)
@@ -485,7 +484,12 @@ void GameClient::adjustPlayer(float deltatime)
 						if (stealth == 0)	//무적이 아니라면
 						{
 							COMMAND_move = dir;//보고있는방향으로 앞으로 나가게, 떨어졌는데 가만히있진 않지요
-							state = 6;//피격으로감
+							//ROWSPEED *= 3;
+							stealth = 100;
+							COMMAND_hurt = true;
+							savey = y;
+							state = 2;
+							//state = 6;//피격으로감
 							hurt();
 							return;
 						}
@@ -555,7 +559,12 @@ void GameClient::adjustPlayer(float deltatime)
 							stealth = 100;	//무적시간 넣어줌 (이동하는로직은 state==7 일때 알아서 다뤄줌
 						}
 						else {
-							state = 6;		//피격으로감
+							//ROWSPEED *= 3;
+							stealth = 100;
+							COMMAND_hurt = true;
+							savey = y;
+							state = 2;
+							//state = 6;		//피격으로감
 						}
 						hurt();
 					}
@@ -625,7 +634,12 @@ void GameClient::adjustPlayer(float deltatime)
 							}
 							else {
 								COMMAND_move = 1;//무조건 왼쪽임
-								state = 6;
+								//ROWSPEED *= 3;
+								stealth = 100;
+								COMMAND_hurt = true;
+								savey = y;
+								state = 2;
+								//state = 6;
 							}
 							hurt();
 						}
@@ -668,7 +682,13 @@ void GameClient::adjustPlayer(float deltatime)
 						}
 						else {
 							COMMAND_move = dir;
-							state = 6;		//피격으로감
+							//
+							//ROWSPEED *= 3;
+							stealth = 100;
+							COMMAND_hurt = true;
+							savey = y;
+							state = 2;
+							//state = 6;		//피격으로감
 						}
 						hurt();
 					}
@@ -702,7 +722,13 @@ void GameClient::adjustPlayer(float deltatime)
 						}
 						else {
 							COMMAND_move = dir;
-							state = 6;		//피격으로감
+							//
+							//ROWSPEED *= 3;
+							stealth = 100;
+							COMMAND_hurt = true;
+							savey = y;
+							state = 2;
+							//state = 6;		//피격으로감
 						}
 						hurt();
 					}
@@ -903,16 +929,20 @@ void GameClient::spike_hurttime(float deltatime)
 	}
 }
 
-void GameClient::stealthtime()
+void GameClient::stealthtime(float deltatime)
 {
 	if (COMMAND_die == 0)	//죽으면 무적안풀림
 		if (stealth > 0)
 		{
-			stealth--;
+			//stealth -= (int)(200 * deltatime);
+			stealth = max(stealth - (int)(100 * deltatime), 0);
+			std::cout << stealth << std::endl;
 			if (stealth == 0)
 				COMMAND_hurt = 0;
 		}
 	if (jumpignore > 0)
-		jumpignore--;
+	{
+		jumpignore = max(jumpignore - (int)(100 * deltatime), 0);
+	}
 }
 
