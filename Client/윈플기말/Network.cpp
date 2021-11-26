@@ -58,7 +58,7 @@ Network* Network::GetNetwork()
 }
 
 
-void Network::ConnectServer(const char* server_ip)
+int Network::ConnectServer(const char* server_ip)
 {
 	ZeroMemory(&server_addr, sizeof(server_addr));
 	server_addr.sin_family = AF_INET;
@@ -68,7 +68,8 @@ void Network::ConnectServer(const char* server_ip)
 	if (SOCKET_ERROR == ret)
 	{
 		std::cout << "연결오류" << std::endl;
-		exit(0);
+		return -1;
+		//exit(0);
 		
 	}
 }
