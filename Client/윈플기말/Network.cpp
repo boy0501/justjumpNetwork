@@ -222,7 +222,9 @@ void Network::ProcessPacket(unsigned char* p)
 		sc_packet_robby* packet = reinterpret_cast<sc_packet_robby*>(p);
 		
 		if (countdown != packet->countdown)
-			init_x += 20;
+			cntdown_controller = true;
+
+			//init_x += 20;
 		countdown = packet->countdown;
 
 		//std::cout << packet->countdown << std::endl;

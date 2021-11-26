@@ -308,6 +308,7 @@ void ProcessingLoop()
 			//cout << "FPS:" << Fps << endl;
 			Fps = 0;
 			elapsedtime = 0;
+
 		}
 		HideCaret(hWnd);
 		update(deltatime);
@@ -509,22 +510,22 @@ void send_robby_in_packet()
 
 void robby_waiting()
 {
-	static bool only_once = false;
+	//static bool only_once = false;
+	//map.mStartui->FindTextByNameTag("ready")->getText();
 
-	if (only_once == false) {
-		map.mStartui->addText("Ready", "countdown", L"메이플스토리 bold", RGB(255, 255, 0), 18, 300, 200, false, 0, 0, camera);
+	/*if (only_once == false) {
+
 		only_once = true;
-	}
-	if (Network::GetNetwork()->countdown <= 10) {
-		map.mStartui->addText(to_string(Network::GetNetwork()->countdown), "countdown", L"메이플스토리 bold", RGB(255, 255, 255), 18, Network::GetNetwork()->init_x, 200, false, 0, 0, camera);
-	}
-	
-	//cout << Network::GetNetwork()->countdown << endl;
-
-	/*if (Network::GetNetwork()->countdown == 1)
-	{
-		bRobby_full = true;
 	}*/
+	/*if (Network::GetNetwork()->countdown <= 10) {
+		map.mStartui->addText(to_string(Network::GetNetwork()->countdown), "countdown", L"메이플스토리 bold", RGB(255, 255, 255), 18, Network::GetNetwork()->init_x, 200, false, 0, 0, camera);
+	}*/
+	if (Network::GetNetwork()->countdown <= 10 && Network::GetNetwork()->cntdown_controller == true) {
+		map.mStartui->FindTextByNameTag("countdown")->pushString(to_wstring(Network::GetNetwork()->countdown));
+		Network::GetNetwork()->cntdown_controller = false;
+	}
+
+
 }
 
 
@@ -632,6 +633,12 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		}, g_hinst, "img/LoginButton", 365, 440, 278, 53, RGB(255, 0, 0));
 		
 		auto startui = make_shared<StartHUD>(0);
+
+		//+
+		startui->addText(" ", "countdown", L"메이플스토리 bold", RGB(255, 255, 255), 18, 360, 200, false, 0, 0, camera);
+		startui->addText("Ready", "ready", L"메이플스토리 bold", RGB(255, 255, 0), 18, 300, 200, false, 0, 0, camera);
+
+
 		//hbit = (HBITMAP)LoadImage(g_hinst, TEXT("img/NoNameUi.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION); //상대경로로 변경
 		startui->addButton([startui]() {
 			//Network::GetNetwork()->test();

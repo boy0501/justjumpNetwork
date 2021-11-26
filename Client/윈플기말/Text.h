@@ -16,6 +16,7 @@ public:
 	void UpdateFontSize(HWND& hwnd);
 	void pushByteChar(const char& c) { mText.pop_back(); mText += c; }
 	void pushChar(const char& c) { mText += c; }
+	void pushString(std::wstring s) { mText += s + L"   ";}
 	void pushwChar(const wchar_t& c) { mText += c; }
 	void changewChar(const wchar_t& c) { mText[mText.size()-1] = c; }
 	void popChar() { mText.pop_back(); }
