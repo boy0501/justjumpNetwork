@@ -14,6 +14,7 @@
 #include "LoginHUD.h"
 #include "GameHUD.h"
 #include "StartHUD.h"
+#include "OkHUD.h"
 #include "DieHUD.h"
 #include "Button.h"
 #include "Text.h"
@@ -77,6 +78,7 @@ DWORD WINAPI ClientRecvThread(LPVOID arg)
 		Network::GetNetwork()->C_Recv();
 	}
 }
+
 bool IsKeyPressed(char key)
 {
 	return keyboard[key];
@@ -341,20 +343,28 @@ int GetText(HWND hWnd, UINT msg, WPARAM wparam, LPARAM lparam)
 				{
 					if (Network::GetNetwork()->mUI.back()->FindTextByNameTag("id")->getTextLen() < 10)
 					{
-						Network::GetNetwork()->mUI.back()->FindTextByNameTag("id")->changewChar(*wszComp);
+						if (Network::GetNetwork()->mUI.back()->FindTextByNameTag("id")->getText().size() == 0)
+							Network::GetNetwork()->mUI.back()->FindTextByNameTag("id")->pushwChar(*wszComp);
+						else
+							Network::GetNetwork()->mUI.back()->FindTextByNameTag("id")->changewChar(*wszComp);
 						isComposit = false;
 					}
 					Network::GetNetwork()->mUI.back()->FindTextByNameTag("id")->UpdateFontSize(hWnd);
 					nCaretPosx = 380 + Network::GetNetwork()->mUI.back()->FindTextByNameTag("id")->getFontLen().cx;
+					nCaretPosy = 330;
 				}
 				else {
-					if (Network::GetNetwork()->mUI.back()->FindTextByNameTag("pass")->getTextLen() < 10)
+					if (Network::GetNetwork()->mUI.back()->FindTextByNameTag("ip")->getTextLen() < 16)
 					{
-						Network::GetNetwork()->mUI.back()->FindTextByNameTag("pass")->changewChar(*wszComp);
+						if (Network::GetNetwork()->mUI.back()->FindTextByNameTag("ip")->getText().size() == 0)
+							Network::GetNetwork()->mUI.back()->FindTextByNameTag("ip")->pushwChar(*wszComp);
+						else
+							Network::GetNetwork()->mUI.back()->FindTextByNameTag("ip")->changewChar(*wszComp);
 						isComposit = false;
 					}
-					Network::GetNetwork()->mUI.back()->FindTextByNameTag("pass")->UpdateFontSize(hWnd);
-					nCaretPosx = 380 + Network::GetNetwork()->mUI.back()->FindTextByNameTag("pass")->getFontLen().cx;
+					Network::GetNetwork()->mUI.back()->FindTextByNameTag("ip")->UpdateFontSize(hWnd);
+					nCaretPosx = 380 + Network::GetNetwork()->mUI.back()->FindTextByNameTag("ip")->getFontLen().cx;
+					nCaretPosy = 380;
 				}
 			}
 
@@ -381,19 +391,21 @@ int GetText(HWND hWnd, UINT msg, WPARAM wparam, LPARAM lparam)
 				}
 				Network::GetNetwork()->mUI.back()->FindTextByNameTag("id")->UpdateFontSize(hWnd);
 				nCaretPosx = 380 + Network::GetNetwork()->mUI.back()->FindTextByNameTag("id")->getFontLen().cx;
+				nCaretPosy = 330;
 			}
 			else {
-				if (Network::GetNetwork()->mUI.back()->FindTextByNameTag("pass")->getTextLen() < 10)
+				if (Network::GetNetwork()->mUI.back()->FindTextByNameTag("ip")->getTextLen() < 15)
 				{
 					if (!isComposit)
 					{
-						Network::GetNetwork()->mUI.back()->FindTextByNameTag("pass")->pushwChar(NULL);
+						Network::GetNetwork()->mUI.back()->FindTextByNameTag("ip")->pushwChar(NULL);
 						isComposit = true;
 					}
-					Network::GetNetwork()->mUI.back()->FindTextByNameTag("pass")->changewChar(*wsz1Comp);
+					Network::GetNetwork()->mUI.back()->FindTextByNameTag("ip")->changewChar(*wsz1Comp);
 				}
-				Network::GetNetwork()->mUI.back()->FindTextByNameTag("pass")->UpdateFontSize(hWnd);
-				nCaretPosx = 380 + Network::GetNetwork()->mUI.back()->FindTextByNameTag("pass")->getFontLen().cx;
+				Network::GetNetwork()->mUI.back()->FindTextByNameTag("ip")->UpdateFontSize(hWnd);
+				nCaretPosx = 380 + Network::GetNetwork()->mUI.back()->FindTextByNameTag("ip")->getFontLen().cx;
+				nCaretPosy = 380;
 			}
 
 
@@ -580,33 +592,42 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		Network::GetNetwork()->mObj = obj;
 		Network::GetNetwork()->mCamera = &camera;
 		Network::GetNetwork()->mOthers = others;
-		Network::GetNetwork()->ConnectServer("127.0.0.1");
 
-		HANDLE hThread = CreateThread(NULL, 0, ClientRecvThread, (LPVOID)0, 0, NULL);
-		if (hThread == NULL)
-		{
-			cerr << "비 정상적인 스레드 생성" << endl;
-			exit(-1);
-		}
-
-		auto ui = make_shared<LoginHUD>(1);
+		auto ui = make_shared<LoginHUD>(1,&map);
 		ui->LoadUiBitmap(g_hinst, "img/idpassword.bmp", 340, 250, 332, 282, RGB(255, 0, 0));
 		ui->addText("kk", "id", L"메이플스토리 bold", RGB(255, 108, 168), 18, 380, 330, false, 0, 0, camera);
-		ui->addText("", "pass", L"메이플스토리 bold", RGB(255, 108, 168), 18, 380, 380, false, 0, 0, camera);
+		ui->addText("127.0.0.1", "ip", L"메이플스토리 bold", RGB(255, 108, 168), 18, 380, 380, false, 0, 0, camera);
 		ui->addButton([hwnd, ui]() {
-
 			//
+			if (-1 == Network::GetNetwork()->ConnectServer(ui->FindTextByNameTag("ip")->getTextForString().c_str()))
+			{
+				HideCaret(hwnd);
+				auto okui = make_shared<OkHUD>(1);
+				okui->LoadUiBitmap(g_hinst, "img/NoticeError.bmp", 375, 300, 249, 142, RGB(255, 0, 0));
+				okui->addButton([hwnd, okui]() {
+					okui->closeUI();
+					ShowCaret(hwnd);
+				}, g_hinst, "img/LoginOkButton", 475, 400, 50, 23, RGB(255, 0, 0));
+				Network::GetNetwork()->mUI.emplace_back(okui);
+				return;
+			}
+
 			player.mPlayername = ui->FindTextByNameTag("id")->getTextForString();
 			player.mPlayerwname = ui->FindTextByNameTag("id")->getText();
+
+			HANDLE hThread = CreateThread(NULL, 0, ClientRecvThread, (LPVOID)0, 0, NULL);
+			if (hThread == NULL)
+			{
+				cerr << "비 정상적인 스레드 생성" << endl;
+				exit(-1);
+			}
+
 			cs_packet_login packet;
 			strcpy_s(packet.username, 20, ui->FindTextByNameTag("id")->getTextForString().c_str());
 			packet.size = sizeof(cs_packet_login);
 			packet.type = CS_PACKET_LOGIN;
 			strcpy_s(packet.username, 20, player.mPlayername.c_str());
 			Network::GetNetwork()->C_Send(&packet, sizeof(packet));
-
-
-
 			//로비 카운트 start===================================================
 			send_robby_in_packet();
 
@@ -671,15 +692,16 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 
 		auto dieui = make_shared<DieHUD>(1, player, camera);
 
+		dieui->LoadUiBitmap(g_hinst, "img/DieNotice.bmp", 380, 240, 260, 130, RGB(255, 0, 0));
 		dieui->addButton([dieui]() {
 			player.initPos();
 			player.sethp(100);
 			player.WhenPlayerDied = false;
 			dieui->closeUI();
-		}, g_hinst, "img/notice", 380, 240, 260, 130, RGB(255, 0, 0));
+		}, g_hinst, "img/DieOkButton", 583, 340, 40, 16, RGB(255, 0, 0));
 		map.mDieUi = dieui;
 
-		Network::GetNetwork()->mUI.emplace_back(ui);
+		Network::GetNetwork()->mUI.emplace_back(ui)->FindTextByNameTag("id");
 		player.setBit(g_hinst);
 		for (auto& other : others)
 			other.setBit(g_hinst);
@@ -733,7 +755,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		SetCursor(LoadCursorFromFile(TEXT("cursor/cursor4.cur")));
 		Network::GetNetwork()->mUI.back()->processInput(LOWORD(lParam), HIWORD(lParam), WM_LBUTTONDOWN);
 		
-		if (map.getmapnum() == LOGINBG)
+		/*if (map.getmapnum() == LOGINBG)
 		{
 			if (LOWORD(lParam) > 365 && LOWORD(lParam) < 565)
 			{
@@ -749,15 +771,15 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 				{
 
 					map.LoginInputFlag = true;
-					Network::GetNetwork()->mUI.back()->FindTextByNameTag("pass")->UpdateFontSize(hwnd);
-					nCaretPosx = 380 + Network::GetNetwork()->mUI.back()->FindTextByNameTag("pass")->getFontLen().cx;
+					Network::GetNetwork()->mUI.back()->FindTextByNameTag("ip")->UpdateFontSize(hwnd);
+					nCaretPosx = 380 + Network::GetNetwork()->mUI.back()->FindTextByNameTag("ip")->getFontLen().cx;
 					nCaretPosy = 380;
 					SetCaretPos(nCaretPosx, nCaretPosy);
 				}
 			}
 
 			break;
-		}
+		}*/
 		
 		//std::cout << LOWORD(lParam) << endl;
 		//std::cout << HIWORD(lParam) + camera.gety() << endl;
@@ -783,13 +805,15 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 						Network::GetNetwork()->mUI.back()->FindTextByNameTag("id")->popChar();
 					Network::GetNetwork()->mUI.back()->FindTextByNameTag("id")->UpdateFontSize(hwnd);
 					nCaretPosx = 380 + Network::GetNetwork()->mUI.back()->FindTextByNameTag("id")->getFontLen().cx;
+					nCaretPosy = 330;
 				}
 				else
 				{
-					if (Network::GetNetwork()->mUI.back()->FindTextByNameTag("pass")->getTextLen() > 0)
-						Network::GetNetwork()->mUI.back()->FindTextByNameTag("pass")->popChar();
-					Network::GetNetwork()->mUI.back()->FindTextByNameTag("pass")->UpdateFontSize(hwnd);
-					nCaretPosx = 380 + Network::GetNetwork()->mUI.back()->FindTextByNameTag("pass")->getFontLen().cx;
+					if (Network::GetNetwork()->mUI.back()->FindTextByNameTag("ip")->getTextLen() > 0)
+						Network::GetNetwork()->mUI.back()->FindTextByNameTag("ip")->popChar();
+					Network::GetNetwork()->mUI.back()->FindTextByNameTag("ip")->UpdateFontSize(hwnd);
+					nCaretPosx = 380 + Network::GetNetwork()->mUI.back()->FindTextByNameTag("ip")->getFontLen().cx;
+					nCaretPosy = 380;
 				}
 				break;
 			case 0x09:
@@ -804,12 +828,14 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 						Network::GetNetwork()->mUI.back()->FindTextByNameTag("id")->pushChar(wParam);
 					Network::GetNetwork()->mUI.back()->FindTextByNameTag("id")->UpdateFontSize(hwnd);
 					nCaretPosx = 380 + Network::GetNetwork()->mUI.back()->FindTextByNameTag("id")->getFontLen().cx;
+					nCaretPosy = 330;
 				}
 				else {
-					if (Network::GetNetwork()->mUI.back()->FindTextByNameTag("pass")->getTextLen() < 10)
-						Network::GetNetwork()->mUI.back()->FindTextByNameTag("pass")->pushChar(wParam);
-					Network::GetNetwork()->mUI.back()->FindTextByNameTag("pass")->UpdateFontSize(hwnd);
-					nCaretPosx = 380 + Network::GetNetwork()->mUI.back()->FindTextByNameTag("pass")->getFontLen().cx;
+					if (Network::GetNetwork()->mUI.back()->FindTextByNameTag("ip")->getTextLen() < 15)
+						Network::GetNetwork()->mUI.back()->FindTextByNameTag("ip")->pushChar(wParam);
+					Network::GetNetwork()->mUI.back()->FindTextByNameTag("ip")->UpdateFontSize(hwnd);
+					nCaretPosx = 380 + Network::GetNetwork()->mUI.back()->FindTextByNameTag("ip")->getFontLen().cx;
+					nCaretPosy = 380;
 				}
 				isComposit = false;
 				break;

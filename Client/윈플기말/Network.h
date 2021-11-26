@@ -37,7 +37,7 @@ public:
 	int prev_size;
 	int* mOcount;
 	class OBJECT* mObj;
-	void ConnectServer(const char* server_ip);
+	int ConnectServer(const char* server_ip);
 	void C_Send(void* packet, int bytes);
 	int C_Recv();
 	void ProcessPacket(unsigned char* p);

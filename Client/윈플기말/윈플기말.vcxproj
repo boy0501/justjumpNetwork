@@ -168,6 +168,7 @@
     <ClCompile Include="Network.cpp" />
     <ClCompile Include="object.cpp" />
     <ClCompile Include="ObjectManager.cpp" />
+    <ClCompile Include="OkHUD.cpp" />
     <ClCompile Include="player.cpp" />
     <ClCompile Include="Sound.cpp" />
     <ClCompile Include="StartHUD.cpp" />
@@ -186,6 +187,7 @@
     <ClInclude Include="Network.h" />
     <ClInclude Include="object.h" />
     <ClInclude Include="ObjectManager.h" />
+    <ClInclude Include="OkHUD.h" />
     <ClInclude Include="player.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Sound.h" />

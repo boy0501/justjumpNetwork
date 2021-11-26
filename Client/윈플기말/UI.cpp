@@ -28,7 +28,7 @@ UI::~UI()
 
 void UI::LoadUiBitmap(HINSTANCE& g_hinst,std::string name,const int& x,const int& y, const int& w, const int& h, const COLORREF& cr)
 {
-	if (hbits.size() > mUiCount)
+	if (hbits.size() >= mUiCount)
 	{
 		std::cout << "허용 ui카운트 보다 많은 ui를 삽입하려고 시도함" << std::endl;
 		return;
