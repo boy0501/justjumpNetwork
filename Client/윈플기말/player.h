@@ -81,6 +81,8 @@ public:
 	void setstealth(int);
 	//하강중 가시로인한 강제적 좌표이동값 0이면 이동끝 -이면 왼쪽으로가야함 + 이면 오른쪽으로 강제이동
 	void setspike_hurt(int);
+	// 순위
+	void setRanking(int);
 	//비트맵설정
 	void setBit(HINSTANCE);
 	//기본 비트맵 Pos 설정
@@ -127,7 +129,7 @@ public:
 	//하강중 가시로인한 강제적 좌표이동값 0이면 이동끝 -이면 왼쪽으로가야함 + 이면 오른쪽으로 강제이동
 	int getspike_hurt();
 
-
+	int getRanking();
 
 
 

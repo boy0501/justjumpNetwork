@@ -103,6 +103,7 @@ void UI::update(float deltatime)
 {
 
 }
+
 void UI::draw(HDC& mem1dc)
 {
 	for (const auto& txt : mText)
@@ -119,6 +120,14 @@ void UI::drawExit(HDC& mem1dc)
 		button->drawByScreenButton(mem1dc);
 	}
 } 
+void UI::drawRanking(HDC& mem1dc)
+{
+	for (const auto& txt : mText)
+	{
+		txt->draw(mem1dc);
+	}
+}
+
 void UI::drawByUserUi(HDC& mem1dc)
 {
 	HDC tmpdc;

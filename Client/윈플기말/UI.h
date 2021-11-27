@@ -38,6 +38,7 @@ public:
 	virtual void update(float deltatime);
 	virtual void draw(HDC& mem1dc);
 	virtual void drawExit(HDC& mem1dc);
+	virtual void drawRanking(HDC& mem1dc);
 
 	void drawByUserUi(HDC& mem1dc);
 	void drawByScreenUi(HDC& mem1dc);
@@ -61,4 +62,5 @@ protected:
 public:
 	std::shared_ptr<class Text> FindTextByNameTag(std::string NameTag);
 	UIState getState() const { return mState; }
+
 };

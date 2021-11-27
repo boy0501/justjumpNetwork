@@ -143,6 +143,11 @@ void PLAYER::setspike_hurt(int i)
 {
 	spike_hurt = i;
 }
+void PLAYER::setRanking(int i)
+{
+	rank = i;
+}
+
 void PLAYER::setBit(HINSTANCE g_hinst)
 {
 	hbitwalk = LoadWalk(g_hinst);
@@ -156,6 +161,8 @@ void PLAYER::initBitPos()
 	bw = 0;
 	bh = 0;
 }
+
+
 
 //ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ세터
 int PLAYER::getx()
@@ -242,6 +249,10 @@ int PLAYER::getjumpignore()
 int PLAYER::getspike_hurt()
 {
 	return spike_hurt;
+}
+int PLAYER::getRanking()
+{
+	return rank;
 }
 //플레이어 상태 변경
 void PLAYER::PlayerSetting(WPARAM wParam)

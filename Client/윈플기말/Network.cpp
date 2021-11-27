@@ -181,6 +181,7 @@ void Network::ProcessPacket(unsigned char* p)
 		mOthers[id].state=packet->state;
 		mOthers[id].stealth=packet->stealth;
 		mOthers[id].mPlayername = packet->username;
+		mOthers[id].rank = packet->rank;
 		USES_CONVERSION;
 		mOthers[id].mPlayerwname = wstring(A2W(mOthers[id].mPlayername.c_str()));
 		mOthers[id].w = packet->w;
