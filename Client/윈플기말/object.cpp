@@ -8,11 +8,12 @@ OBJECT::OBJECT()
 	:degree(0), oldDegree(0.0f)
 	, velocityDegree(0.0f)
 {
-
+	InitializeCriticalSection(&cs);
 }
 
 OBJECT::~OBJECT()
 {
+	DeleteCriticalSection(&cs);
 
 }
 int OBJECT::getX()
@@ -210,7 +211,9 @@ void OBJECT::move(float deltatime)
 	//degree += deltatime * GEARCYCLE;
 	//마찬가지로 degree를 데드레커닝
 	//임계영역자리 이걸 다..?
+	EnterCriticalSection(&cs);
 	degree += (velocityDegree * deltatime) + ((0 * deltatime * deltatime) / 2);
+	LeaveCriticalSection(&cs);
 	/*
 	if (degree < 0)
 	{

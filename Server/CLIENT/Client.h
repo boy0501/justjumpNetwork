@@ -62,6 +62,7 @@ public:
 	HANDLE SceneChangeIsDone;
 	HANDLE CountSendController;
 	SOCKET c_socket;
+	CRITICAL_SECTION cs;
 	bool is_active;
 	int c_id;
 	int prev_size;

@@ -151,8 +151,10 @@ void Network::ProcessPacket(unsigned char* p)
 		mPlayer->stage = packet->stage;
 		mPlayer->player_cid = packet->id;
 		//임계영역 자리
+		EnterCriticalSection(&mPlayer->cs);
 		mPlayer->x = packet->x;
 		mPlayer->y = packet->y;
+		LeaveCriticalSection(&mPlayer->cs);
 		mPlayer->oldY = packet->y;
 		mPlayer->oldX = packet->x;
 		//임계영역 자리
@@ -183,8 +185,10 @@ void Network::ProcessPacket(unsigned char* p)
 		mOthers[id].mPlayerwname = wstring(A2W(mOthers[id].mPlayername.c_str()));
 		mOthers[id].w = packet->w;
 		//임계영역 자리 
+		EnterCriticalSection(&mOthers[id].cs);
 		mOthers[id].x=packet->x;
 		mOthers[id].y=packet->y;
+		LeaveCriticalSection(&mOthers[id].cs);
 		mOthers[id].oldX = packet->x;
 		mOthers[id].oldY = packet->y;
 		//임계영역 자리
@@ -250,15 +254,19 @@ void Network::ProcessPacket(unsigned char* p)
 			mPlayer->dir = packet->dir;
 			mPlayer->hp = packet->hp;
 			mPlayer->rank = packet->rank;
+
 			//임계영역 들어갈 자리 ---
+			EnterCriticalSection(&mPlayer->cs);
 			mPlayer->x = packet->x;
 			mPlayer->y = packet->y;
 			//속도구하는 공식 = 거리 /시간 => (지금패킷위치 - 예전패킷위치) / 걸린시간  
-			mPlayer->velocityX = (mPlayer->x - mPlayer->oldX) / (packet->senddeltatime);
-			mPlayer->velocityY = (mPlayer->y - mPlayer->oldY) / (packet->senddeltatime);
-			mPlayer->oldX = mPlayer->x;
-			mPlayer->oldY = mPlayer->y;
+			mPlayer->velocityX = (packet->x - mPlayer->oldX) / (packet->senddeltatime);
+			mPlayer->velocityY = (packet->y - mPlayer->oldY) / (packet->senddeltatime);
 			//임계영역 풀어줄 자리 ---
+			LeaveCriticalSection(&mPlayer->cs);
+
+			mPlayer->oldX = packet->x;
+			mPlayer->oldY = packet->y;
 
 			//------
 			//rank = packet->rank;
@@ -273,14 +281,16 @@ void Network::ProcessPacket(unsigned char* p)
 			other.hp = packet->hp;
 			other.rank = packet->rank;
 			//임계영역 자리 ----
+			EnterCriticalSection(&other.cs);
 			other.x = packet->x;
 			other.y = packet->y;
 			//속도구하는 공식 = 거리 /시간 => (지금패킷위치 - 예전패킷위치) / 걸린시간  
-			other.velocityX = (other.x - other.oldX) / (packet->senddeltatime);
-			other.velocityY = (other.y - other.oldY) / (packet->senddeltatime);
+			other.velocityX = (packet->x - other.oldX) / (packet->senddeltatime);
+			other.velocityY = (packet->y - other.oldY) / (packet->senddeltatime);
+			LeaveCriticalSection(&other.cs);
 			//mPlayer->reckoningY = (mPlayer->y - mPlayer->oldY) / 2;
-			other.oldX = other.x;
-			other.oldY = other.y;
+			other.oldX = packet->x;
+			other.oldY = packet->y;
 			//임계영역 자리 ----
 			//std::cout << "아덜좌표 y : " << other.y << std::endl;
 			//other.bx = packet->bx;
@@ -296,8 +306,10 @@ void Network::ProcessPacket(unsigned char* p)
 		mPlayer->state = packet->state;
 		mPlayer->stealth = packet->stealth;
 		//임계영역 자리
+		EnterCriticalSection(&mPlayer->cs);
 		mPlayer->x = packet->x;
 		mPlayer->y = packet->y;
+		LeaveCriticalSection(&mPlayer->cs);
 		mPlayer->oldX = packet->x;
 		mPlayer->oldY = packet->y;
 		//임계영역 자리
@@ -368,16 +380,18 @@ void Network::ProcessPacket(unsigned char* p)
 		}
 		case 106: 
 		case 107: {
-			//임계영역 자리긴 한데,, 이 많은걸 다 ?
+			//임계영역 자리
+			EnterCriticalSection(&obj.cs);
 			obj.degree = packet->degree;
-			obj.velocityDegree = (obj.degree - obj.oldDegree) / (packet->senddeltatime);
+			obj.velocityDegree = (packet->degree - obj.oldDegree) / (packet->senddeltatime);
 			if (obj.velocityDegree < 0)
 			{
 				//각도는 0 = 360인데 old는 360에서 362로 갈것으로 기대하고있지만, 실제 degree는 0으로 가서 생기는 - 값 보정
-				obj.velocityDegree = (obj.degree + 360 - obj.oldDegree) / (packet->senddeltatime);
+				obj.velocityDegree = (packet->degree + 360 - obj.oldDegree) / (packet->senddeltatime);
 			}
-			obj.oldDegree = obj.degree;
-			//임계영역 자리긴 한데 ,,, 
+			LeaveCriticalSection(&obj.cs);
+			obj.oldDegree = packet->degree;
+			//임계영역 자리
 
 			//obj.mx = packet->mx;
 			//obj.my = packet->my;

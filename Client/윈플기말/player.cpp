@@ -20,6 +20,7 @@ PLAYER::PLAYER()
 	, oldY(0), oldX(0)
 	, velocityX(0), velocityY(0)
 {
+	InitializeCriticalSection(&cs);
 	// x y 는 캐릭터의 중심좌표이고 w,h 는 xy에서 좌우로 반틈씩만 간 좌표이다. 
 	x = 80; //100 캐릭터의 중심x좌표
 	y = 655; //3800 캐릭터의 중심y좌표
@@ -39,6 +40,10 @@ PLAYER::PLAYER()
 	COMMAND_die = false;
 	COMMAND_ropehurt = false;
 	
+}
+PLAYER::~PLAYER()
+{
+	DeleteCriticalSection(&cs);
 }
 void PLAYER::initPos()
 {
@@ -822,13 +827,15 @@ void PLAYER::move(float deltatime)
 	// x축으로 움직일때는 가속도가 0이다. 등속도운동임.
 
 	//임계영역 자리 
-	x += (int)((velocityX * deltatime) + ((0 * deltatime * deltatime) / 2));
 	if (state == 2)
 	{
 		//우리 게임의 물리엔진은 점프뛸때와 위에서 떨어질때의 가속도가 달라서 이건 구분해줘야함 .
 		//속도 = 거리/시간
 		//가속도 = -25
+		EnterCriticalSection(&cs);
+		x += (int)((velocityX * deltatime) + ((0 * deltatime * deltatime) / 2));
 		y += (int)((velocityY * deltatime) + ((-25 * deltatime * deltatime) / 2));
+		LeaveCriticalSection(&cs);
 	
 
 	}
@@ -838,7 +845,16 @@ void PLAYER::move(float deltatime)
 		//float velocity = reckoningY / (0.032);
 		//속도 = 거리/시간
 		//가속도 = 0 (떨어질땐 등속도운동)
+		EnterCriticalSection(&cs);
+		x += (int)((velocityX * deltatime) + ((0 * deltatime * deltatime) / 2));
 		y += (int)((velocityY * deltatime) + ((0 * deltatime * deltatime) / 2));
+		LeaveCriticalSection(&cs);
+	}
+	else {
+		EnterCriticalSection(&cs);
+		x += (int)((velocityX * deltatime) + ((0 * deltatime * deltatime) / 2));
+		y += (int)((velocityY * deltatime) + ((0 * deltatime * deltatime) / 2));
+		LeaveCriticalSection(&cs);
 	}
 	//임계영역 자리 
 	//std::cout << y << std::endl;

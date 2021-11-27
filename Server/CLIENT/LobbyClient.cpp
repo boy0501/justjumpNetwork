@@ -82,9 +82,11 @@ void LobbyClient::update(float delta_time)
 	}
 
 	//obj_t += 1;
+	EnterCriticalSection(&cs);
 	move(delta_time);
 	//BitMove();
 	adjustPlayer();
+	LeaveCriticalSection(&cs);
 	//timer();
 	//send packet
 
