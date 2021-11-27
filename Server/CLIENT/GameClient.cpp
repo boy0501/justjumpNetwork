@@ -30,10 +30,12 @@ void GameClient::update(float delta_time)
 		elapsedtime = 0;
 		//std::cout << "게임클라" << std::endl;
 	}
+	EnterCriticalSection(&cs);
 	move(delta_time);
 	adjustPlayer(delta_time);
 	spike_hurttime(delta_time);
 	stealthtime(delta_time);
+	LeaveCriticalSection(&cs);
 	int objNum = 0;
 	//for (auto& obj : mMap->mObjects[mStageNum])
 	//{
@@ -741,7 +743,6 @@ void GameClient::adjustPlayer(float deltatime)
 					if (UPkey == true)
 					{
 
-						
 						//내 상태를 다른 사람들에게 전달 (나랑 같은 stage에 있던사람한테 보냄)
 						//이후 다른사람껄 지움. 
 						for (int i = 0; i < Cnt_Player; ++i)
@@ -809,32 +810,6 @@ void GameClient::adjustPlayer(float deltatime)
 							otherpacket.y = y;
 							CLIENTS[i]->do_send(&otherpacket, sizeof(otherpacket));
 						}
-
-
-						//맵이 바뀌는 로직 
-
-						//m.setblack_t(50);
-						///*m.CreateBlack(g_hinst);*/
-						//m.setmapnum(m.getmapnum() + 1);
-						////saveMapNum = m.getmapnum();
-						//player.initPos();
-						//if (m.getmapnum() == 13) {
-						//
-						//	m.CreateMap(g_hinst);
-						//
-						//}
-						//
-						//for (int j = 0; j < mObjectCount; j++)
-						//	obj[j].ResetObject();
-						//mObjectCount = initObject(obj, m.getmapnum(), g_hinst);
-						//m.CreateMap(g_hinst);
-						//
-						//
-						//Sound::GetSelf()->setindex(m.getmapnum() - 9);
-						//Sound::GetSelf()->Sound_Play(BGMSOUND, Sound::GetSelf()->getindex(), BGMVOL);
-						//Sound::GetSelf()->Sound_Play(EFFECTSOUND, PORTALEF, EFVOL);
-						//
-						//return;
 					}
 				}
 			}
