@@ -20,6 +20,7 @@ PLAYER::PLAYER()
 	, oldY(0), oldX(0)
 	, velocityX(0), velocityY(0)
 {
+	InitializeCriticalSection(&cs);
 	// x y 는 캐릭터의 중심좌표이고 w,h 는 xy에서 좌우로 반틈씩만 간 좌표이다. 
 	x = 80; //100 캐릭터의 중심x좌표
 	y = 655; //3800 캐릭터의 중심y좌표
@@ -39,6 +40,10 @@ PLAYER::PLAYER()
 	COMMAND_die = false;
 	COMMAND_ropehurt = false;
 	
+}
+PLAYER::~PLAYER()
+{
+	DeleteCriticalSection(&cs);
 }
 void PLAYER::initPos()
 {
@@ -831,15 +836,19 @@ void PLAYER::move(float deltatime)
 	// S = V0 * t + a* (t^2) / 2 등가속도운동 공식을 적용하여 클라 1프레임에 걸린 시간 후의 위치를 계산하여
 	// 서버에서 패킷을 안보내주더라도 다음위치를 예상하여 보정해준다.
 	// x축으로 움직일때는 가속도가 0이다. 등속도운동임.
-	x += (int)((velocityX * deltatime) + ((0 * deltatime * deltatime) / 2));
-	//std::cout << x << std::endl;
+
+	//임계영역 자리 
 	if (state == 2)
 	{
 		//우리 게임의 물리엔진은 점프뛸때와 위에서 떨어질때의 가속도가 달라서 이건 구분해줘야함 .
 		//속도 = 거리/시간
 		//가속도 = -25
+		EnterCriticalSection(&cs);
+		x += (int)((velocityX * deltatime) + ((0 * deltatime * deltatime) / 2));
 		y += (int)((velocityY * deltatime) + ((-25 * deltatime * deltatime) / 2));
+		LeaveCriticalSection(&cs);
 	
+
 	}
 	else if (state == 7)
 	{
@@ -847,8 +856,18 @@ void PLAYER::move(float deltatime)
 		//float velocity = reckoningY / (0.032);
 		//속도 = 거리/시간
 		//가속도 = 0 (떨어질땐 등속도운동)
+		EnterCriticalSection(&cs);
+		x += (int)((velocityX * deltatime) + ((0 * deltatime * deltatime) / 2));
 		y += (int)((velocityY * deltatime) + ((0 * deltatime * deltatime) / 2));
+		LeaveCriticalSection(&cs);
 	}
+	else {
+		EnterCriticalSection(&cs);
+		x += (int)((velocityX * deltatime) + ((0 * deltatime * deltatime) / 2));
+		y += (int)((velocityY * deltatime) + ((0 * deltatime * deltatime) / 2));
+		LeaveCriticalSection(&cs);
+	}
+	//임계영역 자리 
 	//std::cout << y << std::endl;
 }
 
@@ -870,13 +889,14 @@ void PLAYER::selectBit()
 void PLAYER::BitMove()
 {
 	bx += 1;//인덱스 형식으로 바꿈
-	if (state == 4)
+	if (state == 4 )
 	{
+		//std::cout << "state4 비트맵" << std::endl;
 		if (bx >= 5) bx = 1;
 	}
-	if (state == 5||state==8)
+	if (state == 5 || state == 8)
 	{
-
+		//std::cout << "state5,8 비트맵" << std::endl;
 		if (bx >= 2) bx = 0;
 	}
 }

@@ -1,5 +1,6 @@
 #include <iostream>
 #include <array>
+#include <algorithm>
 
 #include "../Network.h"
 #include "../Map.h"
@@ -29,12 +30,12 @@ void GameClient::update(float delta_time)
 		elapsedtime = 0;
 		//std::cout << "게임클라" << std::endl;
 	}
-
+	EnterCriticalSection(&cs);
 	move(delta_time);
 	adjustPlayer(delta_time);
 	spike_hurttime(delta_time);
-	stealthtime();
-
+	stealthtime(delta_time);
+	LeaveCriticalSection(&cs);
 	int objNum = 0;
 	//for (auto& obj : mMap->mObjects[mStageNum])
 	//{
@@ -259,11 +260,11 @@ void GameClient::move(float deltatime)
 	else if (state == 6)
 	{
 		//std::cout << "state6" << std::endl;
-		ROWSPEED *= 3;
-		stealth = 100;
-		savey = y;
-		COMMAND_hurt = true;
-		state = 2;
+		//ROWSPEED *= 3;
+		//stealth = 100;
+		//COMMAND_hurt = true;
+		//savey = y;
+		//state = 2;
 
 	}
 	else if (state == 7)
@@ -496,7 +497,12 @@ void GameClient::adjustPlayer(float deltatime)
 						if (stealth == 0)	//무적이 아니라면
 						{
 							COMMAND_move = dir;//보고있는방향으로 앞으로 나가게, 떨어졌는데 가만히있진 않지요
-							state = 6;//피격으로감
+							//ROWSPEED *= 3;
+							stealth = 100;
+							COMMAND_hurt = true;
+							savey = y;
+							state = 2;
+							//state = 6;//피격으로감
 							hurt();
 							return;
 						}
@@ -566,7 +572,12 @@ void GameClient::adjustPlayer(float deltatime)
 							stealth = 100;	//무적시간 넣어줌 (이동하는로직은 state==7 일때 알아서 다뤄줌
 						}
 						else {
-							state = 6;		//피격으로감
+							//ROWSPEED *= 3;
+							stealth = 100;
+							COMMAND_hurt = true;
+							savey = y;
+							state = 2;
+							//state = 6;		//피격으로감
 						}
 						hurt();
 					}
@@ -636,7 +647,12 @@ void GameClient::adjustPlayer(float deltatime)
 							}
 							else {
 								COMMAND_move = 1;//무조건 왼쪽임
-								state = 6;
+								//ROWSPEED *= 3;
+								stealth = 100;
+								COMMAND_hurt = true;
+								savey = y;
+								state = 2;
+								//state = 6;
 							}
 							hurt();
 						}
@@ -679,7 +695,13 @@ void GameClient::adjustPlayer(float deltatime)
 						}
 						else {
 							COMMAND_move = dir;
-							state = 6;		//피격으로감
+							//
+							//ROWSPEED *= 3;
+							stealth = 100;
+							COMMAND_hurt = true;
+							savey = y;
+							state = 2;
+							//state = 6;		//피격으로감
 						}
 						hurt();
 					}
@@ -713,7 +735,13 @@ void GameClient::adjustPlayer(float deltatime)
 						}
 						else {
 							COMMAND_move = dir;
-							state = 6;		//피격으로감
+							//
+							//ROWSPEED *= 3;
+							stealth = 100;
+							COMMAND_hurt = true;
+							savey = y;
+							state = 2;
+							//state = 6;		//피격으로감
 						}
 						hurt();
 					}
@@ -726,7 +754,6 @@ void GameClient::adjustPlayer(float deltatime)
 					if (UPkey == true)
 					{
 
-						
 						//내 상태를 다른 사람들에게 전달 (나랑 같은 stage에 있던사람한테 보냄)
 						//이후 다른사람껄 지움. 
 						for (int i = 0; i < Cnt_Player; ++i)
@@ -795,32 +822,6 @@ void GameClient::adjustPlayer(float deltatime)
 							otherpacket.rank = rank;
 							CLIENTS[i]->do_send(&otherpacket, sizeof(otherpacket));
 						}
-
-
-						//맵이 바뀌는 로직 
-
-						//m.setblack_t(50);
-						///*m.CreateBlack(g_hinst);*/
-						//m.setmapnum(m.getmapnum() + 1);
-						////saveMapNum = m.getmapnum();
-						//player.initPos();
-						//if (m.getmapnum() == 13) {
-						//
-						//	m.CreateMap(g_hinst);
-						//
-						//}
-						//
-						//for (int j = 0; j < mObjectCount; j++)
-						//	obj[j].ResetObject();
-						//mObjectCount = initObject(obj, m.getmapnum(), g_hinst);
-						//m.CreateMap(g_hinst);
-						//
-						//
-						//Sound::GetSelf()->setindex(m.getmapnum() - 9);
-						//Sound::GetSelf()->Sound_Play(BGMSOUND, Sound::GetSelf()->getindex(), BGMVOL);
-						//Sound::GetSelf()->Sound_Play(EFFECTSOUND, PORTALEF, EFVOL);
-						//
-						//return;
 					}
 				}
 			}
@@ -915,16 +916,20 @@ void GameClient::spike_hurttime(float deltatime)
 	}
 }
 
-void GameClient::stealthtime()
+void GameClient::stealthtime(float deltatime)
 {
 	if (COMMAND_die == 0)	//죽으면 무적안풀림
 		if (stealth > 0)
 		{
-			stealth--;
+			//stealth -= (int)(200 * deltatime);
+			stealth = max(stealth - (int)(100 * deltatime), 0);
+			std::cout << stealth << std::endl;
 			if (stealth == 0)
 				COMMAND_hurt = 0;
 		}
 	if (jumpignore > 0)
-		jumpignore--;
+	{
+		jumpignore = max(jumpignore - (int)(100 * deltatime), 0);
+	}
 }
 

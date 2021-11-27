@@ -6,7 +6,7 @@
 //#include "object.h"
 #include "Camera.h"
 //#include "Map.h"
-
+#define CONN_FAIL -1
 extern HDC mem1dc, pdc, hdc;
 extern HWND hWnd;
 extern RECT rectview;
@@ -37,7 +37,7 @@ public:
 	int prev_size;
 	int* mOcount;
 	class OBJECT* mObj;
-	void ConnectServer(const char* server_ip);
+	int ConnectServer(const char* server_ip);
 	void C_Send(void* packet, int bytes);
 	int C_Recv();
 	void ProcessPacket(unsigned char* p);
@@ -58,6 +58,7 @@ public:
 	int net_bx;
 
 	int countdown;
+	bool cntdown_controller = false;
 	int init_x = 340;
 
 	int rank;

@@ -39,7 +39,9 @@ public:
 	float GroundAccel = 0.5;	//중력가속도
 	std::string mPlayername;	//플레이어이름
 	std::wstring mPlayerwname;	//플레이어이름 wchar방식
+	CRITICAL_SECTION cs;
 	PLAYER();
+	~PLAYER();
 
 	// 캐릭터위치 초기화 함수
 	void initPos();
