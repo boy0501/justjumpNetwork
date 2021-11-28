@@ -665,33 +665,14 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		//+
 		startui->addText(" ", "countdown", L"메이플스토리 bold", RGB(255, 255, 255), 18, 360, 200, false, 0, 0, camera);
 		startui->addText("Ready", "ready", L"메이플스토리 bold", RGB(255, 255, 0), 18, 300, 200, false, 0, 0, camera);
+		startui->addText("", "5252", L"메이플스토리 bold", RGB(255, 0, 0), 18, 120, 250, false, 0, 0, camera);
 
 
 		//hbit = (HBITMAP)LoadImage(g_hinst, TEXT("img/NoNameUi.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION); //상대경로로 변경
 		startui->addButton([startui]() {
-			//Network::GetNetwork()->test();
-			//cout << "들어옴" << endl;
-
-			//bool occur_button = 0;
-			//map.setblack_t(50);
-			//map.setmapnum(player.stage + 1);
-			//for (int j = 0; j < ocount; j++)
-			//	obj[j].ResetObject();
-			//ocount = initObject(obj, map.getmapnum(), g_hinst);
-			//map.CreateMap(g_hinst);
-			//LoadBK(hbit1, g_hinst, map.getmapnum());
-			//Sound::GetSelf()->setindex(Sound::GetSelf()->getindex() + 1);
-			//Sound::GetSelf()->Sound_Play(EFFECTSOUND, PORTALEF, EFVOL);
-			//Sound::GetSelf()->Sound_Play(BGMSOUND, FIRSTMAPBGM, BGMVOL);
-			//player.initPos();
-			//player.sethp(5);
-			//camera.setx(0);
-			//camera.sety(3232);
-			//map.mStartui->closeUI();
-			//Network::GetNetwork()->mUI.emplace_back(map.mGameUi);
-			//Network::GetNetwork()->mUI.emplace_back(map.mGameUi);
-			map.mStartui->addText("5252~ 3p game", "countdown", L"메이플스토리 bold", RGB(255, 0, 0), 18, 120, 250, false, 0, 0, camera);
-
+			
+			//5252~3p game
+			startui->FindTextByNameTag("5252")->setText(L"5252~3p game");
 
 		}, g_hinst, "img/start", 292, 490, 138, 82, RGB(255, 0, 0));
 		startui->addButton([]() {}, g_hinst, "img/help", 215, 300, 400, 200, RGB(60, 60, 60));
