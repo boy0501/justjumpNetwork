@@ -348,66 +348,45 @@ void GameClient::move(float deltatime)
 
 	//순위 판정-------------------------------------------------
 	
-	//for (int i = 0; i < Cnt_Player; ++i)
-	//{
-	//	//if (c_id == CLIENTS[i]->c_id) continue;
-	//	//mmStagenum[i] = 1;
-	//	//for (int j = 0; j < Cnt_Player; ++j)
-	//	//{
-	//	//	//if (i == j)continue;
-	//	//	if (CLIENTS[i]->mStageNum < CLIENTS[j]->mStageNum)
-	//	//	{
-	//	//		mmStagenum[i] ++;
 
-	//	//	}
-	//	//}
-
-	//	CLIENTS[i]->rank = mmStagenum[i];
-
-	//	sc_packet_put_object packet;
-
-	//	packet.size = sizeof(sc_packet_put_object);
-	//	packet.type = SC_PACKET_PUT_OBJECT;
-	//	packet.id = c_id;
-	//	packet.rank = CLIENTS[i]->rank;
-	//	CLIENTS[i]->do_send(&packet, sizeof(packet));
-	//}
 	for (int i = 0; i < Cnt_Player; ++i)
 	{
-		//if (c_id == CLIENTS[i]->c_id)continue;
-		//auto other = CLIENTS[i];
-
-		if (CLIENTS[i]->mStageNum == 1)
-			mRank[i] = 1;
-		if (CLIENTS[i]->mStageNum == 2)
-			mRank[i] = 3;
-		if (CLIENTS[i]->mStageNum == 3)
-			mRank[i] = 5;
-
-		if (CLIENTS[i]->mStageNum < 4) {
-			for (int j = 0; j < Cnt_Player; ++j)
+		mRank[i] = 1;
+		
+		for (int j = 0; j < Cnt_Player; ++j)
+		{
+			
+			if (CLIENTS[i]->mStageNum < CLIENTS[j]->mStageNum)
 			{
-				if (i == j) continue;	// 넣는게 맞나?
-				//if (CLIENTS[i]->mStageNum == CLIENTS[j]->mStageNum)
-				{
-					if (CLIENTS[i]->mStageNum < CLIENTS[j]->mStageNum)
-					{
-						mRank[i] += 1;
-
-					}
-					//else continue;
-				}
-
+				mRank[i] += 1;
+					
 			}
+			if (CLIENTS[i]->mStageNum == CLIENTS[j]->mStageNum)
+			{
+				if (CLIENTS[i]->y > CLIENTS[j]->y)
+					mRank[i] += 1;
+			}
+			if (CLIENTS[i]->mStageNum > CLIENTS[j]->mStageNum)
+				mRank[j] += 1;
 		}
-		CLIENTS[i]->rank = mRank[i];
-	}
 
-	for(int i = 0;i<Cnt_Player;++i)
-	{
-		if (c_id != CLIENTS[i]->c_id) continue;
+		CLIENTS[i]->rank = mRank[i];
 
 		auto other = CLIENTS[i];
+
+		//if (c_id == CLIENTS[i]->c_id)continue;
+		if (mStageNum != CLIENTS[i]->mStageNum) continue;
+		sc_packet_logout_object packet1;
+		packet1.size = sizeof(sc_packet_logout_object);
+		packet1.type = SC_PACKET_LOGOUT_OBJECT;
+		packet1.id = c_id;
+		CLIENTS[i]->do_send(&packet1, sizeof(packet1));
+
+		sc_packet_logout_object mypacket;
+		mypacket.size = sizeof(sc_packet_logout_object);
+		mypacket.type = SC_PACKET_LOGOUT_OBJECT;
+		mypacket.id = i;
+		do_send(&mypacket, sizeof(mypacket));
 
 		sc_packet_put_object packet;
 		packet.size = sizeof(sc_packet_put_object);
@@ -422,7 +401,7 @@ void GameClient::move(float deltatime)
 		packet.x = other->x;
 		packet.y = other->y;
 		packet.w = other->w;
-		packet.rank =other->rank ;
+		packet.rank = mRank[i] ;
 		do_send(&packet, sizeof(packet));
 
 		sc_packet_put_object otherpacket;
@@ -442,63 +421,6 @@ void GameClient::move(float deltatime)
 		CLIENTS[i]->do_send(&otherpacket, sizeof(otherpacket));
 
 	}
-		//if (c_id == CLIENTS[i]->c_id) continue;
-
-		//for (auto& other : CLIENTS)
-		//{
-		//	if (other->c_id == CLIENTS[i]->c_id) continue;
-
-		//	CLIENTS[i]->rank = 1;
-
-		//	if (other->mStageNum > CLIENTS[i]->mStageNum)
-		//		CLIENTS[i]->rank += 1;
-		//	//else
-		//		//other->rank = 1;
-		//}
-		
-		
-		//	//if (CLIENTS[i]->mStageNum < 4) 
-		//	{
-		//		for (int j = 0; j < Cnt_Player; ++j)
-		//		{
-		//			if (CLIENTS[i]->mStageNum > CLIENTS[j]->mStageNum)
-		//			{
-		//				CLIENTS[i]->rank = 1;
-		//				CLIENTS[j]->rank += CLIENTS[i]->rank;
-		//			}
-		//			if (CLIENTS[i]->mStageNum == CLIENTS[j]->mStageNum)
-		//			{
-		//				if (CLIENTS[i]->y > CLIENTS[j]->y)
-		//				{
-		//					CLIENTS[i]->rank += 1;
-
-		//				}
-		//				//else continue;
-		//			}
-		//			//if (CLIENTS[i]->mStageNum > CLIENTS[j]->mStageNum)
-		//			
-		//			
-		//			
-
-		//		}
-		//	}
-			
-			/*for (int j = 0; j < Cnt_Player; ++j)
-			{
-				CLIENTS[j]->rank = 1;
-				if (CLIENTS[i]->y > CLIENTS[j]->y)
-				{
-					CLIENTS[i]->rank = CLIENTS[j]->rank + 1;
-					CLIENTS[j]->rank = CLIENTS[i]->rank + 1;
-				
-				}
-			}
-			*/
-		
-		//CLIENTS[i]->rank = mRank[i];
-
-	//}
-
 }
 //오브젝트와 플레이어 충돌체크 1이면 부닥침
 //----------------------------------------
