@@ -351,10 +351,12 @@ void GameClient::move(float deltatime)
 
 	for (int i = 0; i < Cnt_Player; ++i)
 	{
+		
 		mRank[i] = 1;
 		
 		for (int j = 0; j < Cnt_Player; ++j)
 		{
+			
 			
 			if (CLIENTS[i]->mStageNum < CLIENTS[j]->mStageNum)
 			{
@@ -372,53 +374,53 @@ void GameClient::move(float deltatime)
 
 		CLIENTS[i]->rank = mRank[i];
 
-		auto other = CLIENTS[i];
+	//	auto other = CLIENTS[i];
 
-		//if (c_id == CLIENTS[i]->c_id)continue;
-		if (mStageNum != CLIENTS[i]->mStageNum) continue;
-		sc_packet_logout_object packet1;
-		packet1.size = sizeof(sc_packet_logout_object);
-		packet1.type = SC_PACKET_LOGOUT_OBJECT;
-		packet1.id = c_id;
-		CLIENTS[i]->do_send(&packet1, sizeof(packet1));
+	//	//if (c_id == CLIENTS[i]->c_id)continue;
+	//	if (mStageNum != CLIENTS[i]->mStageNum) continue;
+	//	sc_packet_logout_object packet1;
+	//	packet1.size = sizeof(sc_packet_logout_object);
+	//	packet1.type = SC_PACKET_LOGOUT_OBJECT;
+	//	packet1.id = c_id;
+	//	CLIENTS[i]->do_send(&packet1, sizeof(packet1));
 
-		sc_packet_logout_object mypacket;
-		mypacket.size = sizeof(sc_packet_logout_object);
-		mypacket.type = SC_PACKET_LOGOUT_OBJECT;
-		mypacket.id = i;
-		do_send(&mypacket, sizeof(mypacket));
+	//	sc_packet_logout_object mypacket;
+	//	mypacket.size = sizeof(sc_packet_logout_object);
+	//	mypacket.type = SC_PACKET_LOGOUT_OBJECT;
+	//	mypacket.id = i;
+	//	do_send(&mypacket, sizeof(mypacket));
 
-		sc_packet_put_object packet;
-		packet.size = sizeof(sc_packet_put_object);
-		packet.type = SC_PACKET_PUT_OBJECT;
-		packet.dir = other->dir;
-		packet.h = other->h;
-		packet.hp = other->hp;
-		packet.id = other->c_id;
-		packet.state = other->state;
-		packet.stealth = other->stealth;
-		strcpy_s(packet.username, 20, other->playername);
-		packet.x = other->x;
-		packet.y = other->y;
-		packet.w = other->w;
-		packet.rank = mRank[i] ;
-		do_send(&packet, sizeof(packet));
+	//	sc_packet_put_object packet;
+	//	packet.size = sizeof(sc_packet_put_object);
+	//	packet.type = SC_PACKET_PUT_OBJECT;
+	//	packet.dir = other->dir;
+	//	packet.h = other->h;
+	//	packet.hp = other->hp;
+	//	packet.id = other->c_id;
+	//	packet.state = other->state;
+	//	packet.stealth = other->stealth;
+	//	strcpy_s(packet.username, 20, other->playername);
+	//	packet.x = other->x;
+	//	packet.y = other->y;
+	//	packet.w = other->w;
+	//	packet.rank = mRank[i] ;
+	//	do_send(&packet, sizeof(packet));
 
-		sc_packet_put_object otherpacket;
-		otherpacket.size = sizeof(sc_packet_put_object);
-		otherpacket.type = SC_PACKET_PUT_OBJECT;
-		otherpacket.id = c_id;
-		otherpacket.dir = dir;
-		otherpacket.h = h;
-		otherpacket.hp = hp;
-		otherpacket.state = state;
-		otherpacket.stealth = stealth;
-		strcpy_s(otherpacket.username, 20, playername);
-		otherpacket.w = w;
-		otherpacket.x = x;
-		otherpacket.y = y;
-		otherpacket.rank = rank;
-		CLIENTS[i]->do_send(&otherpacket, sizeof(otherpacket));
+	//	sc_packet_put_object otherpacket;
+	//	otherpacket.size = sizeof(sc_packet_put_object);
+	//	otherpacket.type = SC_PACKET_PUT_OBJECT;
+	//	otherpacket.id = c_id;
+	//	otherpacket.dir = dir;
+	//	otherpacket.h = h;
+	//	otherpacket.hp = hp;
+	//	otherpacket.state = state;
+	//	otherpacket.stealth = stealth;
+	//	strcpy_s(otherpacket.username, 20, playername);
+	//	otherpacket.w = w;
+	//	otherpacket.x = x;
+	//	otherpacket.y = y;
+	//	otherpacket.rank = rank;
+	//	CLIENTS[i]->do_send(&otherpacket, sizeof(otherpacket));
 
 	}
 }

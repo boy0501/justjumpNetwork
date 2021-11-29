@@ -233,7 +233,9 @@ DWORD WINAPI GameLogicThread(LPVOID arg)
 				for (int j = 0; j < Cnt_Player; ++j)
 				{
 					//맵이 서로 다르면 애초에 보내주질 않음.
-					if (CLIENTS[i]->mStageNum != CLIENTS[j]->mStageNum) continue;
+					//if (CLIENTS[i]->mStageNum != CLIENTS[j]->mStageNum) continue;
+					// 
+				
 					//WaitForSingleObject(c->key_seperate, 10);
 					send_move_process(i, j);
 					//SetEvent(c->key_seperate);

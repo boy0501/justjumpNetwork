@@ -127,7 +127,8 @@ void GameHUD::drawOtherPlayerRanking(HDC& mem1dc)
 	
 	for (int i = 0; i < 3; ++i)
 	{
-		if (mPlayer->player_cid == mOthers[i].player_cid) continue;
+		if (mPlayer->player_cid == i) continue;
+
 		_itow_s(mOthers[i].getRanking(), otherPlayer1Ranking, 10);
 		
 		TextOut(mem1dc, mCamera->getx() + 80, mCamera->gety() + 70+i*15, mOthers[i].mPlayerwname.c_str(), lstrlenW(mOthers[i].mPlayerwname.c_str()));

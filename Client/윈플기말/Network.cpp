@@ -18,6 +18,7 @@ RECT rectview;
 HBITMAP hbit1;
 HINSTANCE g_hinst;
 int obj_t = 0;
+CAMERA camera;
 
 void error_display(int err_no)
 {
