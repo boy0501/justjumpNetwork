@@ -151,7 +151,7 @@ void update(float delta_time)
 			}
 		}
 		//=======================================
-		cout << player.state << endl;
+		
 		player.move(delta_time);
 		//adjustPlayer(player, obj, map, ocount, g_hinst);
 		//cout << player.y << endl;
