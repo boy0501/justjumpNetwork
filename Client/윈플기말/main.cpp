@@ -235,7 +235,7 @@ void update(float delta_time)
 				obj[i].IndexChange();
 
 			}
-			obj[i].move(delta_time);
+			//obj[i].move(delta_time);
 		}
 		else if (obj[i].getType() == 201)
 		{

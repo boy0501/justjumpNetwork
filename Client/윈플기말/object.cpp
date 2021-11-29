@@ -182,7 +182,11 @@ void OBJECT::DrawObj(HDC& mem1dc, HDC& odc)
 	}
 	else if (type == 106 || type == 107) //gear
 	{
-		TransparentBlt(mem1dc, x+mx , y+my, w, h, odc, index * 23, 4, 18, 18, RGB(255, 255, 255)); // 인덱스로 only x change
+		EnterCriticalSection(&cs);
+		auto localmx = mx;
+		auto localmy = my;
+		LeaveCriticalSection(&cs);
+		TransparentBlt(mem1dc, x+ localmx, y+ localmy, w, h, odc, index * 23, 4, 18, 18, RGB(255, 255, 255)); // 인덱스로 only x change
 	}
 	else if (type == 201) //portal
 	{
@@ -210,10 +214,7 @@ void OBJECT::move(float deltatime)
 
 	//degree += deltatime * GEARCYCLE;
 	//마찬가지로 degree를 데드레커닝
-	//임계영역자리 이걸 다..?
-	EnterCriticalSection(&cs);
 	degree += (velocityDegree * deltatime) + ((0 * deltatime * deltatime) / 2);
-	LeaveCriticalSection(&cs);
 	/*
 	if (degree < 0)
 	{
