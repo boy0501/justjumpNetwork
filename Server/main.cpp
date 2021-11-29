@@ -215,7 +215,7 @@ DWORD WINAPI GameLogicThread(LPVOID arg)
 					
 					ChangeRobbyToGame(c->c_id);
 					c->mCss = CSS_LIVE;
-					SetEvent(c->SceneChangeIsDone);
+					//SetEvent(c->SceneChangeIsDone);
 
 					break;
 				}
@@ -297,7 +297,7 @@ DWORD WINAPI ClientInputThread(LPVOID arg)
 	{
 		//cout << c_id << "ÀÇ x°ª: " << CLIENTS[c_id]->x << endl;
 
-		int ret = CLIENTS[c_id]->do_recv();
+		int ret = CLIENTS[c_id]->do_recv();		
 		if (ret == SOCKET_ERROR)
 		{
 			int err_no = WSAGetLastError();

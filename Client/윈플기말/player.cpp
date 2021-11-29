@@ -904,7 +904,19 @@ void PLAYER::BitMove()
 //플레이어를 그려줌
 void PLAYER::draw(HDC& mem1dc, HDC& pdc)
 {
-	if (is_active == false) return;
+	EnterCriticalSection(&cs);
+	auto localactive = is_active;
+	auto localdir = dir;
+	auto localstate = state ;
+	auto localstealth = stealth ;
+	auto localPlayerwname = mPlayerwname;
+	auto localw = w ;
+	auto localh = h;
+	auto localx = x ;
+	auto localy = y ;
+	LeaveCriticalSection(&cs);
+
+	if (localactive == false) return;
 	BLENDFUNCTION bf;
 	bf.AlphaFormat = 0;
 	bf.BlendFlags = 0;
@@ -920,14 +932,14 @@ void PLAYER::draw(HDC& mem1dc, HDC& pdc)
 	HBITMAP tmpdc = CreateCompatibleBitmap(mem1dc, 62, 50);
 	HBITMAP oldtmpdc = (HBITMAP)SelectObject(gdidc, tmpdc);
 	//여기서 0,0 ~62,50 까지의 비트맵을 캐릭터기준으로 바꿔준다 (플레이어가 있는 위치의 비트맵을 복사함)
-	BitBlt(gdidc, 0, 0, charw * 2, h * 2, mem1dc, x - charw, y - h, SRCCOPY);
+	BitBlt(gdidc, 0, 0, charw * 2, localh * 2, mem1dc, localx - charw, localy - localh, SRCCOPY);
 	//기본 움직임
 	SelectObject(pdc, hbitcur);
 	//pdc는 hbitcur 즉 sprite가 들어있음
-	if (state == 1) // 정지상태 
+	if (localstate == 1) // 정지상태 
 	{
 
-		if (dir == 1)//왼쪽
+		if (localdir == 1)//왼쪽
 		{
 			//TransparentBlt(gdidc, x - charw, y - h, charw * 2, h * 2, pdc, 0, 0, 62, 50, RGB(255, 255, 255));
 			//gdidc는 0,0~ 62,50 이니까 이 위치에 투명한 캐릭터를 복사시켜주고 GdialphaBlend 를 통해 투명화처리 해준다.
@@ -938,160 +950,160 @@ void PLAYER::draw(HDC& mem1dc, HDC& pdc)
 			//pdc에는 sprite이미지가 있고(857line에서 해준다), sprite에서 필요한 부분만 짤라서 gdidc에 그려준 다음
 			//gdialphablend로 gdidc에서 alpha값을 조절한다음 mem1dc에 최종적으로 그려주는것이다.
 
-			if (stealth > 0)
+			if (localstealth > 0)
 			{
 
 				bf.SourceConstantAlpha = 155;
-				GdiAlphaBlend(mem1dc, x - charw, y - h, charw * 2, h * 2, gdidc, 0, 0, 62, 50, bf);
+				GdiAlphaBlend(mem1dc, localx - charw, localy - localh, charw * 2, localh * 2, gdidc, 0, 0, 62, 50, bf);
 				bf.SourceConstantAlpha = 255;
 
 			}
 			else
-				GdiAlphaBlend(mem1dc, x - charw, y - h, charw * 2, h * 2, gdidc, 0, 0, 62, 50, bf);
+				GdiAlphaBlend(mem1dc, localx - charw, localy - localh, charw * 2, localh * 2, gdidc, 0, 0, 62, 50, bf);
 		}
-		else if (dir == 2)//오른쪽
+		else if (localdir == 2)//오른쪽
 		{
 			//TransparentBlt(mem1dc, x - charw, y - h, charw * 2, h * 2, pdc, 0, 50, 62, 50, RGB(255, 255, 255));
 			TransparentBlt(gdidc, 0, 0, 62, 50, pdc, 0, 50, 62, 50, RGB(255, 255, 255));
-			if (stealth > 0)
+			if (localstealth > 0)
 			{
 				bf.SourceConstantAlpha = 155;//투명도
 				//이 함수는 일반 stretchblt 와 비슷하다 gdidc 는 최대가 0,0 ~62,50 이므로 뒷 인자는 0 0 62 50
-				GdiAlphaBlend(mem1dc, x - charw, y - h, charw * 2, h * 2, gdidc, 0, 0, 62, 50, bf);
+				GdiAlphaBlend(mem1dc, localx - charw, localy - localh, charw * 2, localh * 2, gdidc, 0, 0, 62, 50, bf);
 				bf.SourceConstantAlpha = 255;
 
 			}
 			else
 			{
-				GdiAlphaBlend(mem1dc, x - charw, y - h, charw * 2, h * 2, gdidc, 0, 0, 62, 50, bf);
+				GdiAlphaBlend(mem1dc, localx - charw, localy - localh, charw * 2, localh * 2, gdidc, 0, 0, 62, 50, bf);
 			}
 		}
 
 	}
-	else if (state == 4) //이동상태
+	else if (localstate == 4) //이동상태
 	{
-		if (dir == 1)//왼쪽
+		if (localdir == 1)//왼쪽
 		{
 			//TransparentBlt(mem1dc, x - charw, y - h, charw * 2, h * 2, pdc, bx, by, bw, bh, RGB(255, 255, 255)); //68 0 130 50
 			TransparentBlt(gdidc, 0, 0, 62, 50, pdc, bx * 68, by, bw, bh, RGB(255, 255, 255));
-			if (stealth > 0)
+			if (localstealth > 0)
 			{
 
 				bf.SourceConstantAlpha = 155;//투명도
 				//이 함수는 일반 stretchblt 와 비슷하다 gdidc 는 최대가 0,0 ~62,50 이므로 뒷 인자는 0 0 62 50
-				GdiAlphaBlend(mem1dc, x - charw, y - h, charw * 2, h * 2, gdidc, 0, 0, 62, 50, bf);
+				GdiAlphaBlend(mem1dc, localx - charw, localy - localh, charw * 2, localh * 2, gdidc, 0, 0, 62, 50, bf);
 				bf.SourceConstantAlpha = 255;
 
 			}
 			else
-				GdiAlphaBlend(mem1dc, x - charw, y - h, charw * 2, h * 2, gdidc, 0, 0, 62, 50, bf);
+				GdiAlphaBlend(mem1dc, localx - charw, localy - localh, charw * 2, localh * 2, gdidc, 0, 0, 62, 50, bf);
 		}
-		else if (dir == 2)//오른쪽
+		else if (localdir == 2)//오른쪽
 		{
 			//TransparentBlt(mem1dc, x - charw, y - h, charw * 2, h * 2, pdc, bx, by + 50, bw, bh, RGB(255, 255, 255));
 			TransparentBlt(gdidc, 0, 0, 62, 50, pdc, bx * 68, by + 50, bw, bh, RGB(255, 255, 255));
-			if (stealth > 0)
+			if (localstealth > 0)
 			{
 				bf.SourceConstantAlpha = 155;//투명도
 				//이 함수는 일반 stretchblt 와 비슷하다 gdidc 는 최대가 0,0 ~62,50 이므로 뒷 인자는 0 0 62 50
-				GdiAlphaBlend(mem1dc, x - charw, y - h, charw * 2, h * 2, gdidc, 0, 0, 62, 50, bf);
+				GdiAlphaBlend(mem1dc, localx - charw, localy - localh, charw * 2, localh * 2, gdidc, 0, 0, 62, 50, bf);
 				bf.SourceConstantAlpha = 255;
 
 			}
 			else
 			{
-				GdiAlphaBlend(mem1dc, x - charw, y - h, charw * 2, h * 2, gdidc, 0, 0, 62, 50, bf);
+				GdiAlphaBlend(mem1dc, localx - charw, localy - localh, charw * 2, localh * 2, gdidc, 0, 0, 62, 50, bf);
 			}
 		}
 
 
 	}
-	else if (state == 2 || state == 7) //점프하거나 떨어질때
+	else if (localstate == 2 || localstate == 7) //점프하거나 떨어질때
 	{
-		if (dir == 1)//왼쪽
+		if (localdir == 1)//왼쪽
 		{
 			//TransparentBlt(mem1dc, x - charw, y - h, charw * 2, h * 2, pdc, 0, 107, 62, 48, RGB(255, 255, 255)); //68 0 130 50
 			TransparentBlt(gdidc, 0, 0, 62, 50, pdc, 0, 107, 62, 50, RGB(255, 255, 255));
-			if (stealth > 0)
+			if (localstealth > 0)
 			{
 
 				bf.SourceConstantAlpha = 155;//투명도
 				//이 함수는 일반 stretchblt 와 비슷하다 gdidc 는 최대가 0,0 ~62,50 이므로 뒷 인자는 0 0 62 50
-				GdiAlphaBlend(mem1dc, x - charw, y - h, charw * 2, h * 2, gdidc, 0, 0, 62, 50, bf);
+				GdiAlphaBlend(mem1dc, localx - charw, localy - localh, charw * 2, localh * 2, gdidc, 0, 0, 62, 50, bf);
 				bf.SourceConstantAlpha = 255;
 
 			}
 			else
-				GdiAlphaBlend(mem1dc, x - charw, y - h, charw * 2, h * 2, gdidc, 0, 0, 62, 50, bf);
+				GdiAlphaBlend(mem1dc, localx - charw, localy - localh, charw * 2, localh * 2, gdidc, 0, 0, 62, 50, bf);
 		}
-		else if (dir == 2)//오른쪽
+		else if (localdir == 2)//오른쪽
 		{
 			//TransparentBlt(mem1dc, x - charw, y - h, charw * 2, h * 2, pdc, 77, 107, 62, 48, RGB(255, 255, 255));
 			TransparentBlt(gdidc, 0, 0, 62, 50, pdc, 77, 107, 62, 48, RGB(255, 255, 255));
-			if (stealth > 0)
+			if (localstealth > 0)
 			{
 
 				bf.SourceConstantAlpha = 155;//투명도
 				//이 함수는 일반 stretchblt 와 비슷하다 gdidc 는 최대가 0,0 ~62,50 이므로 뒷 인자는 0 0 62 50
-				GdiAlphaBlend(mem1dc, x - charw, y - h, charw * 2, h * 2, gdidc, 0, 0, 62, 50, bf);
+				GdiAlphaBlend(mem1dc, localx - charw, localy - localh, charw * 2, localh * 2, gdidc, 0, 0, 62, 50, bf);
 				bf.SourceConstantAlpha = 255;
 
 			}
 			else
-				GdiAlphaBlend(mem1dc, x - charw, y - h, charw * 2, h * 2, gdidc, 0, 0, 62, 50, bf);
+				GdiAlphaBlend(mem1dc, localx - charw, localy - localh, charw * 2, localh * 2, gdidc, 0, 0, 62, 50, bf);
 		}
 	}
-	else if (state == 3) //숙이기
+	else if (localstate == 3) //숙이기
 	{
 		//h는 줄고 y는 늘고 
 
-		BitBlt(gdidc, 0, 0, charw * 2, 26, mem1dc, x - charw, y - h, SRCCOPY);
-		if (dir == 1)//왼쪽
+		BitBlt(gdidc, 0, 0, charw * 2, 26, mem1dc, localx - charw, localy - localh, SRCCOPY);
+		if (localdir == 1)//왼쪽
 		{
 			//TransparentBlt(mem1dc, x - charw, y - h, charw * 2, h * 2, pdc, 0, 161, 62, 26, RGB(255, 255, 255)); //68 0 130 50
 			TransparentBlt(gdidc, 0, 0, 62, 26, pdc, 0, 161, 62, 26, RGB(255, 255, 255));
-			if (stealth > 0)
+			if (localstealth > 0)
 			{
 
 				bf.SourceConstantAlpha = 155;//투명도
 				//이 함수는 일반 stretchblt 와 비슷하다 gdidc 는 최대가 0,0 ~62,50 이므로 뒷 인자는 0 0 62 50
-				GdiAlphaBlend(mem1dc, x - charw, y - 12 - h + 12, charw * 2, h * 2, gdidc, 0, 0, 62, 26, bf);
+				GdiAlphaBlend(mem1dc, localx - charw, localy - 12 - localh + 12, charw * 2, localh * 2, gdidc, 0, 0, 62, 26, bf);
 				bf.SourceConstantAlpha = 255;
 
 			}
 			else
-				GdiAlphaBlend(mem1dc, x - charw, y - 12 - h + 12, charw * 2, h * 2, gdidc, 0, 0, 62, 26, bf);
+				GdiAlphaBlend(mem1dc, localx - charw, localy - 12 - localh + 12, charw * 2, localh * 2, gdidc, 0, 0, 62, 26, bf);
 		}
-		else if (dir == 2)//오른쪽
+		else if (localdir == 2)//오른쪽
 		{
 			//	TransparentBlt(mem1dc, x - charw, y - h, charw * 2, h * 2, pdc, 77, 161, 62, 26, RGB(255, 255, 255));
 			TransparentBlt(gdidc, 0, 0, 62, 26, pdc, 77, 161, 62, 26, RGB(255, 255, 255));
-			if (stealth > 0)
+			if (localstealth > 0)
 			{
 
 				bf.SourceConstantAlpha = 155;//투명도
 				//이 함수는 일반 stretchblt 와 비슷하다 gdidc 는 최대가 0,0 ~62,50 이므로 뒷 인자는 0 0 62 50
-				GdiAlphaBlend(mem1dc, x - charw, y - h, charw * 2, h * 2, gdidc, 0, 0, 62, 26, bf);
+				GdiAlphaBlend(mem1dc, localx - charw, localy - localh, charw * 2, localh * 2, gdidc, 0, 0, 62, 26, bf);
 				bf.SourceConstantAlpha = 255;
 
 			}
 			else
-				GdiAlphaBlend(mem1dc, x - charw, y - h, charw * 2, h * 2, gdidc, 0, 0, 62, 26, bf);
+				GdiAlphaBlend(mem1dc, localx - charw, localy - localh, charw * 2, localh * 2, gdidc, 0, 0, 62, 26, bf);
 		}
 	}
-	else if (state == 5 || state == 8)	//줄에 매달린상태
+	else if (localstate == 5 || localstate == 8)	//줄에 매달린상태
 	{
 		TransparentBlt(gdidc, 0, 0, 62, 50, pdc, bx * 77, 54, 62, 50, RGB(255, 255, 255));
 
-		if (stealth > 0)
+		if (localstealth > 0)
 		{
 
 			bf.SourceConstantAlpha = 155;
-			GdiAlphaBlend(mem1dc, x - charw, y - h, charw * 2, h * 2, gdidc, 0, 0, 62, 50, bf);
+			GdiAlphaBlend(mem1dc, localx - charw, localy - localh, charw * 2, localh * 2, gdidc, 0, 0, 62, 50, bf);
 			bf.SourceConstantAlpha = 255;
 
 		}
-		else GdiAlphaBlend(mem1dc, x - charw, y - h, charw * 2, h * 2, gdidc, 0, 0, 62, 50, bf);
+		else GdiAlphaBlend(mem1dc, localx - charw, localy - localh, charw * 2, localh * 2, gdidc, 0, 0, 62, 50, bf);
 
 	}
 
@@ -1100,8 +1112,8 @@ void PLAYER::draw(HDC& mem1dc, HDC& pdc)
 	HFONT oldfont = (HFONT)SelectObject(mem1dc, hfont);
 	SetBkMode(mem1dc, TRANSPARENT);
 	SetTextColor(mem1dc, RGB(255, 108, 168));
-	RECT rt{ x - 60,y + 25,x + 60,y + 65 };
-	DrawText(mem1dc, mPlayerwname.c_str(), lstrlenW(mPlayerwname.c_str()), &rt, DT_CENTER);
+	RECT rt{ localx - 60,localy + 25,localx + 60,localy + 65 };
+	DrawText(mem1dc, localPlayerwname.c_str(), lstrlenW(localPlayerwname.c_str()), &rt, DT_CENTER);
 
 	SelectObject(mem1dc, oldfont);
 	DeleteObject(hfont);
