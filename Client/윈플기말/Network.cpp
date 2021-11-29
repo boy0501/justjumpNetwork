@@ -39,6 +39,8 @@ Network::Network()
 {
 	WSAStartup(MAKEWORD(2, 2), &WSAData);
 	s_socket = socket(AF_INET, SOCK_STREAM, 0);
+	BOOL optval = true;
+	setsockopt(s_socket, IPPROTO_TCP, TCP_NODELAY, (char*)&optval, sizeof(optval));
 
 }
 
@@ -143,7 +145,6 @@ void Network::test()
 void Network::ProcessPacket(unsigned char* p)
 {
 	unsigned char packet_type = p[1];
-	//cout << (int)packet_type << endl;
 	switch (packet_type) {
 	case SC_PACKET_LOGIN_OK: {
 		isLogin = false;
@@ -244,7 +245,7 @@ void Network::ProcessPacket(unsigned char* p)
 	case SC_PACKET_MOVE_PROCESS: {
 		if (isLogin == true) break;
 		sc_packet_move_process* packet = reinterpret_cast<sc_packet_move_process*>(p);
-		
+
 		//std::cout << packet->x << "," << packet->y << std::endl;
 		//std::cout << (int)packet->bx << std::endl;
 		if (packet->id == mPlayer->player_cid)

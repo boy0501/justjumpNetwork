@@ -77,7 +77,7 @@ DWORD WINAPI ClientRecvThread(LPVOID arg)
 {
 	while (1)
 	{
-		//Network::GetNetwork()->C_Recv();
+		Network::GetNetwork()->C_Recv();
 	}
 }
 
@@ -95,7 +95,7 @@ void update(float delta_time)
 	player_keyProcess();
 	robby_waiting();
 
-	Network::GetNetwork()->C_Recv();
+	//Network::GetNetwork()->C_Recv();
 
 	//빼줘야 할 Ui가 있다면 Ui 삭제
 	auto iter = Network::GetNetwork()->mUI.begin();
@@ -346,7 +346,7 @@ int GetText(HWND hWnd, UINT msg, WPARAM wparam, LPARAM lparam)
 
 				if (map.LoginInputFlag == false)
 				{
-					if (Network::GetNetwork()->mUI.back()->FindTextByNameTag("id")->getTextLen() < 10)
+					if (Network::GetNetwork()->mUI.back()->FindTextByNameTag("id")->getTextLen() < 9)
 					{
 						if (Network::GetNetwork()->mUI.back()->FindTextByNameTag("id")->getText().size() == 0) 
 							Network::GetNetwork()->mUI.back()->FindTextByNameTag("id")->pushwChar(*wszComp);
@@ -385,7 +385,7 @@ int GetText(HWND hWnd, UINT msg, WPARAM wparam, LPARAM lparam)
 			wsz1Comp[len] = 0;
 			if (map.LoginInputFlag == false)
 			{
-				if (Network::GetNetwork()->mUI.back()->FindTextByNameTag("id")->getTextLen() < 10)
+				if (Network::GetNetwork()->mUI.back()->FindTextByNameTag("id")->getTextLen() < 9)
 				{
 					if (!isComposit)
 					{
@@ -620,12 +620,12 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 			player.mPlayername = ui->FindTextByNameTag("id")->getTextForString();
 			player.mPlayerwname = ui->FindTextByNameTag("id")->getText();
 
-			//HANDLE hThread = CreateThread(NULL, 0, ClientRecvThread, (LPVOID)0, 0, NULL);
-			//if (hThread == NULL)
-			//{
-			//	cerr << "비 정상적인 스레드 생성" << endl;
-			//	exit(-1);
-			//}
+			HANDLE hThread = CreateThread(NULL, 0, ClientRecvThread, (LPVOID)0, 0, NULL);
+			if (hThread == NULL)
+			{
+				cerr << "비 정상적인 스레드 생성" << endl;
+				exit(-1);
+			}
 
 			cs_packet_login packet;
 			strcpy_s(packet.username, 20, ui->FindTextByNameTag("id")->getTextForString().c_str());
@@ -725,7 +725,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 			break;
 		if (player.getGamemode() == 0) {
 			keyboard[wParam] = true;
-			player.PlayerSetting(wParam);
+			//player.PlayerSetting(wParam);
 			//send_move_packet(wParam);
 		}	
 		else if (player.getGamemode() == 1)
@@ -735,7 +735,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		if (player.getCMD_die() == 1)
 			break;
 		if (player.getGamemode() == 0) {
-			player.PlayerWaiting(wParam);
+			//player.PlayerWaiting(wParam);
 			keyboard[wParam] = false;
 			send_keyup_packet(wParam);
 		}
@@ -787,7 +787,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 			default:
 				if (map.LoginInputFlag == false)
 				{
-					if (Network::GetNetwork()->mUI.back()->FindTextByNameTag("id")->getTextLen() < 10)
+					if (Network::GetNetwork()->mUI.back()->FindTextByNameTag("id")->getTextLen() < 9)
 						Network::GetNetwork()->mUI.back()->FindTextByNameTag("id")->pushChar(wParam);
 					Network::GetNetwork()->mUI.back()->FindTextByNameTag("id")->UpdateFontSize(hwnd);
 					nCaretPosx = 380 + Network::GetNetwork()->mUI.back()->FindTextByNameTag("id")->getFontLen().cx;
