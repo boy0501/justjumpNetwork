@@ -77,7 +77,7 @@ DWORD WINAPI ClientRecvThread(LPVOID arg)
 {
 	while (1)
 	{
-		Network::GetNetwork()->C_Recv();
+		//Network::GetNetwork()->C_Recv();
 	}
 }
 
@@ -95,7 +95,7 @@ void update(float delta_time)
 	player_keyProcess();
 	robby_waiting();
 
-	//Network::GetNetwork()->C_Recv();
+	Network::GetNetwork()->C_Recv();
 
 	//빼줘야 할 Ui가 있다면 Ui 삭제
 	auto iter = Network::GetNetwork()->mUI.begin();
@@ -151,15 +151,14 @@ void update(float delta_time)
 			}
 		}
 		//=======================================
-		cout << player.state << endl;
-		player.move(delta_time);
+		//player.move(delta_time);
 		//adjustPlayer(player, obj, map, ocount, g_hinst);
 		//cout << player.y << endl;
-		for (auto& other : others)
-		{
-			other.move(delta_time);
-			//adjustPlayer(other, obj, map, ocount, g_hinst);
-		}
+		//for (auto& other : others)
+		//{
+		//	other.move(delta_time);
+		//	//adjustPlayer(other, obj, map, ocount, g_hinst);
+		//}
 		//두개 다 서버로 옮겨줬기 때문에, 이제 필요가 없다.
 		if (player.getCMD_die())
 		{
@@ -349,7 +348,7 @@ int GetText(HWND hWnd, UINT msg, WPARAM wparam, LPARAM lparam)
 				{
 					if (Network::GetNetwork()->mUI.back()->FindTextByNameTag("id")->getTextLen() < 10)
 					{
-						if (Network::GetNetwork()->mUI.back()->FindTextByNameTag("id")->getText().size() == 0)
+						if (Network::GetNetwork()->mUI.back()->FindTextByNameTag("id")->getText().size() == 0) 
 							Network::GetNetwork()->mUI.back()->FindTextByNameTag("id")->pushwChar(*wszComp);
 						else
 							Network::GetNetwork()->mUI.back()->FindTextByNameTag("id")->changewChar(*wszComp);
@@ -621,12 +620,12 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 			player.mPlayername = ui->FindTextByNameTag("id")->getTextForString();
 			player.mPlayerwname = ui->FindTextByNameTag("id")->getText();
 
-			HANDLE hThread = CreateThread(NULL, 0, ClientRecvThread, (LPVOID)0, 0, NULL);
-			if (hThread == NULL)
-			{
-				cerr << "비 정상적인 스레드 생성" << endl;
-				exit(-1);
-			}
+			//HANDLE hThread = CreateThread(NULL, 0, ClientRecvThread, (LPVOID)0, 0, NULL);
+			//if (hThread == NULL)
+			//{
+			//	cerr << "비 정상적인 스레드 생성" << endl;
+			//	exit(-1);
+			//}
 
 			cs_packet_login packet;
 			strcpy_s(packet.username, 20, ui->FindTextByNameTag("id")->getTextForString().c_str());
