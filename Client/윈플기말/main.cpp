@@ -91,7 +91,12 @@ bool bRobby_full = false;
 
 void update(float delta_time)
 {
-
+	/*if (player.hp == 0) {
+		cout << "죽음!" << endl;
+	}
+	else
+		cout << player.hp << endl;*/
+	//cout << player.hp << endl;
 	player_keyProcess();
 	robby_waiting();
 
@@ -160,11 +165,11 @@ void update(float delta_time)
 		//	//adjustPlayer(other, obj, map, ocount, g_hinst);
 		//}
 		//두개 다 서버로 옮겨줬기 때문에, 이제 필요가 없다.
-		if (player.getCMD_die())
+		if (player.hp == 0)
 		{
-			if (player.WhenPlayerDied == false)
-				Network::GetNetwork()->mUI.emplace_back(map.mDieUi);
-			player.WhenPlayerDied = true;
+			//if (player.WhenPlayerDied == false)
+			Network::GetNetwork()->mUI.emplace_back(map.mDieUi);
+			//player.WhenPlayerDied = true;
 		}
 	}
 	map.movemap();
@@ -515,6 +520,15 @@ void send_robby_in_packet()
 
 	Network::GetNetwork()->C_Send(&packet, sizeof(packet));
 }
+void send_die_ok_packet()
+{
+	cs_packet_die_ok packet;
+	packet.size = sizeof(packet);
+	packet.type = CS_PACKET_DIEOK;
+
+
+	Network::GetNetwork()->C_Send(&packet, sizeof(packet));
+}
 //void send_logout_packet(char button)
 //{
 //	cs_packet_logout packet;
@@ -549,30 +563,35 @@ void robby_waiting()
 
 void player_keyProcess()
 {
-	if (IsKeyPressed(VK_LEFT))
+	if (player.hp != 0)
 	{
-		send_move_packet(VK_LEFT);
+		if (IsKeyPressed(VK_LEFT))
+		{
+			send_move_packet(VK_LEFT);
+		}
+		if (IsKeyPressed(VK_RIGHT))
+		{
+			send_move_packet(VK_RIGHT);
+		}
+		if (IsKeyPressed(VK_UP))
+		{
+			send_move_packet(VK_UP);
+		}
+		if (IsKeyPressed(VK_DOWN))
+		{
+			send_move_packet(VK_DOWN);
+		}
+		if (IsKeyPressed(VK_SPACE))
+		{
+			send_move_packet(VK_SPACE);
+		}
+		if (IsKeyPressed(VK_END))
+		{
+			send_move_packet(VK_END);
+		}
 	}
-	if (IsKeyPressed(VK_RIGHT))
-	{
-		send_move_packet(VK_RIGHT);
-	}
-	if (IsKeyPressed(VK_UP))
-	{
-		send_move_packet(VK_UP);
-	}
-	if (IsKeyPressed(VK_DOWN))
-	{
-		send_move_packet(VK_DOWN);
-	}
-	if (IsKeyPressed(VK_SPACE))
-	{
-		send_move_packet(VK_SPACE);
-	}
-	if (IsKeyPressed(VK_END))
-	{
-		send_move_packet(VK_END);
-	}
+	
+	
 }
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
@@ -687,11 +706,15 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 
 		auto dieui = make_shared<DieHUD>(1, player, camera);
 
+		//die ui 비트맵 수정 필요!!!
 		dieui->LoadUiBitmap(g_hinst, "img/DieNotice.bmp", 380, 240, 260, 130, RGB(255, 0, 0));
+		
 		dieui->addButton([dieui]() {
-			player.initPos();
-			player.sethp(100);
-			player.WhenPlayerDied = false;
+			cout << "위치 초기화!" << endl;
+			send_die_ok_packet();
+			//player.initPos();
+			//player.sethp(100);
+			//player.WhenPlayerDied = false;
 			dieui->closeUI();
 		}, g_hinst, "img/DieOkButton", 583, 340, 40, 16, RGB(255, 0, 0));
 		map.mDieUi = dieui;
@@ -738,7 +761,11 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		if (player.getGamemode() == 0) {
 			//player.PlayerWaiting(wParam);
 			keyboard[wParam] = false;
-			send_keyup_packet(wParam);
+			if (player.hp != 0)
+			{
+				send_keyup_packet(wParam);
+
+			}
 		}
 		else if (player.getGamemode() == 1)
 			camera.CameraSetting(wParam);
