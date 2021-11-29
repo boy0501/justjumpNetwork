@@ -96,30 +96,28 @@ void GameHUD::drawMyRanking(HDC& mem1dc)
 
 void GameHUD::drawOtherPlayerRanking(HDC& mem1dc)
 {
-	EnterCriticalSection(&mPlayer->cs);
-	auto localMyC_id = mPlayer->player_cid;
-	LeaveCriticalSection(&mPlayer->cs);
+	//EnterCriticalSection(&mPlayer->cs);
+	//auto localMyC_id = mPlayer->player_cid;
+	//LeaveCriticalSection(&mPlayer->cs);
 
-	EnterCriticalSection(&mOthers[0].cs);
-	auto localother1Name = mOthers[0].mPlayerwname;
-	auto localother1Rank = mOthers[0].rank;
-	auto localother1c_id = mOthers[0].player_cid;
-	LeaveCriticalSection(&mOthers[0].cs);
+	//EnterCriticalSection(&mOthers[0].cs);
+	//auto localother1Name = mOthers[0].mPlayerwname;
+	//auto localother1Rank = mOthers[0].rank;
+	//auto localother1c_id = mOthers[0].player_cid;
+	//LeaveCriticalSection(&mOthers[0].cs);
 
-	EnterCriticalSection(&mOthers[1].cs);
-	//로컬로 캐싱
-	LeaveCriticalSection(&mOthers[1].cs);
+	//EnterCriticalSection(&mOthers[1].cs);
+	////로컬로 캐싱
+	//LeaveCriticalSection(&mOthers[1].cs);
 
-	EnterCriticalSection(&mOthers[2].cs);
-	//로컬로 캐싱
-	LeaveCriticalSection(&mOthers[2].cs);
+	//EnterCriticalSection(&mOthers[2].cs);
+	////로컬로 캐싱
+	//LeaveCriticalSection(&mOthers[2].cs);
 
 	//int ranking;
 	TCHAR otherPlayer1Name[100];
-	TCHAR otherPlayer2Name[100];
-	TCHAR otherPlayer3Name[100];
+	
 
-	TCHAR otherPlayer1Name[100];
 	TCHAR otherPlayer1Ranking[100];
 	
 	HFONT hfont = CreateFont(14, 0, 0, 0, 0, 0, 0, 0, HANGEUL_CHARSET, 0, 0, 0, VARIABLE_PITCH | FF_ROMAN, TEXT("메이플스토리 bold"));
