@@ -30,7 +30,7 @@ void LobbyClient::update(float delta_time)
 		std::cout << "로비클라" << std::endl;
 		std::cout << robby_cnt << std::endl;
 
-		if (robby_cnt == 1)
+		if (robby_cnt == 3)
 		{
 
 			robby_timer--;
