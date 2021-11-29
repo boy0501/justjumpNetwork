@@ -11,6 +11,7 @@ Client::Client()
 	,mSn(SN_LOGIN)
 	,is_active(false)
 {
+	ZeroMemory(buf, sizeof(buf));
 	x = 80; 
 	y = 655;
 	savey = 3700;	
@@ -73,8 +74,30 @@ void Client::ProcessPacket(unsigned char* p)
 		break;
 	}
 	//jpark
+	case CS_PACKET_DIEOK: {
+		cs_packet_die_ok* packet = reinterpret_cast<cs_packet_die_ok*>(p);
+
+		x = 80;
+		y = 3700;
+		savey = 3700;
+		w = 14;
+		h = 25;
+		state = 7;
+		dir = 2;
+		adjustspd = 0;
+		stealth = 0;
+		spike_hurt = 0;
+		COMMAND_move = false;
+		COMMAND_hurt = false;
+		COMMAND_die = false;
+
+		hp = 100;
+
+		break;
+	}
 	case CS_PACKET_MOVE: {
 		cs_packet_move* packet = reinterpret_cast<cs_packet_move*>(p);
+		if (c_id != packet->id) break;
 		switch ((int)packet->dir) {
 		case VK_LEFT: //VK_LEFT
 			//std::cout << "left" << std::endl;
@@ -476,6 +499,7 @@ int Client::do_recv()
 	{
 		memcpy(&buf, packet_start, remain_data);
 	}
+
 	return 0;
 }
 

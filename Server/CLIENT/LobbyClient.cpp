@@ -30,7 +30,7 @@ void LobbyClient::update(float delta_time)
 		std::cout << "로비클라" << std::endl;
 		std::cout << robby_cnt << std::endl;
 
-		if (robby_cnt == 3)
+		if (robby_cnt == 1)
 		{
 
 			robby_timer--;
@@ -125,7 +125,7 @@ void LobbyClient::initPos()
 	h = 25;
 	//charw = 31;	
 	//charh = 25;	
-	hp = 100;
+	hp = 5;
 	state = 1;
 	dir = 2;
 	adjustspd = 0;

@@ -39,6 +39,8 @@ Network::Network()
 {
 	WSAStartup(MAKEWORD(2, 2), &WSAData);
 	s_socket = socket(AF_INET, SOCK_STREAM, 0);
+	BOOL optval = true;
+	setsockopt(s_socket, IPPROTO_TCP, TCP_NODELAY, (char*)&optval, sizeof(optval));
 
 }
 
@@ -143,7 +145,6 @@ void Network::test()
 void Network::ProcessPacket(unsigned char* p)
 {
 	unsigned char packet_type = p[1];
-	//cout << (int)packet_type << endl;
 	switch (packet_type) {
 	case SC_PACKET_LOGIN_OK: {
 		isLogin = false;
@@ -173,6 +174,7 @@ void Network::ProcessPacket(unsigned char* p)
 	case SC_PACKET_PUT_OBJECT: {
 		sc_packet_put_object* packet = reinterpret_cast<sc_packet_put_object*>(p);
 		auto id = packet->id;
+		EnterCriticalSection(&mOthers[id].cs);
 		mOthers[id].is_active = true;
 		mOthers[id].dir=packet->dir;
 		mOthers[id].h=packet->h;
@@ -186,7 +188,6 @@ void Network::ProcessPacket(unsigned char* p)
 		mOthers[id].mPlayerwname = wstring(A2W(mOthers[id].mPlayername.c_str()));
 		mOthers[id].w = packet->w;
 		//임계영역 자리 
-		EnterCriticalSection(&mOthers[id].cs);
 		mOthers[id].x=packet->x;
 		mOthers[id].y=packet->y;
 		LeaveCriticalSection(&mOthers[id].cs);
@@ -205,7 +206,6 @@ void Network::ProcessPacket(unsigned char* p)
 	case SC_PACKET_PORTAL: {
 		sc_packet_portal* packet = reinterpret_cast<sc_packet_portal*>(p);
 		mPlayer->stage = packet->stagenum;
-
 		occur_button = 0;
 		mMap->setblack_t(100);
 		mMap->setmapnum(mPlayer->stage + 9);
@@ -244,11 +244,12 @@ void Network::ProcessPacket(unsigned char* p)
 	case SC_PACKET_MOVE_PROCESS: {
 		if (isLogin == true) break;
 		sc_packet_move_process* packet = reinterpret_cast<sc_packet_move_process*>(p);
-		
+
 		//std::cout << packet->x << "," << packet->y << std::endl;
 		//std::cout << (int)packet->bx << std::endl;
 		if (packet->id == mPlayer->player_cid)
 		{
+			EnterCriticalSection(&mPlayer->cs);
 			mPlayer->h = packet->h;
 			mPlayer->state = packet->state;
 			mPlayer->stealth = packet->stealth;
@@ -257,7 +258,6 @@ void Network::ProcessPacket(unsigned char* p)
 			mPlayer->rank = packet->rank;
 
 			//임계영역 들어갈 자리 ---
-			EnterCriticalSection(&mPlayer->cs);
 			mPlayer->x = packet->x;
 			mPlayer->y = packet->y;
 			//속도구하는 공식 = 거리 /시간 => (지금패킷위치 - 예전패킷위치) / 걸린시간  
@@ -275,6 +275,7 @@ void Network::ProcessPacket(unsigned char* p)
 		}
 		else {
 			auto& other = mOthers[packet->id];
+			EnterCriticalSection(&other.cs);
 			other.h = packet->h;
 			other.state = packet->state;
 			other.stealth = packet->stealth;
@@ -282,7 +283,6 @@ void Network::ProcessPacket(unsigned char* p)
 			other.hp = packet->hp;
 			other.rank = packet->rank;
 			//임계영역 자리 ----
-			EnterCriticalSection(&other.cs);
 			other.x = packet->x;
 			other.y = packet->y;
 			//속도구하는 공식 = 거리 /시간 => (지금패킷위치 - 예전패킷위치) / 걸린시간  
@@ -301,13 +301,13 @@ void Network::ProcessPacket(unsigned char* p)
 	}
 	case SC_PACKET_GAMESTART:{
 		sc_packet_gamestart* packet = reinterpret_cast<sc_packet_gamestart*>(p);
+		//임계영역 자리
+		EnterCriticalSection(&mPlayer->cs);
 		mPlayer->dir = packet->dir;
 		mPlayer->h = packet->h;
 		mPlayer->stage = packet->stage;
 		mPlayer->state = packet->state;
 		mPlayer->stealth = packet->stealth;
-		//임계영역 자리
-		EnterCriticalSection(&mPlayer->cs);
 		mPlayer->x = packet->x;
 		mPlayer->y = packet->y;
 		LeaveCriticalSection(&mPlayer->cs);
@@ -383,19 +383,19 @@ void Network::ProcessPacket(unsigned char* p)
 		case 107: {
 			//임계영역 자리
 			EnterCriticalSection(&obj.cs);
-			obj.degree = packet->degree;
-			obj.velocityDegree = (packet->degree - obj.oldDegree) / (packet->senddeltatime);
-			if (obj.velocityDegree < 0)
-			{
-				//각도는 0 = 360인데 old는 360에서 362로 갈것으로 기대하고있지만, 실제 degree는 0으로 가서 생기는 - 값 보정
-				obj.velocityDegree = (packet->degree + 360 - obj.oldDegree) / (packet->senddeltatime);
-			}
+			//obj.degree = packet->degree;
+			//obj.velocityDegree = (packet->degree - obj.oldDegree) / (packet->senddeltatime);
+			//if (obj.velocityDegree < 0)
+			//{
+			//	//각도는 0 = 360인데 old는 360에서 362로 갈것으로 기대하고있지만, 실제 degree는 0으로 가서 생기는 - 값 보정
+			//	obj.velocityDegree = (packet->degree + 360 - obj.oldDegree) / (packet->senddeltatime);
+			//}
+			obj.mx = packet->mx;
+			obj.my = packet->my;
 			LeaveCriticalSection(&obj.cs);
-			obj.oldDegree = packet->degree;
+			//obj.oldDegree = packet->degree;
 			//임계영역 자리
 
-			//obj.mx = packet->mx;
-			//obj.my = packet->my;
 			break;
 		}
 		}

@@ -91,7 +91,12 @@ bool bRobby_full = false;
 
 void update(float delta_time)
 {
-
+	/*if (player.hp == 0) {
+		cout << "죽음!" << endl;
+	}
+	else
+		cout << player.hp << endl;*/
+	//cout << player.hp << endl;
 	player_keyProcess();
 	robby_waiting();
 
@@ -151,21 +156,20 @@ void update(float delta_time)
 			}
 		}
 		//=======================================
-		
-		player.move(delta_time);
+		//player.move(delta_time);
 		//adjustPlayer(player, obj, map, ocount, g_hinst);
 		//cout << player.y << endl;
-		for (auto& other : others)
-		{
-			other.move(delta_time);
-			//adjustPlayer(other, obj, map, ocount, g_hinst);
-		}
+		//for (auto& other : others)
+		//{
+		//	other.move(delta_time);
+		//	//adjustPlayer(other, obj, map, ocount, g_hinst);
+		//}
 		//두개 다 서버로 옮겨줬기 때문에, 이제 필요가 없다.
-		if (player.getCMD_die())
+		if (player.hp == 0)
 		{
-			if (player.WhenPlayerDied == false)
-				Network::GetNetwork()->mUI.emplace_back(map.mDieUi);
-			player.WhenPlayerDied = true;
+			//if (player.WhenPlayerDied == false)
+			Network::GetNetwork()->mUI.emplace_back(map.mDieUi);
+			//player.WhenPlayerDied = true;
 		}
 	}
 	map.movemap();
@@ -236,7 +240,7 @@ void update(float delta_time)
 				obj[i].IndexChange();
 
 			}
-			obj[i].move(delta_time);
+			//obj[i].move(delta_time);
 		}
 		else if (obj[i].getType() == 201)
 		{
@@ -347,9 +351,9 @@ int GetText(HWND hWnd, UINT msg, WPARAM wparam, LPARAM lparam)
 
 				if (map.LoginInputFlag == false)
 				{
-					if (Network::GetNetwork()->mUI.back()->FindTextByNameTag("id")->getTextLen() < 10)
+					if (Network::GetNetwork()->mUI.back()->FindTextByNameTag("id")->getTextLen() < 9)
 					{
-						if (Network::GetNetwork()->mUI.back()->FindTextByNameTag("id")->getText().size() == 0)
+						if (Network::GetNetwork()->mUI.back()->FindTextByNameTag("id")->getText().size() == 0) 
 							Network::GetNetwork()->mUI.back()->FindTextByNameTag("id")->pushwChar(*wszComp);
 						else
 							Network::GetNetwork()->mUI.back()->FindTextByNameTag("id")->changewChar(*wszComp);
@@ -386,7 +390,7 @@ int GetText(HWND hWnd, UINT msg, WPARAM wparam, LPARAM lparam)
 			wsz1Comp[len] = 0;
 			if (map.LoginInputFlag == false)
 			{
-				if (Network::GetNetwork()->mUI.back()->FindTextByNameTag("id")->getTextLen() < 10)
+				if (Network::GetNetwork()->mUI.back()->FindTextByNameTag("id")->getTextLen() < 9)
 				{
 					if (!isComposit)
 					{
@@ -493,6 +497,7 @@ void send_move_packet(char dr)
 	packet.size = sizeof(packet);
 	packet.type = CS_PACKET_MOVE;
 	packet.dir = dr;
+	packet.id = player.player_cid;
 
 	Network::GetNetwork()->C_Send(&packet, sizeof(packet));
 	//cout << "send패킷 보냄" << endl;
@@ -512,6 +517,15 @@ void send_robby_in_packet()
 	packet.size = sizeof(packet);
 	packet.type = CS_PACKET_ROBBY;
 	
+
+	Network::GetNetwork()->C_Send(&packet, sizeof(packet));
+}
+void send_die_ok_packet()
+{
+	cs_packet_die_ok packet;
+	packet.size = sizeof(packet);
+	packet.type = CS_PACKET_DIEOK;
+
 
 	Network::GetNetwork()->C_Send(&packet, sizeof(packet));
 }
@@ -549,30 +563,35 @@ void robby_waiting()
 
 void player_keyProcess()
 {
-	if (IsKeyPressed(VK_LEFT))
+	if (player.hp != 0)
 	{
-		send_move_packet(VK_LEFT);
+		if (IsKeyPressed(VK_LEFT))
+		{
+			send_move_packet(VK_LEFT);
+		}
+		if (IsKeyPressed(VK_RIGHT))
+		{
+			send_move_packet(VK_RIGHT);
+		}
+		if (IsKeyPressed(VK_UP))
+		{
+			send_move_packet(VK_UP);
+		}
+		if (IsKeyPressed(VK_DOWN))
+		{
+			send_move_packet(VK_DOWN);
+		}
+		if (IsKeyPressed(VK_SPACE))
+		{
+			send_move_packet(VK_SPACE);
+		}
+		if (IsKeyPressed(VK_END))
+		{
+			send_move_packet(VK_END);
+		}
 	}
-	if (IsKeyPressed(VK_RIGHT))
-	{
-		send_move_packet(VK_RIGHT);
-	}
-	if (IsKeyPressed(VK_UP))
-	{
-		send_move_packet(VK_UP);
-	}
-	if (IsKeyPressed(VK_DOWN))
-	{
-		send_move_packet(VK_DOWN);
-	}
-	if (IsKeyPressed(VK_SPACE))
-	{
-		send_move_packet(VK_SPACE);
-	}
-	if (IsKeyPressed(VK_END))
-	{
-		send_move_packet(VK_END);
-	}
+	
+	
 }
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
@@ -687,11 +706,15 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 
 		auto dieui = make_shared<DieHUD>(1, player, camera);
 
+		//die ui 비트맵 수정 필요!!!
 		dieui->LoadUiBitmap(g_hinst, "img/DieNotice.bmp", 380, 240, 260, 130, RGB(255, 0, 0));
+		
 		dieui->addButton([dieui]() {
-			player.initPos();
-			player.sethp(100);
-			player.WhenPlayerDied = false;
+			cout << "위치 초기화!" << endl;
+			send_die_ok_packet();
+			//player.initPos();
+			//player.sethp(100);
+			//player.WhenPlayerDied = false;
 			dieui->closeUI();
 		}, g_hinst, "img/DieOkButton", 583, 340, 40, 16, RGB(255, 0, 0));
 		map.mDieUi = dieui;
@@ -726,7 +749,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 			break;
 		if (player.getGamemode() == 0) {
 			keyboard[wParam] = true;
-			player.PlayerSetting(wParam);
+			//player.PlayerSetting(wParam);
 			//send_move_packet(wParam);
 		}	
 		else if (player.getGamemode() == 1)
@@ -736,9 +759,13 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		if (player.getCMD_die() == 1)
 			break;
 		if (player.getGamemode() == 0) {
-			player.PlayerWaiting(wParam);
+			//player.PlayerWaiting(wParam);
 			keyboard[wParam] = false;
-			send_keyup_packet(wParam);
+			if (player.hp != 0)
+			{
+				send_keyup_packet(wParam);
+
+			}
 		}
 		else if (player.getGamemode() == 1)
 			camera.CameraSetting(wParam);
@@ -788,7 +815,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 			default:
 				if (map.LoginInputFlag == false)
 				{
-					if (Network::GetNetwork()->mUI.back()->FindTextByNameTag("id")->getTextLen() < 10)
+					if (Network::GetNetwork()->mUI.back()->FindTextByNameTag("id")->getTextLen() < 9)
 						Network::GetNetwork()->mUI.back()->FindTextByNameTag("id")->pushChar(wParam);
 					Network::GetNetwork()->mUI.back()->FindTextByNameTag("id")->UpdateFontSize(hwnd);
 					nCaretPosx = 380 + Network::GetNetwork()->mUI.back()->FindTextByNameTag("id")->getFontLen().cx;
