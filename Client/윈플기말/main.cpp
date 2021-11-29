@@ -235,7 +235,7 @@ void update(float delta_time)
 				obj[i].IndexChange();
 
 			}
-			obj[i].move(delta_time);
+			//obj[i].move(delta_time);
 		}
 		else if (obj[i].getType() == 201)
 		{
@@ -492,6 +492,7 @@ void send_move_packet(char dr)
 	packet.size = sizeof(packet);
 	packet.type = CS_PACKET_MOVE;
 	packet.dir = dr;
+	packet.id = player.player_cid;
 
 	Network::GetNetwork()->C_Send(&packet, sizeof(packet));
 	//cout << "send패킷 보냄" << endl;
