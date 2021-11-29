@@ -348,46 +348,156 @@ void GameClient::move(float deltatime)
 
 	//순위 판정-------------------------------------------------
 	
-	for (int i= 0; i < Cnt_Player; ++i)
+	//for (int i = 0; i < Cnt_Player; ++i)
+	//{
+	//	//if (c_id == CLIENTS[i]->c_id) continue;
+	//	//mmStagenum[i] = 1;
+	//	//for (int j = 0; j < Cnt_Player; ++j)
+	//	//{
+	//	//	//if (i == j)continue;
+	//	//	if (CLIENTS[i]->mStageNum < CLIENTS[j]->mStageNum)
+	//	//	{
+	//	//		mmStagenum[i] ++;
+
+	//	//	}
+	//	//}
+
+	//	CLIENTS[i]->rank = mmStagenum[i];
+
+	//	sc_packet_put_object packet;
+
+	//	packet.size = sizeof(sc_packet_put_object);
+	//	packet.type = SC_PACKET_PUT_OBJECT;
+	//	packet.id = c_id;
+	//	packet.rank = CLIENTS[i]->rank;
+	//	CLIENTS[i]->do_send(&packet, sizeof(packet));
+	//}
+	for (int i = 0; i < Cnt_Player; ++i)
 	{
-		
-		
-		//if(CLIENTS[i]->mStageNum == 1 )
-			//mRank[i] = 2;
-		//else
+		//if (c_id == CLIENTS[i]->c_id)continue;
+		//auto other = CLIENTS[i];
+
+		if (CLIENTS[i]->mStageNum == 1)
 			mRank[i] = 1;
+		if (CLIENTS[i]->mStageNum == 2)
+			mRank[i] = 3;
+		if (CLIENTS[i]->mStageNum == 3)
+			mRank[i] = 5;
 
 		if (CLIENTS[i]->mStageNum < 4) {
 			for (int j = 0; j < Cnt_Player; ++j)
 			{
-				if (i == j) continue;	// 넣는게 맞나	
-					
-				if (CLIENTS[i]->mStageNum > CLIENTS[j]->mStageNum ||
-					CLIENTS[i]->y > CLIENTS[j]->y)
+				if (i == j) continue;	// 넣는게 맞나?
+				//if (CLIENTS[i]->mStageNum == CLIENTS[j]->mStageNum)
 				{
-					if (CLIENTS[i]->mStageNum >= CLIENTS[j]->mStageNum)
+					if (CLIENTS[i]->mStageNum < CLIENTS[j]->mStageNum)
 					{
-						if (CLIENTS[i]->mStageNum == CLIENTS[j]->mStageNum)
-						{
-							if (CLIENTS[i]->y > CLIENTS[j]->y)
-								mRank[i] += 1;
-						}
-						if (CLIENTS[i]->mStageNum > CLIENTS[j]->mStageNum)
-						{
-							mRank[j] += 1;
-						}
-						//else
-						//mRank[i] += 1;
+						mRank[i] += 1;
+
 					}
+					//else continue;
 				}
-				
-				
+
 			}
-		}		
+		}
 		CLIENTS[i]->rank = mRank[i];
 	}
 
-	
+	for(int i = 0;i<Cnt_Player;++i)
+	{
+		if (c_id != CLIENTS[i]->c_id) continue;
+
+		auto other = CLIENTS[i];
+
+		sc_packet_put_object packet;
+		packet.size = sizeof(sc_packet_put_object);
+		packet.type = SC_PACKET_PUT_OBJECT;
+		packet.dir = other->dir;
+		packet.h = other->h;
+		packet.hp = other->hp;
+		packet.id = other->c_id;
+		packet.state = other->state;
+		packet.stealth = other->stealth;
+		strcpy_s(packet.username, 20, other->playername);
+		packet.x = other->x;
+		packet.y = other->y;
+		packet.w = other->w;
+		packet.rank =other->rank ;
+		do_send(&packet, sizeof(packet));
+
+		sc_packet_put_object otherpacket;
+		otherpacket.size = sizeof(sc_packet_put_object);
+		otherpacket.type = SC_PACKET_PUT_OBJECT;
+		otherpacket.id = c_id;
+		otherpacket.dir = dir;
+		otherpacket.h = h;
+		otherpacket.hp = hp;
+		otherpacket.state = state;
+		otherpacket.stealth = stealth;
+		strcpy_s(otherpacket.username, 20, playername);
+		otherpacket.w = w;
+		otherpacket.x = x;
+		otherpacket.y = y;
+		otherpacket.rank = rank;
+		CLIENTS[i]->do_send(&otherpacket, sizeof(otherpacket));
+
+	}
+		//if (c_id == CLIENTS[i]->c_id) continue;
+
+		//for (auto& other : CLIENTS)
+		//{
+		//	if (other->c_id == CLIENTS[i]->c_id) continue;
+
+		//	CLIENTS[i]->rank = 1;
+
+		//	if (other->mStageNum > CLIENTS[i]->mStageNum)
+		//		CLIENTS[i]->rank += 1;
+		//	//else
+		//		//other->rank = 1;
+		//}
+		
+		
+		//	//if (CLIENTS[i]->mStageNum < 4) 
+		//	{
+		//		for (int j = 0; j < Cnt_Player; ++j)
+		//		{
+		//			if (CLIENTS[i]->mStageNum > CLIENTS[j]->mStageNum)
+		//			{
+		//				CLIENTS[i]->rank = 1;
+		//				CLIENTS[j]->rank += CLIENTS[i]->rank;
+		//			}
+		//			if (CLIENTS[i]->mStageNum == CLIENTS[j]->mStageNum)
+		//			{
+		//				if (CLIENTS[i]->y > CLIENTS[j]->y)
+		//				{
+		//					CLIENTS[i]->rank += 1;
+
+		//				}
+		//				//else continue;
+		//			}
+		//			//if (CLIENTS[i]->mStageNum > CLIENTS[j]->mStageNum)
+		//			
+		//			
+		//			
+
+		//		}
+		//	}
+			
+			/*for (int j = 0; j < Cnt_Player; ++j)
+			{
+				CLIENTS[j]->rank = 1;
+				if (CLIENTS[i]->y > CLIENTS[j]->y)
+				{
+					CLIENTS[i]->rank = CLIENTS[j]->rank + 1;
+					CLIENTS[j]->rank = CLIENTS[i]->rank + 1;
+				
+				}
+			}
+			*/
+		
+		//CLIENTS[i]->rank = mRank[i];
+
+	//}
 
 }
 //오브젝트와 플레이어 충돌체크 1이면 부닥침
@@ -771,6 +881,8 @@ void GameClient::adjustPlayer(float deltatime)
 							mypacket.type = SC_PACKET_LOGOUT_OBJECT;
 							mypacket.id = i;
 							do_send(&mypacket, sizeof(mypacket));
+
+							
 						}
 
 						//Stage의 변경 
@@ -782,6 +894,7 @@ void GameClient::adjustPlayer(float deltatime)
 						packet.stagenum = mStageNum;
 						do_send(&packet, sizeof(packet));
 
+						
 						//다른사람들의 상태를 나한테 전달 (바뀐 stage에 있는 사람들걸 가져옴
 						//이후 나도 다른사람들한테 보냄.
 						for (int i = 0; i < Cnt_Player; ++i)
@@ -803,7 +916,7 @@ void GameClient::adjustPlayer(float deltatime)
 							packet.w = other->w;
 							packet.x = other->x;
 							packet.y = other->y;
-							packet.rank = other->rank;
+							packet.rank = CLIENTS[i]->rank;
 							do_send(&packet, sizeof(packet));
 
 							sc_packet_put_object otherpacket;

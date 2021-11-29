@@ -7,7 +7,7 @@
 
 LobbyClient::LobbyClient()
 	:elapsedtime(0),
-	robby_timer(11)
+	robby_timer(2)
 {
 	
 }

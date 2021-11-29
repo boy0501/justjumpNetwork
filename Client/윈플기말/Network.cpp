@@ -193,7 +193,7 @@ void Network::ProcessPacket(unsigned char* p)
 		mOthers[id].oldX = packet->x;
 		mOthers[id].oldY = packet->y;
 		//임계영역 자리
-		//mOthers[id].rank = packet->rank;
+		mOthers[id].rank = packet->rank;
 		break;
 	}
 	case SC_PACKET_LOGOUT_OBJECT: {
