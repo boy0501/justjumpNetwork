@@ -15,6 +15,8 @@ const char CS_PACKET_LOGIN = 1;
 const char CS_PACKET_MOVE = 2;
 const char CS_PACKET_SCENE_CHANGE = 3;
 const char CS_PACKET_KEYUP = 5;
+const char CS_PACKET_DIEOK = 6;
+
 //const char CS_PACEKT_LOGOUT = 6;
 
 const char CS_PACKET_ROBBY = 98;
@@ -75,6 +77,12 @@ struct cs_packet_robby {
 	
 };
 
+struct cs_packet_die_ok {
+	unsigned char size;
+	char type;
+
+};
+
 //-----------------------server packet
 struct sc_packet_login_ok {
 	unsigned char size;
@@ -106,7 +114,7 @@ struct sc_packet_put_object {
 	char	username[MAX_NAME_SIZE];
 	char state;
 	char w, h;
-	char hp;
+	short hp;
 	char dir;
 	bool stealth;
 	char rank;
