@@ -500,7 +500,6 @@ void send_move_packet(char dr)
 	packet.id = player.player_cid;
 
 	Network::GetNetwork()->C_Send(&packet, sizeof(packet));
-	//cout << "send패킷 보냄" << endl;
 }
 
 void send_keyup_packet(char vk_key)
@@ -563,32 +562,43 @@ void robby_waiting()
 
 void player_keyProcess()
 {
+	bool is_Pressed_Once = false;
 	if (player.hp != 0)
 	{
 		if (IsKeyPressed(VK_LEFT))
 		{
+			is_Pressed_Once = true;
 			send_move_packet(VK_LEFT);
 		}
 		if (IsKeyPressed(VK_RIGHT))
 		{
+			is_Pressed_Once = true;
 			send_move_packet(VK_RIGHT);
 		}
 		if (IsKeyPressed(VK_UP))
 		{
+			is_Pressed_Once = true;
 			send_move_packet(VK_UP);
 		}
 		if (IsKeyPressed(VK_DOWN))
 		{
+			is_Pressed_Once = true;
 			send_move_packet(VK_DOWN);
 		}
 		if (IsKeyPressed(VK_SPACE))
 		{
+			is_Pressed_Once = true;
 			send_move_packet(VK_SPACE);
 		}
 		if (IsKeyPressed(VK_END))
 		{
+			is_Pressed_Once = true;
 			send_move_packet(VK_END);
 		}
+	}
+	if (is_Pressed_Once == false)
+	{
+		send_move_packet(0);
 	}
 	
 	

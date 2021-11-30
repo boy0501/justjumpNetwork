@@ -9,6 +9,7 @@ Client::Client()
 	:prev_size(0)
 	,mCss(CSS_LIVE)
 	,mSn(SN_LOGIN)
+	,is_ingame(false)
 	,is_active(false)
 {
 	ZeroMemory(buf, sizeof(buf));
@@ -29,9 +30,6 @@ Client::Client()
 	COMMAND_hurt = false;
 	COMMAND_die = false;
 	COMMAND_ropehurt = false;
-	SceneChangeTrigger = CreateEvent(NULL, FALSE, FALSE, NULL);
-	SceneChangeIsDone = CreateEvent(NULL, FALSE, FALSE, NULL);
-	//CountSendController = CreateEvent(NULL, FALSE, TRUE, NULL);
 
 	//
 	//bx = 0;
@@ -433,6 +431,33 @@ int Client::do_recv()
 	{
 		//jpark logout 작업 수정
 		is_logout = true;
+		is_active = false;
+
+		switch (c_id)
+		{
+		case 0: {
+			if (CLIENTS[1]->is_active == true)
+				SetEvent(Client1Event);
+			else
+				SetEvent(Client2Event);
+			break;
+		}
+		case 1: {
+			if (CLIENTS[2]->is_active == true)
+				SetEvent(Client2Event);
+			else
+				SetEvent(Client0Event);
+
+			break;
+		}
+		case 2: {
+			if (CLIENTS[0]->is_active == true)
+				SetEvent(Client0Event);
+			else
+				SetEvent(Client1Event);
+			break;
+		}
+		}
 
 		for (int i = 0; i < Cnt_Player; ++i) {
 
