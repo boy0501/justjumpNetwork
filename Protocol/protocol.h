@@ -7,7 +7,7 @@ const int WORLD_WIDTH = 8;
 const int  MAX_NAME_SIZE = 20;
 const int  MAX_USER = 10;
 const int GEARCYCLE = 180;
-const int GEARSPEED = 9500;
+const int GEARSPEED = 150;
 
 const float PI = 3.14159265;
 
