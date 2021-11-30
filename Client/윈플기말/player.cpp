@@ -43,6 +43,7 @@ PLAYER::PLAYER()
 }
 PLAYER::~PLAYER()
 {
+	std::cout << "들어오면 안됨" << std::endl;
 	DeleteCriticalSection(&cs);
 }
 void PLAYER::initPos()

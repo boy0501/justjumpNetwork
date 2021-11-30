@@ -16,7 +16,7 @@ extern int obj_t;
 
 void error_display(int err_no);
 
-static CAMERA camera;
+extern CAMERA camera;
 //static MAP map;
 
 class Network

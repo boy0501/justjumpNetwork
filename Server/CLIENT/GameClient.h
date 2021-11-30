@@ -28,5 +28,5 @@ public:
 
 private:
 	int mRank[3] = { 1,1,1 };//랭킹을 저장할 변수
-	
+	int mmStagenum[3] = { 1,1,1 };
 };

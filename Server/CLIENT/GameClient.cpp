@@ -348,47 +348,81 @@ void GameClient::move(float deltatime)
 
 	//순위 판정-------------------------------------------------
 	
-	for (int i= 0; i < Cnt_Player; ++i)
+
+	for (int i = 0; i < Cnt_Player; ++i)
 	{
 		
+		mRank[i] = 1;
 		
-		//if(CLIENTS[i]->mStageNum == 1 )
-			//mRank[i] = 2;
-		//else
-			mRank[i] = 1;
-
-		if (CLIENTS[i]->mStageNum < 4) {
-			for (int j = 0; j < Cnt_Player; ++j)
+		for (int j = 0; j < Cnt_Player; ++j)
+		{
+			
+			
+			if (CLIENTS[i]->mStageNum < CLIENTS[j]->mStageNum)
 			{
-				if (i == j) continue;	// 넣는게 맞나	
+				mRank[i] += 1;
 					
-				if (CLIENTS[i]->mStageNum > CLIENTS[j]->mStageNum ||
-					CLIENTS[i]->y > CLIENTS[j]->y)
-				{
-					if (CLIENTS[i]->mStageNum >= CLIENTS[j]->mStageNum)
-					{
-						if (CLIENTS[i]->mStageNum == CLIENTS[j]->mStageNum)
-						{
-							if (CLIENTS[i]->y > CLIENTS[j]->y)
-								mRank[i] += 1;
-						}
-						if (CLIENTS[i]->mStageNum > CLIENTS[j]->mStageNum)
-						{
-							mRank[j] += 1;
-						}
-						//else
-						//mRank[i] += 1;
-					}
-				}
-				
-				
 			}
-		}		
+			if (CLIENTS[i]->mStageNum == CLIENTS[j]->mStageNum)
+			{
+				if (CLIENTS[i]->y > CLIENTS[j]->y)
+					mRank[i] += 1;
+			}
+			if (CLIENTS[i]->mStageNum > CLIENTS[j]->mStageNum)
+				mRank[j] += 1;
+		}
+
 		CLIENTS[i]->rank = mRank[i];
+
+	//	auto other = CLIENTS[i];
+
+	//	//if (c_id == CLIENTS[i]->c_id)continue;
+	//	if (mStageNum != CLIENTS[i]->mStageNum) continue;
+	//	sc_packet_logout_object packet1;
+	//	packet1.size = sizeof(sc_packet_logout_object);
+	//	packet1.type = SC_PACKET_LOGOUT_OBJECT;
+	//	packet1.id = c_id;
+	//	CLIENTS[i]->do_send(&packet1, sizeof(packet1));
+
+	//	sc_packet_logout_object mypacket;
+	//	mypacket.size = sizeof(sc_packet_logout_object);
+	//	mypacket.type = SC_PACKET_LOGOUT_OBJECT;
+	//	mypacket.id = i;
+	//	do_send(&mypacket, sizeof(mypacket));
+
+	//	sc_packet_put_object packet;
+	//	packet.size = sizeof(sc_packet_put_object);
+	//	packet.type = SC_PACKET_PUT_OBJECT;
+	//	packet.dir = other->dir;
+	//	packet.h = other->h;
+	//	packet.hp = other->hp;
+	//	packet.id = other->c_id;
+	//	packet.state = other->state;
+	//	packet.stealth = other->stealth;
+	//	strcpy_s(packet.username, 20, other->playername);
+	//	packet.x = other->x;
+	//	packet.y = other->y;
+	//	packet.w = other->w;
+	//	packet.rank = mRank[i] ;
+	//	do_send(&packet, sizeof(packet));
+
+	//	sc_packet_put_object otherpacket;
+	//	otherpacket.size = sizeof(sc_packet_put_object);
+	//	otherpacket.type = SC_PACKET_PUT_OBJECT;
+	//	otherpacket.id = c_id;
+	//	otherpacket.dir = dir;
+	//	otherpacket.h = h;
+	//	otherpacket.hp = hp;
+	//	otherpacket.state = state;
+	//	otherpacket.stealth = stealth;
+	//	strcpy_s(otherpacket.username, 20, playername);
+	//	otherpacket.w = w;
+	//	otherpacket.x = x;
+	//	otherpacket.y = y;
+	//	otherpacket.rank = rank;
+	//	CLIENTS[i]->do_send(&otherpacket, sizeof(otherpacket));
+
 	}
-
-	
-
 }
 //오브젝트와 플레이어 충돌체크 1이면 부닥침
 //----------------------------------------
@@ -771,6 +805,8 @@ void GameClient::adjustPlayer(float deltatime)
 							mypacket.type = SC_PACKET_LOGOUT_OBJECT;
 							mypacket.id = i;
 							do_send(&mypacket, sizeof(mypacket));
+
+							
 						}
 
 						//Stage의 변경 
@@ -782,6 +818,7 @@ void GameClient::adjustPlayer(float deltatime)
 						packet.stagenum = mStageNum;
 						do_send(&packet, sizeof(packet));
 
+						
 						//다른사람들의 상태를 나한테 전달 (바뀐 stage에 있는 사람들걸 가져옴
 						//이후 나도 다른사람들한테 보냄.
 						for (int i = 0; i < Cnt_Player; ++i)
@@ -803,7 +840,7 @@ void GameClient::adjustPlayer(float deltatime)
 							packet.w = other->w;
 							packet.x = other->x;
 							packet.y = other->y;
-							packet.rank = other->rank;
+							packet.rank = CLIENTS[i]->rank;
 							do_send(&packet, sizeof(packet));
 
 							sc_packet_put_object otherpacket;

@@ -17,6 +17,6 @@ void adjustPlayer(PLAYER&, OBJECT*, MAP&, int&, HINSTANCE);
 //int(맵 번호) 에 따라 장애물 위치값 넣어주고 몇개의 오브젝트가 들어갔는지 알려주는 함수
 int initObject(OBJECT*, int, HINSTANCE);
 //카메라 무빙워크
-void adjustCamera(CAMERA&,PLAYER);
+void adjustCamera(CAMERA&,PLAYER&);
 
 //int saveMapNum = 0;
