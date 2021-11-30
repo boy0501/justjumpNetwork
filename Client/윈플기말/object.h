@@ -21,7 +21,6 @@ public:
 	int dir;					//object's moving direction 0 == left , right / 1 == up , down
 	HBITMAP hbit;				
 	float degree;
-	CRITICAL_SECTION cs;
 public:
 	//오브젝트의 x y 는 왼쪽상단이 기준이다.
 	int getX();

@@ -370,8 +370,6 @@ void Network::ProcessPacket(unsigned char* p)
 		}
 		case 106: 
 		case 107: {
-			//임계영역 자리
-			EnterCriticalSection(&obj.cs);
 			//obj.degree = packet->degree;
 			//obj.velocityDegree = (packet->degree - obj.oldDegree) / (packet->senddeltatime);
 			//if (obj.velocityDegree < 0)
@@ -381,9 +379,7 @@ void Network::ProcessPacket(unsigned char* p)
 			//}
 			obj.mx = packet->mx;
 			obj.my = packet->my;
-			LeaveCriticalSection(&obj.cs);
 			//obj.oldDegree = packet->degree;
-			//임계영역 자리
 
 			break;
 		}

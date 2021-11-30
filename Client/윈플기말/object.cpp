@@ -8,12 +8,10 @@ OBJECT::OBJECT()
 	:degree(0), oldDegree(0.0f)
 	, velocityDegree(0.0f)
 {
-	InitializeCriticalSection(&cs);
 }
 
 OBJECT::~OBJECT()
 {
-	DeleteCriticalSection(&cs);
 
 }
 int OBJECT::getX()
@@ -182,11 +180,7 @@ void OBJECT::DrawObj(HDC& mem1dc, HDC& odc)
 	}
 	else if (type == 106 || type == 107) //gear
 	{
-		EnterCriticalSection(&cs);
-		auto localmx = mx;
-		auto localmy = my;
-		LeaveCriticalSection(&cs);
-		TransparentBlt(mem1dc, x+ localmx, y+ localmy, w, h, odc, index * 23, 4, 18, 18, RGB(255, 255, 255)); // ¿Œµ¶Ω∫∑Œ only x change
+		TransparentBlt(mem1dc, x+ mx, y+ my, w, h, odc, index * 23, 4, 18, 18, RGB(255, 255, 255)); // ¿Œµ¶Ω∫∑Œ only x change
 	}
 	else if (type == 201) //portal
 	{
