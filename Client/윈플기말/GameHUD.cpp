@@ -33,7 +33,7 @@ void GameHUD::draw(HDC& mem1dc)
 		button->drawByScreenButton(mem1dc);
 	}
 
-	drawMyRanking(mem1dc);
+	//drawMyRanking(mem1dc);
 	drawOtherPlayerRanking(mem1dc);
 
 		
@@ -116,26 +116,53 @@ void GameHUD::drawOtherPlayerRanking(HDC& mem1dc)
 
 	//int ranking;
 	TCHAR otherPlayer1Name[100];
-	
+	TCHAR playerName[100];
 
 	TCHAR otherPlayer1Ranking[100];
 	
 	HFONT hfont = CreateFont(14, 0, 0, 0, 0, 0, 0, 0, HANGEUL_CHARSET, 0, 0, 0, VARIABLE_PITCH | FF_ROMAN, TEXT("메이플스토리 bold"));
 	HFONT oldfont = (HFONT)SelectObject(mem1dc, hfont);
 	SetTextColor(mem1dc, RGB(255, 255, 255));
+
+	TextOut(mem1dc, mCamera->getx() + 40, mCamera->gety() + 30, L"1등", lstrlenW(L"1등"));
+	TextOut(mem1dc, mCamera->getx() + 40, mCamera->gety() + 60, L"2등", lstrlenW(L"2등"));
+	TextOut(mem1dc, mCamera->getx() + 40, mCamera->gety() + 90, L"3등", lstrlenW(L"3등"));
 	
-	
+	int ranking = mPlayer->getRanking();
+
 	for (int i = 0; i < 3; ++i)
 	{
-		if (mPlayer->player_cid == i) continue;
+		if (mPlayer->player_cid == i)
+		{
+			if (mPlayer->getRanking() == 1)
+			{
+				TextOut(mem1dc, mCamera->getx() + 60, mCamera->gety() + 30, mPlayer->mPlayerwname.c_str(), lstrlenW(mPlayer->mPlayerwname.c_str()));
+			}
+			if (mPlayer->getRanking() == 2)
+			{
+				TextOut(mem1dc, mCamera->getx() + 60, mCamera->gety() + 60, mPlayer->mPlayerwname.c_str(), lstrlenW(mPlayer->mPlayerwname.c_str()));
+			}
+			if (mPlayer->getRanking() == 3)
+			{
+				TextOut(mem1dc, mCamera->getx() + 60, mCamera->gety() + 90, mPlayer->mPlayerwname.c_str(), lstrlenW(mPlayer->mPlayerwname.c_str()));
+			}
+		}
 
 		_itow_s(mOthers[i].getRanking(), otherPlayer1Ranking, 10);
-		
-		TextOut(mem1dc, mCamera->getx() + 80, mCamera->gety() + 70+i*15, mOthers[i].mPlayerwname.c_str(), lstrlenW(mOthers[i].mPlayerwname.c_str()));
-		TextOut(mem1dc, mCamera->getx() + 40, mCamera->gety() + 70+i*15, otherPlayer1Ranking, lstrlenW(otherPlayer1Ranking));
-		TextOut(mem1dc, mCamera->getx() + 50, mCamera->gety() + 70 + i * 15, L"등", lstrlenW(L"등"));
+
+		if(mOthers[i].getRanking()==1)
+		{
+			TextOut(mem1dc, mCamera->getx() + 60 + mPlayer->mPlayerwname.size()*10, mCamera->gety() + 30, mOthers[i].mPlayerwname.c_str(), lstrlenW(mOthers[i].mPlayerwname.c_str()));
+		}
+		if (mOthers[i].getRanking() == 2)
+		{
+			TextOut(mem1dc, mCamera->getx() + 60 + mPlayer->mPlayerwname.size() * 10, mCamera->gety() + 60, mOthers[i].mPlayerwname.c_str(), lstrlenW(mOthers[i].mPlayerwname.c_str()));
+		}
+		if (mOthers[i].getRanking() == 3)
+		{
+			TextOut(mem1dc, mCamera->getx() + 60 + mPlayer->mPlayerwname.size() * 10, mCamera->gety() + 90, mOthers[i].mPlayerwname.c_str(), lstrlenW(mOthers[i].mPlayerwname.c_str()));
+		}
 	}
-	
 	SelectObject(mem1dc, oldfont);
 	DeleteObject(hfont);
 }
