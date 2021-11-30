@@ -31,7 +31,6 @@ Client::Client()
 	COMMAND_ropehurt = false;
 	SceneChangeTrigger = CreateEvent(NULL, FALSE, FALSE, NULL);
 	SceneChangeIsDone = CreateEvent(NULL, FALSE, FALSE, NULL);
-	InitializeCriticalSection(&cs);
 	//CountSendController = CreateEvent(NULL, FALSE, TRUE, NULL);
 
 	//
@@ -41,7 +40,6 @@ Client::Client()
 
 Client::~Client()
 {
-	DeleteCriticalSection(&cs);
 }
 
 
@@ -101,7 +99,6 @@ void Client::ProcessPacket(unsigned char* p)
 		switch ((int)packet->dir) {
 		case VK_LEFT: //VK_LEFT
 			//std::cout << "left" << std::endl;
-			EnterCriticalSection(&cs);
 			LEFTkey = true;
 			if (RIGHTkey == true)
 			{
@@ -109,7 +106,6 @@ void Client::ProcessPacket(unsigned char* p)
 				if (state == 4)
 					state = 1;
 
-				LeaveCriticalSection(&cs);
 				break;
 			}
 			if (state == 7) {
@@ -149,17 +145,14 @@ void Client::ProcessPacket(unsigned char* p)
 			{
 				dir = 1;
 			}
-			LeaveCriticalSection(&cs);
 			break;
 		case VK_RIGHT: //VK_RIGHT
-			EnterCriticalSection(&cs);
 			RIGHTkey = true;
 			if (LEFTkey == true)
 			{
 				LRkey = true;
 				if (state == 4)
 					state = 1;
-				LeaveCriticalSection(&cs);
 				break;
 			}
 			if (state == 7)
@@ -201,10 +194,8 @@ void Client::ProcessPacket(unsigned char* p)
 				dir = 2;
 				//COMMAND_move = 2;
 			}
-			LeaveCriticalSection(&cs);
 			break;
 		case VK_UP: //VK_UP
-			EnterCriticalSection(&cs);
 			UPkey = true;
 
 			if (DOWNkey == true)
@@ -212,7 +203,6 @@ void Client::ProcessPacket(unsigned char* p)
 				UDkey = true;
 				if (state == 8)
 					state = 5;
-				LeaveCriticalSection(&cs);
 				break;
 			}
 			if (state == 5 || state == 8)
@@ -221,13 +211,10 @@ void Client::ProcessPacket(unsigned char* p)
 				COMMAND_move = 3;
 
 			}
-			LeaveCriticalSection(&cs);
 			break;
 		case VK_DOWN: //VK_DOWN
-			EnterCriticalSection(&cs);
 			if (COMMAND_hurt == 1)
 			{
-				LeaveCriticalSection(&cs);
 				break;
 			}
 			DOWNkey = true;
@@ -236,7 +223,6 @@ void Client::ProcessPacket(unsigned char* p)
 				UDkey = true;
 				if (state == 8)
 					state = 5;
-				LeaveCriticalSection(&cs);
 				break;
 			}
 			if (state == 5 || state == 8)
@@ -260,13 +246,10 @@ void Client::ProcessPacket(unsigned char* p)
 				h -= 12;
 				y += 12;
 			}
-			LeaveCriticalSection(&cs);
 			break;
 		case VK_SPACE: //VK_SPACE
-			EnterCriticalSection(&cs);
 			if (DOWNkey == true)
 			{
-				LeaveCriticalSection(&cs);
 				break;
 			}
 			if (state == 5 || state == 8)
@@ -279,12 +262,10 @@ void Client::ProcessPacket(unsigned char* p)
 						jumpignore = 2;
 					}
 					else {
-						LeaveCriticalSection(&cs); 
 						break; 
 					}
 				}
 				else {
-					LeaveCriticalSection(&cs); 
 					break;
 				}
 			}
@@ -295,12 +276,9 @@ void Client::ProcessPacket(unsigned char* p)
 				state = 2;
 				savey = y;
 			}
-			LeaveCriticalSection(&cs);
 			break;
 		case VK_END:	//치트키
-			EnterCriticalSection(&cs);
 			EndKey = true;
-			LeaveCriticalSection(&cs);
 			break;
 		default:
 			break;
@@ -312,7 +290,6 @@ void Client::ProcessPacket(unsigned char* p)
 		switch (packet->vk_key)
 		{
 		case VK_LEFT: //left keyUp
-			EnterCriticalSection(&cs);
 			if (RIGHTkey == true)
 			{
 				dir = 2;
@@ -344,10 +321,8 @@ void Client::ProcessPacket(unsigned char* p)
 
 			LRkey = false;
 			LEFTkey = false;
-			LeaveCriticalSection(&cs);
 			break;
 		case VK_RIGHT: //right keyUp
-			EnterCriticalSection(&cs);
 			if (LEFTkey == true)
 			{
 				dir = 1;
@@ -378,10 +353,8 @@ void Client::ProcessPacket(unsigned char* p)
 
 			LRkey = false;
 			RIGHTkey = false;
-			LeaveCriticalSection(&cs);
 			break;
 		case VK_UP: //up keyUp
-			EnterCriticalSection(&cs);
 			if (DOWNkey == true)
 			{
 				if (state == 5)
@@ -398,10 +371,8 @@ void Client::ProcessPacket(unsigned char* p)
 
 			UPkey = false;
 			UDkey = false;
-			LeaveCriticalSection(&cs);
 			break;
 		case VK_DOWN: //down keyDown
-			EnterCriticalSection(&cs);
 			if (UPkey == true)
 			{
 				if (state == 5)
@@ -431,7 +402,6 @@ void Client::ProcessPacket(unsigned char* p)
 
 			UDkey = false;
 			DOWNkey = false;
-			LeaveCriticalSection(&cs);
 			break;
 		}		
 		break;

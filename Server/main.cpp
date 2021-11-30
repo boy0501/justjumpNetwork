@@ -18,6 +18,9 @@
 #pragma comment(lib, "ws2_32")
 using namespace std;
 
+HANDLE Client1Event; 
+HANDLE Client2Event; 
+HANDLE Client3Event;
 Map* mainMap;
 LARGE_INTEGER Frequency;
 LARGE_INTEGER BeginTime;
@@ -297,8 +300,21 @@ DWORD WINAPI ClientInputThread(LPVOID arg)
 	int c_id = (int)arg;
 	while (1)
 	{
-		//cout << c_id << "ÀÇ x°ª: " << CLIENTS[c_id]->x << endl;
-
+		//switch (c_id)
+		//{
+		//case 0: {
+		//	WaitForSingleObject(Client1Event, INFINITE);
+		//	break;
+		//}
+		//case 1: {
+		//	WaitForSingleObject(Client2Event, INFINITE);
+		//	break;
+		//}
+		//case 2: {
+		//	WaitForSingleObject(Client3Event, INFINITE);
+		//	break;
+		//}
+		//}
 		int ret = CLIENTS[c_id]->do_recv();		
 		if (ret == SOCKET_ERROR)
 		{
@@ -307,12 +323,22 @@ DWORD WINAPI ClientInputThread(LPVOID arg)
 			closesocket(CLIENTS[c_id]->c_socket);
 			return 0;
 		}
+		//switch (c_id)
+		//{
+		//case 0: {
+		//	SetEvent(Client2Event);
+		//	break;
+		//}
+		//case 1: {
+		//	SetEvent(Client3Event);
+		//	break;
+		//}
+		//case 2: {
+		//	SetEvent(Client1Event);
+		//	break;
+		//}
+		//}
 
-		/*for (int i = 0; i < Cnt_Player; ++i)
-		{
-			send_move_process(i);
-
-		}*/
 	}
 }
 
