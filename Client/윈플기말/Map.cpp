@@ -75,7 +75,7 @@ void MAP :: DrawBK(HDC& mem1dc, HDC& mem2dc, RECT& rectview)
 		HFONT hfont = CreateFont(50, 0, 0, 0, 0, 0, 0, 0, HANGEUL_CHARSET, 0, 0, 0, VARIABLE_PITCH | FF_ROMAN, TEXT("¸ÞÀÌÇÃ½ºÅä¸® light"));
 		HFONT oldfont = (HFONT)SelectObject(mem1dc, hfont);
 		TCHAR count[100];
-		TextOut(mem1dc, 100, 3400, L"Á¡ÇÁ È½¼ö : ", lstrlenW(L"Á¡ÇÁ È½¼ö : "));
+		TextOut(mem1dc, 100, 3400, L"·©Å· : ", lstrlenW(L"·©Å· : "));
 		_itow_s(jumpcount, count, 10);
 		TextOut(mem1dc, 300, 3400, count, lstrlenW(count));
 
