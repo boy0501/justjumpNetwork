@@ -409,6 +409,13 @@ int main()
 	CloseHandle(Client0Event);
 	CloseHandle(Client1Event);
 	CloseHandle(Client2Event);
+
+	CloseHandle(Client0SceneChangeTrigger);
+	CloseHandle(Client1SceneChangeTrigger);
+	CloseHandle(Client2SceneChangeTrigger);
+	CloseHandle(Client0SceneChangeIsDone);
+	CloseHandle(Client1SceneChangeIsDone);
+	CloseHandle(Client2SceneChangeIsDone);
 	delete Network::GetNetwork();
 	delete mainMap;
 
