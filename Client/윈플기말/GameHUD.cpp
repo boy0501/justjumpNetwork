@@ -165,6 +165,9 @@ void GameHUD::drawOtherPlayerRanking(HDC& mem1dc)
 				
 		}
 	}
+
+
+
 	SelectObject(mem1dc, oldfont);
 	DeleteObject(hfont);
 }
