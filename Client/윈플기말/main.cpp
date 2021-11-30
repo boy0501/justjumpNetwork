@@ -679,7 +679,6 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 			gameui->LoadUiBitmap(g_hinst, "img/NoNameUi.bmp", 400, 700, 199, 65, RGB(0, 255, 0), camera);
 			gameui->addText(player.mPlayerwname, "NickName", L"메이플스토리 bold", RGB(255, 255, 255), 14, 475, 705, true, 100, 65, camera);
 			gameui->LoadHpUiBitmap(g_hinst, "img/Ui_HP.bmp", 421, 728, 100, 65, RGB(0, 0, 255), camera);
-			
 			map.mGameUi = gameui;
 			//map.mGameUi = othergameui;
 			//gameUi설정 끝 
