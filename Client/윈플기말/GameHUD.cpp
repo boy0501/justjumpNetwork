@@ -72,11 +72,6 @@ void GameHUD::update(float deltatime)
 
 void GameHUD::drawMyRanking(HDC& mem1dc)
 {
-	EnterCriticalSection(&mPlayer->cs);
-	auto localranking = mPlayer->rank;
-	auto localplayerName = mPlayer->mPlayerwname;
-	LeaveCriticalSection(&mPlayer->cs);
-
 	int ranking = mPlayer->getRanking();
 
 	TCHAR playerRanking[100];
@@ -96,23 +91,6 @@ void GameHUD::drawMyRanking(HDC& mem1dc)
 
 void GameHUD::drawOtherPlayerRanking(HDC& mem1dc)
 {
-	//EnterCriticalSection(&mPlayer->cs);
-	//auto localMyC_id = mPlayer->player_cid;
-	//LeaveCriticalSection(&mPlayer->cs);
-
-	//EnterCriticalSection(&mOthers[0].cs);
-	//auto localother1Name = mOthers[0].mPlayerwname;
-	//auto localother1Rank = mOthers[0].rank;
-	//auto localother1c_id = mOthers[0].player_cid;
-	//LeaveCriticalSection(&mOthers[0].cs);
-
-	//EnterCriticalSection(&mOthers[1].cs);
-	////로컬로 캐싱
-	//LeaveCriticalSection(&mOthers[1].cs);
-
-	//EnterCriticalSection(&mOthers[2].cs);
-	////로컬로 캐싱
-	//LeaveCriticalSection(&mOthers[2].cs);
 	
 	HFONT hfont = CreateFont(14, 0, 0, 0, 0, 0, 0, 0, HANGEUL_CHARSET, 0, 0, 0, VARIABLE_PITCH | FF_ROMAN, TEXT("메이플스토리 bold"));
 	HFONT oldfont = (HFONT)SelectObject(mem1dc, hfont);
@@ -177,13 +155,10 @@ void GameHUD::drawOtherPlayerRanking(HDC& mem1dc)
 
 void GameHUD::drawHP(HDC& mem1dc)
 {
-	EnterCriticalSection(&mPlayer->cs);
-	int localhp = mPlayer->hp;
-	LeaveCriticalSection(&mPlayer->cs);
 
-	int hp = localhp * 171 / 100;
+	int hp = mPlayer->hp * 171 / 100;
 	TCHAR hpname[100];
-	_itow_s(localhp, hpname, 10);
+	_itow_s(mPlayer->hp, hpname, 10);
 	HFONT hfont = CreateFont(14, 0, 0, 0, 0, 0, 0, 0, HANGEUL_CHARSET, 0, 0, 0, VARIABLE_PITCH | FF_ROMAN, TEXT("메이플스토리 light"));
 	HFONT oldfont = (HFONT)SelectObject(mem1dc, hfont);
 	HDC mem2dc = CreateCompatibleDC(mem1dc);

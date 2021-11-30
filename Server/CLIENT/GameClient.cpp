@@ -30,12 +30,10 @@ void GameClient::update(float delta_time)
 		elapsedtime = 0;
 		//std::cout << "게임클라" << std::endl;
 	}
-	EnterCriticalSection(&cs);
 	move(delta_time);
 	adjustPlayer(delta_time);
 	spike_hurttime(delta_time);
 	stealthtime(delta_time);
-	LeaveCriticalSection(&cs);
 	int objNum = 0;
 	//for (auto& obj : mMap->mObjects[mStageNum])
 	//{

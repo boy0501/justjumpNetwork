@@ -22,10 +22,11 @@ void MoveObstacle::update(float deltatime)
 	switch (mMoveType)
 	{
 	case MoveType::Horizontal:
-		mx = sin(degree * PI / 180)* GEARSPEED * deltatime;
+		mx = sin(degree * PI / 180)* GEARSPEED;
+		//std::cout << mx << ", " << degree << ", " << sin(degree * PI / 180) <<", " << deltatime <<std::endl;
 		break;
 	case MoveType::Vertical:
-		my = sin(degree * PI / 180) * GEARSPEED * deltatime;
+		my = sin(degree * PI / 180) * GEARSPEED;
 		break;
 	}
 	if (degree > 360)

@@ -153,10 +153,8 @@ void Network::ProcessPacket(unsigned char* p)
 		mPlayer->stage = packet->stage;
 		mPlayer->player_cid = packet->id;
 		//임계영역 자리
-		EnterCriticalSection(&mPlayer->cs);
 		mPlayer->x = packet->x;
 		mPlayer->y = packet->y;
-		LeaveCriticalSection(&mPlayer->cs);
 		mPlayer->oldY = packet->y;
 		mPlayer->oldX = packet->x;
 		//임계영역 자리
@@ -175,7 +173,6 @@ void Network::ProcessPacket(unsigned char* p)
 	case SC_PACKET_PUT_OBJECT: {
 		sc_packet_put_object* packet = reinterpret_cast<sc_packet_put_object*>(p);
 		auto id = packet->id;
-		EnterCriticalSection(&mOthers[id].cs);
 		mOthers[id].is_active = true;
 		mOthers[id].dir=packet->dir;
 		mOthers[id].h=packet->h;
@@ -191,7 +188,6 @@ void Network::ProcessPacket(unsigned char* p)
 		//임계영역 자리 
 		mOthers[id].x=packet->x;
 		mOthers[id].y=packet->y;
-		LeaveCriticalSection(&mOthers[id].cs);
 		mOthers[id].oldX = packet->x;
 		mOthers[id].oldY = packet->y;
 		//임계영역 자리
@@ -250,7 +246,6 @@ void Network::ProcessPacket(unsigned char* p)
 		//std::cout << (int)packet->bx << std::endl;
 		if (packet->id == mPlayer->player_cid)
 		{
-			EnterCriticalSection(&mPlayer->cs);
 			mPlayer->h = packet->h;
 			mPlayer->state = packet->state;
 			mPlayer->stealth = packet->stealth;
@@ -258,14 +253,11 @@ void Network::ProcessPacket(unsigned char* p)
 			mPlayer->hp = packet->hp;
 			mPlayer->rank = packet->rank;
 
-			//임계영역 들어갈 자리 ---
 			mPlayer->x = packet->x;
 			mPlayer->y = packet->y;
 			//속도구하는 공식 = 거리 /시간 => (지금패킷위치 - 예전패킷위치) / 걸린시간  
 			mPlayer->velocityX = (packet->x - mPlayer->oldX) / (packet->senddeltatime);
 			mPlayer->velocityY = (packet->y - mPlayer->oldY) / (packet->senddeltatime);
-			//임계영역 풀어줄 자리 ---
-			LeaveCriticalSection(&mPlayer->cs);
 
 			mPlayer->oldX = packet->x;
 			mPlayer->oldY = packet->y;
@@ -276,7 +268,6 @@ void Network::ProcessPacket(unsigned char* p)
 		}
 		else {
 			auto& other = mOthers[packet->id];
-			EnterCriticalSection(&other.cs);
 			other.h = packet->h;
 			other.state = packet->state;
 			other.stealth = packet->stealth;
@@ -289,7 +280,6 @@ void Network::ProcessPacket(unsigned char* p)
 			//속도구하는 공식 = 거리 /시간 => (지금패킷위치 - 예전패킷위치) / 걸린시간  
 			other.velocityX = (packet->x - other.oldX) / (packet->senddeltatime);
 			other.velocityY = (packet->y - other.oldY) / (packet->senddeltatime);
-			LeaveCriticalSection(&other.cs);
 			//mPlayer->reckoningY = (mPlayer->y - mPlayer->oldY) / 2;
 			other.oldX = packet->x;
 			other.oldY = packet->y;
@@ -303,7 +293,6 @@ void Network::ProcessPacket(unsigned char* p)
 	case SC_PACKET_GAMESTART:{
 		sc_packet_gamestart* packet = reinterpret_cast<sc_packet_gamestart*>(p);
 		//임계영역 자리
-		EnterCriticalSection(&mPlayer->cs);
 		mPlayer->dir = packet->dir;
 		mPlayer->h = packet->h;
 		mPlayer->stage = packet->stage;
@@ -311,7 +300,6 @@ void Network::ProcessPacket(unsigned char* p)
 		mPlayer->stealth = packet->stealth;
 		mPlayer->x = packet->x;
 		mPlayer->y = packet->y;
-		LeaveCriticalSection(&mPlayer->cs);
 		mPlayer->oldX = packet->x;
 		mPlayer->oldY = packet->y;
 		//임계영역 자리
@@ -382,8 +370,6 @@ void Network::ProcessPacket(unsigned char* p)
 		}
 		case 106: 
 		case 107: {
-			//임계영역 자리
-			EnterCriticalSection(&obj.cs);
 			//obj.degree = packet->degree;
 			//obj.velocityDegree = (packet->degree - obj.oldDegree) / (packet->senddeltatime);
 			//if (obj.velocityDegree < 0)
@@ -393,14 +379,12 @@ void Network::ProcessPacket(unsigned char* p)
 			//}
 			obj.mx = packet->mx;
 			obj.my = packet->my;
-			LeaveCriticalSection(&obj.cs);
 			//obj.oldDegree = packet->degree;
-			//임계영역 자리
 
 			break;
 		}
 		}
-		break;
+		break;//
 	}
 	}
 	

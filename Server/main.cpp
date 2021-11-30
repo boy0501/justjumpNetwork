@@ -44,11 +44,11 @@ void ChangeLoginToRobby(const int& c_id)
 	delete p;
 
 	//login Button 누른 플레이어는 여기 와서 비로소 active가 된다.
-	CLIENTS[my_id]->is_active = true;
+	CLIENTS[my_id]->is_ingame = true;
 	//send_ok_packet me and other
 	for (auto& c : CLIENTS)
 	{
-		if (c->is_active == false) continue;
+		if (c->is_ingame == false) continue;
 		if (c->c_id == my_id)
 		{
 			sc_packet_login_ok packet;
@@ -84,7 +84,7 @@ void ChangeLoginToRobby(const int& c_id)
 	//send_ok_packet 상대방껄 나에게
 	for (auto& c : CLIENTS)
 	{
-		if (c->is_active == false) continue;
+		if (c->is_ingame == false) continue;
 		if (c->c_id == my_id)continue;
 
 		sc_packet_put_object packet;
@@ -297,8 +297,24 @@ DWORD WINAPI ClientInputThread(LPVOID arg)
 	int c_id = (int)arg;
 	while (1)
 	{
-		//cout << c_id << "의 x값: " << CLIENTS[c_id]->x << endl;
-
+		switch (c_id)
+		{
+		case 0: {
+			if (CLIENTS[1]->is_active || CLIENTS[2]->is_active)
+				WaitForSingleObject(Client0Event, INFINITE);
+			break;
+		}
+		case 1: {
+			if (CLIENTS[0]->is_active || CLIENTS[2]->is_active)
+				WaitForSingleObject(Client1Event, INFINITE);
+			break;
+		}
+		case 2: {
+			if (CLIENTS[0]->is_active || CLIENTS[1]->is_active)
+				WaitForSingleObject(Client2Event, INFINITE);
+			break;
+		}
+		}
 		int ret = CLIENTS[c_id]->do_recv();		
 		if (ret == SOCKET_ERROR)
 		{
@@ -307,12 +323,32 @@ DWORD WINAPI ClientInputThread(LPVOID arg)
 			closesocket(CLIENTS[c_id]->c_socket);
 			return 0;
 		}
-
-		/*for (int i = 0; i < Cnt_Player; ++i)
+		switch (c_id)
 		{
-			send_move_process(i);
+		case 0: {
+			if (CLIENTS[1]->is_active == true)
+				SetEvent(Client1Event);
+			else
+				SetEvent(Client2Event);
+			break;
+		}
+		case 1: {
+			if (CLIENTS[2]->is_active == true)
+				SetEvent(Client2Event);
+			else
+				SetEvent(Client0Event);
 
-		}*/
+			break;
+		}
+		case 2: {
+			if (CLIENTS[0]->is_active == true)
+				SetEvent(Client0Event);
+			else
+				SetEvent(Client1Event);
+			break;
+		}
+		}
+
 	}
 }
 
@@ -328,8 +364,21 @@ int main()
 	mainMap = new Map();
 	mainMap->LoadAllObjects();
 	//
-
-
+	Client0Event = CreateEvent(NULL, FALSE, TRUE, NULL);
+	Client1Event = CreateEvent(NULL, FALSE, FALSE, NULL);
+	Client2Event = CreateEvent(NULL, FALSE, FALSE, NULL);
+	Client0SceneChangeTrigger = CreateEvent(NULL, FALSE, FALSE, NULL);
+	Client1SceneChangeTrigger = CreateEvent(NULL, FALSE, FALSE, NULL);
+	Client2SceneChangeTrigger = CreateEvent(NULL, FALSE, FALSE, NULL);
+	Client0SceneChangeIsDone = CreateEvent(NULL, FALSE, FALSE, NULL);
+	Client1SceneChangeIsDone = CreateEvent(NULL, FALSE, FALSE, NULL);
+	Client2SceneChangeIsDone = CreateEvent(NULL, FALSE, FALSE, NULL);
+	CLIENTS[0]->SceneChangeTrigger = Client0SceneChangeTrigger;
+	CLIENTS[0]->SceneChangeIsDone = Client0SceneChangeIsDone;
+	CLIENTS[1]->SceneChangeTrigger = Client1SceneChangeTrigger;
+	CLIENTS[1]->SceneChangeIsDone = Client1SceneChangeIsDone;
+	CLIENTS[2]->SceneChangeTrigger = Client2SceneChangeTrigger;
+	CLIENTS[2]->SceneChangeIsDone = Client2SceneChangeIsDone;
 	auto mNet = Network::GetNetwork();
 	mNet->InitServer();
 	HANDLE hThread;
@@ -341,7 +390,8 @@ int main()
 	{
 		CLIENTS[i]->c_socket = mNet->AcceptClient(CLIENTS[i]->c_addr);
 		CLIENTS[i]->c_id = i;
-		CLIENTS[i]->is_active = false;
+		CLIENTS[i]->is_ingame = false;
+		CLIENTS[i]->is_active = true;
 		//send_login_ok(i);
 		hThread = CreateThread(NULL, 0, ClientInputThread, (LPVOID)i, 0, NULL);
 		if (hThread == NULL) closesocket(CLIENTS[i]->c_socket);
@@ -356,8 +406,12 @@ int main()
 		if (CLIENTS[i] != nullptr)
 			delete CLIENTS[i];
 	}
+	CloseHandle(Client0Event);
+	CloseHandle(Client1Event);
+	CloseHandle(Client2Event);
 	delete Network::GetNetwork();
 	delete mainMap;
+
 	return 0;
 }
 
