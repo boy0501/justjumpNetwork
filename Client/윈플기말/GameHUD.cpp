@@ -113,30 +113,24 @@ void GameHUD::drawOtherPlayerRanking(HDC& mem1dc)
 	//EnterCriticalSection(&mOthers[2].cs);
 	////로컬로 캐싱
 	//LeaveCriticalSection(&mOthers[2].cs);
-
-	//int ranking;
-	TCHAR otherPlayer1Name[100];
-	TCHAR playerName[100];
-
-	TCHAR otherPlayer1Ranking[100];
 	
 	HFONT hfont = CreateFont(14, 0, 0, 0, 0, 0, 0, 0, HANGEUL_CHARSET, 0, 0, 0, VARIABLE_PITCH | FF_ROMAN, TEXT("메이플스토리 bold"));
 	HFONT oldfont = (HFONT)SelectObject(mem1dc, hfont);
-	SetTextColor(mem1dc, RGB(255, 255, 255));
+	SetTextColor(mem1dc, RGB(255, 105, 180));
 
 	TextOut(mem1dc, mCamera->getx() + 40, mCamera->gety() + 30, L"1등", lstrlenW(L"1등"));
 	TextOut(mem1dc, mCamera->getx() + 40, mCamera->gety() + 60, L"2등", lstrlenW(L"2등"));
 	TextOut(mem1dc, mCamera->getx() + 40, mCamera->gety() + 90, L"3등", lstrlenW(L"3등"));
 	
-	int ranking = mPlayer->getRanking();
 
 	for (int i = 0; i < 3; ++i)
 	{
 		if (mPlayer->player_cid == i)
 		{
+			SetTextColor(mem1dc, RGB(255, 255, 0));
 			if (mPlayer->getRanking() == 1)
 			{
-				TextOut(mem1dc, mCamera->getx() + 60, mCamera->gety() + 30, mPlayer->mPlayerwname.c_str(), lstrlenW(mPlayer->mPlayerwname.c_str()));
+				TextOut(mem1dc, mCamera->getx() + 60 , mCamera->gety() + 30, mPlayer->mPlayerwname.c_str(), lstrlenW(mPlayer->mPlayerwname.c_str()));
 			}
 			if (mPlayer->getRanking() == 2)
 			{
@@ -144,23 +138,65 @@ void GameHUD::drawOtherPlayerRanking(HDC& mem1dc)
 			}
 			if (mPlayer->getRanking() == 3)
 			{
-				TextOut(mem1dc, mCamera->getx() + 60, mCamera->gety() + 90, mPlayer->mPlayerwname.c_str(), lstrlenW(mPlayer->mPlayerwname.c_str()));
+				TextOut(mem1dc, mCamera->getx() + 60 , mCamera->gety() + 90, mPlayer->mPlayerwname.c_str(), lstrlenW(mPlayer->mPlayerwname.c_str()));
 			}
 		}
 
-		_itow_s(mOthers[i].getRanking(), otherPlayer1Ranking, 10);
+		else
+		{
+			SetTextColor(mem1dc, RGB(255, 255, 255));
+			
+			//for (int j = 0; j < 3; j++)
+			//{
+			//	if (mOthers[i].getRanking() == mOthers[j].getRanking())
+			//	{
+			//		if (i != j)
+			//		{
+			//			if (mOthers[i].getRanking() == 1 && mOthers[j].getRanking() == 1)
+			//			{
+			//				TextOut(mem1dc, mCamera->getx() + 60 + mPlayer->mPlayerwname.size() * 10 + (j + 1) * 20, mCamera->gety() + 30, mOthers[i].mPlayerwname.c_str(), lstrlenW(mOthers[i].mPlayerwname.c_str()));
 
-		if(mOthers[i].getRanking()==1)
-		{
-			TextOut(mem1dc, mCamera->getx() + 60 + mPlayer->mPlayerwname.size()*10, mCamera->gety() + 30, mOthers[i].mPlayerwname.c_str(), lstrlenW(mOthers[i].mPlayerwname.c_str()));
-		}
-		if (mOthers[i].getRanking() == 2)
-		{
-			TextOut(mem1dc, mCamera->getx() + 60 + mPlayer->mPlayerwname.size() * 10, mCamera->gety() + 60, mOthers[i].mPlayerwname.c_str(), lstrlenW(mOthers[i].mPlayerwname.c_str()));
-		}
-		if (mOthers[i].getRanking() == 3)
-		{
-			TextOut(mem1dc, mCamera->getx() + 60 + mPlayer->mPlayerwname.size() * 10, mCamera->gety() + 90, mOthers[i].mPlayerwname.c_str(), lstrlenW(mOthers[i].mPlayerwname.c_str()));
+			//				break;
+			//			}
+			//			if (mOthers[i].getRanking() == 2 && mOthers[j].getRanking() == 2)
+			//			{
+			//				TextOut(mem1dc, mCamera->getx() + 60 + mPlayer->mPlayerwname.size() * 10 + (j + 1) * 20, mCamera->gety() + 30, mOthers[i].mPlayerwname.c_str(), lstrlenW(mOthers[i].mPlayerwname.c_str()));
+			//				//TextOut(mem1dc, mCamera->getx() + 60 + mPlayer->mPlayerwname.size() * 10 + (j + 1) * 50, mCamera->gety() + 30, mOthers[j].mPlayerwname.c_str(), lstrlenW(mOthers[j].mPlayerwname.c_str()));
+			//				break;
+			//			}
+			//			if (mOthers[i].getRanking() == 3 && mOthers[j].getRanking() == 3)
+			//			{
+			//				TextOut(mem1dc, mCamera->getx() + 60 + mPlayer->mPlayerwname.size() * 10 + (j + 1) * 20, mCamera->gety() + 30, mOthers[i].mPlayerwname.c_str(), lstrlenW(mOthers[i].mPlayerwname.c_str()));
+			//				//TextOut(mem1dc, mCamera->getx() + 60 + mPlayer->mPlayerwname.size() * 10 + (j + 1) * 30, mCamera->gety() + 30, mOthers[j].mPlayerwname.c_str(), lstrlenW(mOthers[j].mPlayerwname.c_str()));
+			//				break;
+			//			}
+			//			//break;
+			//		}
+			//	}
+				//else //if(mOthers[i].getRanking()!=mOthers[j].getRanking())
+				{
+
+					//TextOut(mem1dc, mCamera->getx() + 60 + mPlayer->mPlayerwname.size() * 10, mCamera->gety() + 30, mOthers[i].mPlayerwname.c_str(), lstrlenW(mOthers[i].mPlayerwname.c_str()));
+					if (mOthers[i].getRanking() == 1)
+					{
+						TextOut(mem1dc, mCamera->getx() + 60 + mPlayer->mPlayerwname.size() * 10 + mOthers[i].mPlayername.size()*i*10, mCamera->gety() + 30, mOthers[i].mPlayerwname.c_str(), lstrlenW(mOthers[i].mPlayerwname.c_str()));
+						//break;
+					}
+					if (mOthers[i].getRanking() == 2)
+					{
+						TextOut(mem1dc, mCamera->getx() + 60 + mPlayer->mPlayerwname.size() * 10 + mOthers[i].mPlayername.size()*i * 10, mCamera->gety() + 60, mOthers[i].mPlayerwname.c_str(), lstrlenW(mOthers[i].mPlayerwname.c_str()));
+						//break;
+					}
+					if (mOthers[i].getRanking() == 3)
+					{
+						TextOut(mem1dc, mCamera->getx() + 60 + mPlayer->mPlayerwname.size() * 10 + mOthers[i].mPlayername.size()*i * 10, mCamera->gety() + 90, mOthers[i].mPlayerwname.c_str(), lstrlenW(mOthers[i].mPlayerwname.c_str()));
+						//break;
+					}
+					//break;
+				}
+			
+
+			
 		}
 	}
 	SelectObject(mem1dc, oldfont);
