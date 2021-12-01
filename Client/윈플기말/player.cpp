@@ -870,7 +870,6 @@ void PLAYER::selectBit()
 		bw = 62;
 		bh = 50;
 	}
-
 	else
 		hbitcur = hbitex;
 }
@@ -913,11 +912,11 @@ void PLAYER::draw(HDC& mem1dc, HDC& pdc)
 	//여기서 0,0 ~62,50 까지의 비트맵을 캐릭터기준으로 바꿔준다 (플레이어가 있는 위치의 비트맵을 복사함)
 	BitBlt(gdidc, 0, 0, charw * 2, h * 2, mem1dc, x - charw, y - h, SRCCOPY);
 	//기본 움직임
-	SelectObject(pdc, hbitcur);
+	//SelectObject(pdc, hbitcur);
 	//pdc는 hbitcur 즉 sprite가 들어있음
 	if (state == 1) // 정지상태 
 	{
-
+		SelectObject(pdc, hbitwalk);
 		if (dir == 1)//왼쪽
 		{
 			//TransparentBlt(gdidc, x - charw, y - h, charw * 2, h * 2, pdc, 0, 0, 62, 50, RGB(255, 255, 255));
@@ -961,6 +960,7 @@ void PLAYER::draw(HDC& mem1dc, HDC& pdc)
 	}
 	else if (state == 4) //이동상태
 	{
+		SelectObject(pdc, hbitwalk);
 		if (dir == 1)//왼쪽
 		{
 			//TransparentBlt(mem1dc, x - charw, y - h, charw * 2, h * 2, pdc, bx, by, bw, bh, RGB(255, 255, 255)); //68 0 130 50
@@ -999,6 +999,7 @@ void PLAYER::draw(HDC& mem1dc, HDC& pdc)
 	}
 	else if (state == 2 || state == 7) //점프하거나 떨어질때
 	{
+		SelectObject(pdc,hbitex);
 		if (dir == 1)//왼쪽
 		{
 			//TransparentBlt(mem1dc, x - charw, y - h, charw * 2, h * 2, pdc, 0, 107, 62, 48, RGB(255, 255, 255)); //68 0 130 50
@@ -1034,6 +1035,7 @@ void PLAYER::draw(HDC& mem1dc, HDC& pdc)
 	}
 	else if (state == 3) //숙이기
 	{
+		SelectObject(pdc, hbitex);
 		//h는 줄고 y는 늘고 
 
 		BitBlt(gdidc, 0, 0, charw * 2, 26, mem1dc, x - charw, y - h, SRCCOPY);
@@ -1072,6 +1074,7 @@ void PLAYER::draw(HDC& mem1dc, HDC& pdc)
 	}
 	else if (state == 5 || state == 8)	//줄에 매달린상태
 	{
+		SelectObject(pdc, hbitex);
 		TransparentBlt(gdidc, 0, 0, 62, 50, pdc, bx * 77, 54, 62, 50, RGB(255, 255, 255));
 
 		if (stealth > 0)

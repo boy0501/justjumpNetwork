@@ -27,88 +27,83 @@ int Fps = 0;
 
 
 
-void ChangeLoginToRobby(const int& c_id)
-{
-	int my_id = c_id;
-	//auto p = reinterpret_cast<LoginClient*>(CLIENTS[my_id]);
-	//LobbyClient* willbe_changed = new LobbyClient();
-	//auto Upcasting_changed = reinterpret_cast<Client*>(willbe_changed);
-	//auto Upcasted_original = reinterpret_cast<Client*>(p);
-	//*Upcasting_changed = *Upcasted_original;
-	//willbe_changed->elapsedtime = 0;
-	//willbe_changed->mStageNum = 0;
-	//willbe_changed->mMap = mainMap;
-	//willbe_changed->initBitPos();
-	//willbe_changed->initPos();
-	//CLIENTS[my_id] = willbe_changed;
-	//delete p;
-
-	CLIENTS[my_id]->elapsedtime = 0;
-	CLIENTS[my_id]->mStageNum = 0;
-	CLIENTS[my_id]->initBitPos();
-	CLIENTS[my_id]->initPos();
-
-	//login Button 누른 플레이어는 여기 와서 비로소 active가 된다.
-	CLIENTS[my_id]->is_ingame = true;
-	//send_ok_packet me and other
-	for (auto& c : CLIENTS)
-	{
-		if (c->is_ingame == false) continue;
-		if (c->c_id == my_id)
-		{
-			sc_packet_login_ok packet;
-			packet.size = sizeof(sc_packet_login_ok);
-			packet.type = SC_PACKET_LOGIN_OK;
-			packet.id = my_id;
-			packet.x = CLIENTS[my_id]->x;
-			packet.y = CLIENTS[my_id]->y;
-			packet.stage = 1;
-			c->do_send(&packet, sizeof(packet));
-		}
-		else {
-			sc_packet_put_object packet;
-			packet.size = sizeof(sc_packet_put_object);
-			packet.type = SC_PACKET_PUT_OBJECT;
-			packet.dir = CLIENTS[my_id]->dir;
-			packet.h = CLIENTS[my_id]->h;
-			packet.hp = CLIENTS[my_id]->hp;
-			packet.id = my_id;
-			packet.state = CLIENTS[my_id]->state;
-			packet.stealth = CLIENTS[my_id]->stealth;
-			strcpy_s(packet.username, 20, CLIENTS[my_id]->playername);
-			packet.x = CLIENTS[my_id]->x;
-			packet.y = CLIENTS[my_id]->y;
-			packet.w = CLIENTS[my_id]->w;
-			packet.rank = CLIENTS[my_id]->rank;
-			//
-			//packet.bx = CLIENTS[my_id]->bx;
-			
-			c->do_send(&packet, sizeof(packet));
-		}
-	}
-	//send_ok_packet 상대방껄 나에게
-	for (auto& c : CLIENTS)
-	{
-		if (c->is_ingame == false) continue;
-		if (c->c_id == my_id)continue;
-
-		sc_packet_put_object packet;
-		packet.size = sizeof(sc_packet_put_object);
-		packet.type = SC_PACKET_PUT_OBJECT;
-		packet.dir = c->dir;
-		packet.h = c->h;
-		packet.hp = c->hp;
-		packet.id = c->c_id;
-		packet.state = c->state;
-		packet.stealth = c->stealth;
-		strcpy_s(packet.username, 20, c->playername);
-		packet.x = c->x;
-		packet.y = c->y;
-		packet.w = c->w;
-		packet.rank = c->rank;
-		CLIENTS[my_id]->do_send(&packet, sizeof(packet));
-	}
-}
+//void ChangeLoginToRobby(const int& c_id)
+//{
+//	int my_id = c_id;
+//	//auto p = reinterpret_cast<LoginClient*>(CLIENTS[my_id]);
+//	//LobbyClient* willbe_changed = new LobbyClient();
+//	//auto Upcasting_changed = reinterpret_cast<Client*>(willbe_changed);
+//	//auto Upcasted_original = reinterpret_cast<Client*>(p);
+//	//*Upcasting_changed = *Upcasted_original;
+//	//willbe_changed->elapsedtime = 0;
+//	//willbe_changed->mStageNum = 0;
+//	//willbe_changed->mMap = mainMap;
+//	//willbe_changed->initBitPos();
+//	//willbe_changed->initPos();
+//	//CLIENTS[my_id] = willbe_changed;
+//	//delete p;
+//
+//	//login Button 누른 플레이어는 여기 와서 비로소 active가 된다.
+//	//CLIENTS[my_id]->is_ingame = true;
+//	//send_ok_packet me and other
+//	for (auto& c : CLIENTS)
+//	{
+//		if (c->is_ingame == false) continue;
+//		if (c->c_id == my_id)
+//		{
+//			sc_packet_login_ok packet;
+//			packet.size = sizeof(sc_packet_login_ok);
+//			packet.type = SC_PACKET_LOGIN_OK;
+//			packet.id = my_id;
+//			packet.x = CLIENTS[my_id]->x;
+//			packet.y = CLIENTS[my_id]->y;
+//			packet.stage = 1;
+//			c->do_send(&packet, sizeof(packet));
+//		}
+//		else {
+//			sc_packet_put_object packet;
+//			packet.size = sizeof(sc_packet_put_object);
+//			packet.type = SC_PACKET_PUT_OBJECT;
+//			packet.dir = CLIENTS[my_id]->dir;
+//			packet.h = CLIENTS[my_id]->h;
+//			packet.hp = CLIENTS[my_id]->hp;
+//			packet.id = my_id;
+//			packet.state = CLIENTS[my_id]->state;
+//			packet.stealth = CLIENTS[my_id]->stealth;
+//			strcpy_s(packet.username, 20, CLIENTS[my_id]->playername);
+//			packet.x = CLIENTS[my_id]->x;
+//			packet.y = CLIENTS[my_id]->y;
+//			packet.w = CLIENTS[my_id]->w;
+//			packet.rank = CLIENTS[my_id]->rank;
+//			//
+//			//packet.bx = CLIENTS[my_id]->bx;
+//			
+//			c->do_send(&packet, sizeof(packet));
+//		}
+//	}
+//	//send_ok_packet 상대방껄 나에게
+//	for (auto& c : CLIENTS)
+//	{
+//		if (c->is_ingame == false) continue;
+//		if (c->c_id == my_id)continue;
+//
+//		sc_packet_put_object packet;
+//		packet.size = sizeof(sc_packet_put_object);
+//		packet.type = SC_PACKET_PUT_OBJECT;
+//		packet.dir = c->dir;
+//		packet.h = c->h;
+//		packet.hp = c->hp;
+//		packet.id = c->c_id;
+//		packet.state = c->state;
+//		packet.stealth = c->stealth;
+//		strcpy_s(packet.username, 20, c->playername);
+//		packet.x = c->x;
+//		packet.y = c->y;
+//		packet.w = c->w;
+//		packet.rank = c->rank;
+//		CLIENTS[my_id]->do_send(&packet, sizeof(packet));
+//	}
+//}
 void ChangeRobbyToGame(const int& c_id)
 {
 	int my_id = c_id;
@@ -344,14 +339,14 @@ DWORD WINAPI ClientInputThread(LPVOID arg)
 		case 0: {
 			if (CLIENTS[1]->is_active == true)
 				SetEvent(Client1Event);
-			else
+			else if(CLIENTS[2]->is_active == true)
 				SetEvent(Client2Event);
 			break;
 		}
 		case 1: {
 			if (CLIENTS[2]->is_active == true)
 				SetEvent(Client2Event);
-			else
+			else if(CLIENTS[0]->is_active == true)
 				SetEvent(Client0Event);
 
 			break;
@@ -359,7 +354,7 @@ DWORD WINAPI ClientInputThread(LPVOID arg)
 		case 2: {
 			if (CLIENTS[0]->is_active == true)
 				SetEvent(Client0Event);
-			else
+			else if (CLIENTS[1]->is_active == true)
 				SetEvent(Client1Event);
 			break;
 		}
