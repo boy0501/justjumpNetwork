@@ -188,38 +188,43 @@ DWORD WINAPI GameLogicThread(LPVOID arg)
 			// Scene Changer
 			for (auto& c : CLIENTS)
 			{
-				if (c->mCss == CSS_LIVE) continue;
-				//PlayerInputThread에서 mCss와 mSn을 바꿔주는데
-				// mCss가 바뀌고 mSn이 바뀌기 전에(순서가 존재함) 이 아래 코드를 실행하면 동기화문제가 생기니
-				// Event를 사용하여 동기화문제를 해결한다.
-				WaitForSingleObject(c->SceneChangeTrigger, INFINITE);
-
-				switch (c->mSn)
+				if (c->SceneChangeTrigger == true)
 				{
-				case SN_LOBBY:
-				{
-					ChangeLoginToRobby(c->c_id);
-					c->mCss = CSS_LIVE;
-					auto lc = reinterpret_cast<LobbyClient*>(c);
-					//WaitForSingleObject(lc->CountSendController, INFINITE);
-
-					robby_cnt += 1;
-					//cout << "lc로비카운트는"<<robby_cnt << endl;
-
-					SetEvent(c->SceneChangeIsDone);
- 					break;
+					c->SceneName = Scene_Name::SN_INGAME;
+					c->SceneChangeTrigger = false;
 				}
-				case SN_INGAME: 
-				{
-					//로비에서 인게임으로 다같이 가자
-					
-					ChangeRobbyToGame(c->c_id);
-					c->mCss = CSS_LIVE;
-					//SetEvent(c->SceneChangeIsDone);
-
-					break;
-				}
-				}
+				//if (c->mCss == CSS_LIVE) continue;
+				////PlayerInputThread에서 mCss와 mSn을 바꿔주는데
+				//// mCss가 바뀌고 mSn이 바뀌기 전에(순서가 존재함) 이 아래 코드를 실행하면 동기화문제가 생기니
+				//// Event를 사용하여 동기화문제를 해결한다.
+				//WaitForSingleObject(c->SceneChangeTrigger, INFINITE);
+				//
+				//switch (c->mSn)
+				//{
+				//case SN_LOBBY:
+				//{
+				//	ChangeLoginToRobby(c->c_id);
+				//	c->mCss = CSS_LIVE;
+				//	auto lc = reinterpret_cast<LobbyClient*>(c);
+				//	//WaitForSingleObject(lc->CountSendController, INFINITE);
+				//
+				//	robby_cnt += 1;
+				//	//cout << "lc로비카운트는"<<robby_cnt << endl;
+				//
+				//	SetEvent(c->SceneChangeIsDone);
+ 				//	break;
+				//}
+				//case SN_INGAME: 
+				//{
+				//	//로비에서 인게임으로 다같이 가자
+				//	
+				//	ChangeRobbyToGame(c->c_id);
+				//	c->mCss = CSS_LIVE;
+				//	//SetEvent(c->SceneChangeIsDone);
+				//
+				//	break;
+				//}
+				//}
 				//서버에서 플레이어를 옮겨줬다면 SetEvent를 하여 클라이언트에게 바뀌었다고 패킷을 날림
 				//1.서버처리 2.클라에게 패킷처리 [ 순서 존재 ]
 			}
@@ -245,7 +250,7 @@ DWORD WINAPI GameLogicThread(LPVOID arg)
 			for (int i = 0; i < Cnt_Player; ++i)
 			{
 				auto& c = CLIENTS[i];
-				if (c->mSn == Scene_Name::SN_INGAME)
+				if (c->SceneName == Scene_Name::SN_INGAME)
 				{
 					auto game = reinterpret_cast<GameClient*>(CLIENTS[i]);
 					int objNum = 0;
@@ -367,18 +372,6 @@ int main()
 	Client0Event = CreateEvent(NULL, FALSE, TRUE, NULL);
 	Client1Event = CreateEvent(NULL, FALSE, FALSE, NULL);
 	Client2Event = CreateEvent(NULL, FALSE, FALSE, NULL);
-	Client0SceneChangeTrigger = CreateEvent(NULL, FALSE, FALSE, NULL);
-	Client1SceneChangeTrigger = CreateEvent(NULL, FALSE, FALSE, NULL);
-	Client2SceneChangeTrigger = CreateEvent(NULL, FALSE, FALSE, NULL);
-	Client0SceneChangeIsDone = CreateEvent(NULL, FALSE, FALSE, NULL);
-	Client1SceneChangeIsDone = CreateEvent(NULL, FALSE, FALSE, NULL);
-	Client2SceneChangeIsDone = CreateEvent(NULL, FALSE, FALSE, NULL);
-	CLIENTS[0]->SceneChangeTrigger = Client0SceneChangeTrigger;
-	CLIENTS[0]->SceneChangeIsDone = Client0SceneChangeIsDone;
-	CLIENTS[1]->SceneChangeTrigger = Client1SceneChangeTrigger;
-	CLIENTS[1]->SceneChangeIsDone = Client1SceneChangeIsDone;
-	CLIENTS[2]->SceneChangeTrigger = Client2SceneChangeTrigger;
-	CLIENTS[2]->SceneChangeIsDone = Client2SceneChangeIsDone;
 	auto mNet = Network::GetNetwork();
 	mNet->InitServer();
 	HANDLE hThread;
@@ -409,13 +402,6 @@ int main()
 	CloseHandle(Client0Event);
 	CloseHandle(Client1Event);
 	CloseHandle(Client2Event);
-
-	CloseHandle(Client0SceneChangeTrigger);
-	CloseHandle(Client1SceneChangeTrigger);
-	CloseHandle(Client2SceneChangeTrigger);
-	CloseHandle(Client0SceneChangeIsDone);
-	CloseHandle(Client1SceneChangeIsDone);
-	CloseHandle(Client2SceneChangeIsDone);
 	delete Network::GetNetwork();
 	delete mainMap;
 

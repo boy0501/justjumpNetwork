@@ -6,9 +6,9 @@
 
 std::array<class Client*, 3> CLIENTS;
 Network* Network::mNetwork = nullptr;
-HANDLE Client0Event, Client0SceneChangeTrigger, Client0SceneChangeIsDone;
-HANDLE Client1Event, Client1SceneChangeTrigger, Client1SceneChangeIsDone;
-HANDLE Client2Event, Client2SceneChangeTrigger, Client2SceneChangeIsDone;
+HANDLE Client0Event;
+HANDLE Client1Event;
+HANDLE Client2Event;
 int Cnt_Player = 0;
 int robby_cnt = 0;
 
