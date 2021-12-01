@@ -189,6 +189,16 @@ std::shared_ptr<Text> UI::FindTextByNameTag(std::string NameTag)
 }
 void UI::closeUI()
 {
+#ifdef _DEBUG
 	std::cout << "closeUI 호출" << std::endl;
+#endif 
 	mState = UIState::Dead;
+}
+
+void UI::activeUI()
+{
+#ifdef _DEBUG
+	std::cout << "ActiveUI 호출" << std::endl;
+#endif 
+	mState = UIState::Active;
 }

@@ -267,6 +267,7 @@ void Network::ProcessPacket(unsigned char* p)
 				if (mPlayer->WhenPlayerDied == false)
 				{
 					mPlayer->WhenPlayerDied = true;
+					mMap->mDieUi->activeUI();
 					mUI.emplace_back(mMap->mDieUi);
 				}
 			}
