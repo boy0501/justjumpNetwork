@@ -165,12 +165,15 @@ void update(float delta_time)
 		//	//adjustPlayer(other, obj, map, ocount, g_hinst);
 		//}
 		//두개 다 서버로 옮겨줬기 때문에, 이제 필요가 없다.
-		if (player.hp == 0)
-		{
-			//if (player.WhenPlayerDied == false)
-			Network::GetNetwork()->mUI.emplace_back(map.mDieUi);
-			//player.WhenPlayerDied = true;
-		}
+		//if (player.WhenPlayerDied == false)
+		//{
+		//	if (player.hp == 0)
+		//	{
+		//		//if (player.WhenPlayerDied == false)
+		//		Network::GetNetwork()->mUI.emplace_back(map.mDieUi);
+		//		//player.WhenPlayerDied = true;
+		//	}
+		//}
 	}
 	map.movemap();
 
@@ -188,11 +191,11 @@ void update(float delta_time)
 			adjustCamera(camera, player);
 	}
 
-	player.selectBit();
+	//player.selectBit();
 	//player.stealthtime();
 	//player.spike_hurttime();
-	for (auto& o : others)
-		o.selectBit();
+	//for (auto& o : others)
+	//	o.selectBit();
 
 	// 이거를 따로 넣는게 나을듯 오브젝트 멤버함수로다가
 	for (int i = 0; i <= ocount; i++)
@@ -719,6 +722,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		
 		dieui->addButton([dieui]() {
 			cout << "위치 초기화!" << endl;
+			//player.WhenPlayerDied = false;
 			send_die_ok_packet();
 			//player.initPos();
 			//player.sethp(100);

@@ -262,6 +262,17 @@ void Network::ProcessPacket(unsigned char* p)
 			mPlayer->oldX = packet->x;
 			mPlayer->oldY = packet->y;
 
+			if (packet->hp <= 0)
+			{
+				if (mPlayer->WhenPlayerDied == false)
+				{
+					mPlayer->WhenPlayerDied = true;
+					mUI.emplace_back(mMap->mDieUi);
+				}
+			}
+			else {
+				mPlayer->WhenPlayerDied = false;
+			}
 			//------
 			//rank = packet->rank;
 			//------

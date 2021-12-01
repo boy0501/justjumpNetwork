@@ -178,6 +178,7 @@ void Client::ProcessPacket(unsigned char* p)
 	}
 	case CS_PACKET_MOVE: {
 		cs_packet_move* packet = reinterpret_cast<cs_packet_move*>(p);
+		if (COMMAND_die == true) break;	//서버에서 죽었으면 서버에서 더이상 move패킷 안받음. 
 		switch ((int)packet->dir) {
 		case VK_LEFT: //VK_LEFT
 			//std::cout << "left" << std::endl;
@@ -1207,10 +1208,10 @@ void Client::adjustPlayer(float deltatime)
 				else if (obj->type == 103) //왼쪽 증기, 가시와 비슷함 대신 증기가 완전히 뿜어져  나왔을때 피격판정이 있다.
 				{
 					auto steamobj = reinterpret_cast<AttackObstacle*>(obj);
-					std::cout << "인덱스" << steamobj->index << std::endl;
+					//std::cout << "인덱스" << steamobj->index << std::endl;
 					if (steamobj->index == 2) //증기가 완전히 뿜어졌을때만 피격이 발생한다
 					{
-						std::cout << "인덱스 들어옴" << stealth << std::endl;
+						//std::cout << "인덱스 들어옴" << stealth << std::endl;
 
 						if (stealth == 0)
 						{
@@ -1469,8 +1470,8 @@ void Client::adjustPlayer(float deltatime)
 
 void Client::hurt()
 {
-	std::cout << "다침상태 들어오지 ?" << std::endl;
-	std::cout << "hp는 ? : " << COMMAND_die << "," << hp << std::endl;
+	//std::cout << "다침상태 들어오지 ?" << std::endl;
+	//std::cout << "hp는 ? : " << COMMAND_die << "," << hp << std::endl;
 	if (COMMAND_die == false)
 		hp -= 5;
 	if (hp <= 0)	//0 이하라면
@@ -1495,7 +1496,7 @@ void Client::spike_hurttime(float deltatime)
 	if (spike_hurt < 0)
 	{
 		spike_hurt++;
-		std::cout << "들어오긴하냐" << std::endl;
+		//std::cout << "들어오긴하냐" << std::endl;
 		x -= (int)(200 * deltatime);			//왼쪽으로감
 	}
 	else if (spike_hurt > 0)
@@ -1512,7 +1513,7 @@ void Client::stealthtime(float deltatime)
 		{
 			//stealth -= (int)(200 * deltatime);
 			stealth = max(stealth - (int)(100 * deltatime), 0);
-			std::cout << stealth << std::endl;
+			//std::cout << stealth << std::endl;
 			if (stealth == 0)
 				COMMAND_hurt = 0;
 		}
