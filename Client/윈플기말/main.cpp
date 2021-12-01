@@ -497,7 +497,6 @@ void send_move_packet(char dr)
 	packet.size = sizeof(packet);
 	packet.type = CS_PACKET_MOVE;
 	packet.dir = dr;
-	packet.id = player.player_cid;
 
 	Network::GetNetwork()->C_Send(&packet, sizeof(packet));
 }

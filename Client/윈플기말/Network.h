@@ -13,7 +13,6 @@ extern RECT rectview;
 extern HBITMAP hbit1;
 extern HINSTANCE g_hinst;
 extern int obj_t;
-
 void error_display(int err_no);
 
 extern CAMERA camera;
