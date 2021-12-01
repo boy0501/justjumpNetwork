@@ -11,6 +11,7 @@ Client::Client()
 	:prev_size(0)
 	,is_ingame(false)
 	,is_active(false)
+	, robby_timer(3)
 {
 	ZeroMemory(buf, sizeof(buf));
 	x = 80; 
@@ -79,8 +80,78 @@ void Client::ProcessPacket(unsigned char* p)
 		strcpy_s(playername, packet->username);
 		x = 80;
 		y = 665;
-		mStageNum = 0;
 
+		mStageNum = 0;
+		elapsedtime = 0;
+		initBitPos();
+		LobbyinitPos();
+
+		//login Button 누른 플레이어는 여기 와서 비로소 active가 된다.
+		is_ingame = true;
+		//send_ok_packet me and other
+		for (auto& c : CLIENTS)
+		{
+			if (c->is_ingame == false) continue;
+			if (c->c_id == c_id)
+			{
+				sc_packet_login_ok packet;
+				packet.size = sizeof(sc_packet_login_ok);
+				packet.type = SC_PACKET_LOGIN_OK;
+				packet.id = c_id;
+				packet.x = x;
+				packet.y = y;
+				packet.stage = 1;
+				c->do_send(&packet, sizeof(packet));
+			}
+			else {
+				sc_packet_put_object packet;
+				packet.size = sizeof(sc_packet_put_object);
+				packet.type = SC_PACKET_PUT_OBJECT;
+				packet.dir = dir;
+				packet.h = h;
+				packet.hp = hp;
+				packet.id = c_id;
+				packet.state = state;
+				packet.stealth = stealth;
+				strcpy_s(packet.username, 20, playername);
+				packet.x = x;
+				packet.y = y;
+				packet.w = w;
+				packet.rank = rank;
+				//
+				//packet.bx = CLIENTS[my_id]->bx;
+
+				c->do_send(&packet, sizeof(packet));
+			}
+		}
+		//send_ok_packet 상대방껄 나에게
+		for (auto& c : CLIENTS)
+		{
+			if (c->is_ingame == false) continue;
+			if (c->c_id == c_id)continue;
+
+			sc_packet_put_object packet;
+			packet.size = sizeof(sc_packet_put_object);
+			packet.type = SC_PACKET_PUT_OBJECT;
+			packet.dir = c->dir;
+			packet.h = c->h;
+			packet.hp = c->hp;
+			packet.id = c->c_id;
+			packet.state = c->state;
+			packet.stealth = c->stealth;
+			strcpy_s(packet.username, 20, c->playername);
+			packet.x = c->x;
+			packet.y = c->y;
+			packet.w = c->w;
+			packet.rank = c->rank;
+			do_send(&packet, sizeof(packet));
+		}
+
+		//여기서 드디어 로그인이 승인되고 하나의 Client로 인정받아, GameLogic의 Loop문을 실행하게 됨 .
+		SceneName = Scene_Name::SN_LOBBY;
+		Cnt_Player++;
+		robby_cnt++;
+		
 		break;
 	}
 	//jpark
@@ -107,7 +178,6 @@ void Client::ProcessPacket(unsigned char* p)
 	}
 	case CS_PACKET_MOVE: {
 		cs_packet_move* packet = reinterpret_cast<cs_packet_move*>(p);
-		if (c_id != packet->id) break;
 		switch ((int)packet->dir) {
 		case VK_LEFT: //VK_LEFT
 			//std::cout << "left" << std::endl;
@@ -520,6 +590,26 @@ void Client::do_send(void* packet, int bytes)
 }
 
 
+void Client::LobbyinitPos()
+{
+	x = 80;
+	y = 655;
+	savey = 655;
+	w = 14;
+	h = 25;
+	//charw = 31;	
+	//charh = 25;	
+	hp = 5;
+	state = 1;
+	dir = 2;
+	adjustspd = 0;
+	stealth = 0;
+	spike_hurt = 0;
+	COMMAND_move = false;
+	COMMAND_hurt = false;
+	COMMAND_die = false;
+	COMMAND_ropehurt = false;
+}
 
 void Client::initPos()
 {

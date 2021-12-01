@@ -56,12 +56,12 @@ void LobbyClient::update(float delta_time)
 				COMMAND_die = false;
 				//mStageNum = 1;
 
-				for (auto& c : CLIENTS)
-				{
-					c->mCss = CSS_DEAD;
-					c->mSn = SN_INGAME;
-					SetEvent(c->SceneChangeTrigger);
-				}
+				//for (auto& c : CLIENTS)
+				//{
+				//	c->mCss = CSS_DEAD;
+				//	c->mSn = SN_INGAME;
+				//	SetEvent(c->SceneChangeTrigger);
+				//}
 
 			
 
@@ -118,7 +118,7 @@ void LobbyClient::initPos()
 {
 	x = 80;
 	y = 655;
-	savey = 3700;
+	savey = 655;
 	w = 14;
 	h = 25;
 	//charw = 31;	

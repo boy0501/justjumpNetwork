@@ -30,18 +30,23 @@ int Fps = 0;
 void ChangeLoginToRobby(const int& c_id)
 {
 	int my_id = c_id;
-	auto p = reinterpret_cast<LoginClient*>(CLIENTS[my_id]);
-	LobbyClient* willbe_changed = new LobbyClient();
-	auto Upcasting_changed = reinterpret_cast<Client*>(willbe_changed);
-	auto Upcasted_original = reinterpret_cast<Client*>(p);
-	*Upcasting_changed = *Upcasted_original;
-	willbe_changed->elapsedtime = 0;
-	willbe_changed->mStageNum = 0;
-	willbe_changed->mMap = mainMap;
-	willbe_changed->initBitPos();
-	willbe_changed->initPos();
-	CLIENTS[my_id] = willbe_changed;
-	delete p;
+	//auto p = reinterpret_cast<LoginClient*>(CLIENTS[my_id]);
+	//LobbyClient* willbe_changed = new LobbyClient();
+	//auto Upcasting_changed = reinterpret_cast<Client*>(willbe_changed);
+	//auto Upcasted_original = reinterpret_cast<Client*>(p);
+	//*Upcasting_changed = *Upcasted_original;
+	//willbe_changed->elapsedtime = 0;
+	//willbe_changed->mStageNum = 0;
+	//willbe_changed->mMap = mainMap;
+	//willbe_changed->initBitPos();
+	//willbe_changed->initPos();
+	//CLIENTS[my_id] = willbe_changed;
+	//delete p;
+
+	CLIENTS[my_id]->elapsedtime = 0;
+	CLIENTS[my_id]->mStageNum = 0;
+	CLIENTS[my_id]->initBitPos();
+	CLIENTS[my_id]->initPos();
 
 	//login Button 누른 플레이어는 여기 와서 비로소 active가 된다.
 	CLIENTS[my_id]->is_ingame = true;
@@ -107,18 +112,23 @@ void ChangeLoginToRobby(const int& c_id)
 void ChangeRobbyToGame(const int& c_id)
 {
 	int my_id = c_id;
-	auto p = reinterpret_cast<LobbyClient*>(CLIENTS[my_id]);
-	GameClient* willbe_changed = new GameClient();
-	auto Upcasting_changed = reinterpret_cast<Client*>(willbe_changed);
-	auto Upcasted_original = reinterpret_cast<Client*>(p);
-	*Upcasting_changed = *Upcasted_original;
-	willbe_changed->elapsedtime = 0;
-	willbe_changed->mStageNum = 1;
-	willbe_changed->mMap = mainMap;
-	willbe_changed->initBitPos();
-	willbe_changed->initPos();
-	CLIENTS[my_id] = willbe_changed;
-	delete p;
+	//auto p = reinterpret_cast<LobbyClient*>(CLIENTS[my_id]);
+	//GameClient* willbe_changed = new GameClient();
+	//auto Upcasting_changed = reinterpret_cast<Client*>(willbe_changed);
+	//auto Upcasted_original = reinterpret_cast<Client*>(p);
+	//*Upcasting_changed = *Upcasted_original;
+	//willbe_changed->elapsedtime = 0;
+	//willbe_changed->mStageNum = 1;
+	//willbe_changed->mMap = mainMap;
+	//willbe_changed->initBitPos();
+	//willbe_changed->initPos();
+	//CLIENTS[my_id] = willbe_changed;
+	//delete p;
+
+	CLIENTS[my_id]->elapsedtime = 0;
+	CLIENTS[my_id]->mStageNum = 1;
+	CLIENTS[my_id]->initBitPos();
+	CLIENTS[my_id]->initPos();
 
 	sc_packet_gamestart packet;
 	packet.size = sizeof(sc_packet_gamestart);
@@ -192,6 +202,7 @@ DWORD WINAPI GameLogicThread(LPVOID arg)
 				{
 					c->SceneName = Scene_Name::SN_INGAME;
 					c->SceneChangeTrigger = false;
+					ChangeRobbyToGame(c->c_id);
 				}
 				//if (c->mCss == CSS_LIVE) continue;
 				////PlayerInputThread에서 mCss와 mSn을 바꿔주는데
@@ -252,7 +263,7 @@ DWORD WINAPI GameLogicThread(LPVOID arg)
 				auto& c = CLIENTS[i];
 				if (c->SceneName == Scene_Name::SN_INGAME)
 				{
-					auto game = reinterpret_cast<GameClient*>(CLIENTS[i]);
+					auto game = CLIENTS[i];
 					int objNum = 0;
 					for (auto& obj : game->mMap->mObjects[game->mStageNum])
 					{
@@ -361,13 +372,16 @@ DWORD WINAPI ClientInputThread(LPVOID arg)
 int main()
 {
 	wcout.imbue(locale("korean"));
-	for (int i = 0; i < 3; ++i) //오브젝트 풀링
-	{
-		CLIENTS[i] = new LoginClient();
-	}
+
 	//맵 정보 All Loading
 	mainMap = new Map();
 	mainMap->LoadAllObjects();
+
+	for (int i = 0; i < 3; ++i) //오브젝트 풀링
+	{
+		CLIENTS[i] = new Client();
+		CLIENTS[i]->mMap = mainMap;
+	}
 	//
 	Client0Event = CreateEvent(NULL, FALSE, TRUE, NULL);
 	Client1Event = CreateEvent(NULL, FALSE, FALSE, NULL);
@@ -379,7 +393,7 @@ int main()
 	LogicThread = CreateThread(NULL, 0, GameLogicThread, 0, 0, NULL);
 
 
-	for (int i = 0; i < 3; ++i,++Cnt_Player)
+	for (int i = 0; i < 3; ++i)
 	{
 		CLIENTS[i]->c_socket = mNet->AcceptClient(CLIENTS[i]->c_addr);
 		CLIENTS[i]->c_id = i;
