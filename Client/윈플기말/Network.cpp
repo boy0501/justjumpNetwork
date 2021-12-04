@@ -155,8 +155,6 @@ void Network::ProcessPacket(unsigned char* p)
 		//임계영역 자리
 		mPlayer->x = packet->x;
 		mPlayer->y = packet->y;
-		mPlayer->oldY = packet->y;
-		mPlayer->oldX = packet->x;
 		//임계영역 자리
 		mMap->setmapnum(9);
 		*mOcount = initObject(mObj, mMap->getmapnum(), g_hinst);
@@ -181,17 +179,11 @@ void Network::ProcessPacket(unsigned char* p)
 		mOthers[id].state=packet->state;
 		mOthers[id].stealth=packet->stealth;
 		mOthers[id].mPlayername = packet->username;
-		mOthers[id].rank = packet->rank;
 		USES_CONVERSION;
 		mOthers[id].mPlayerwname = wstring(A2W(mOthers[id].mPlayername.c_str()));
 		mOthers[id].w = packet->w;
-		//임계영역 자리 
 		mOthers[id].x=packet->x;
 		mOthers[id].y=packet->y;
-		mOthers[id].oldX = packet->x;
-		mOthers[id].oldY = packet->y;
-		//임계영역 자리
-		mOthers[id].rank = packet->rank;
 		break;
 	}
 	case SC_PACKET_LOGOUT_OBJECT: {
@@ -213,14 +205,9 @@ void Network::ProcessPacket(unsigned char* p)
 		mMap->CreateMap(g_hinst);
 		LoadBK(hbit1, g_hinst, mMap->getmapnum());
 
-
-		//hbit1 = (HBITMAP)LoadImage(g_hinst, TEXT("img/bk.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
 		Sound::GetSelf()->setindex(Sound::GetSelf()->getindex() + 1);
 		Sound::GetSelf()->Sound_Play(EFFECTSOUND, PORTALEF, EFVOL);
 		Sound::GetSelf()->Sound_Play(BGMSOUND, FIRSTMAPBGM, BGMVOL);
-		//mPlayer->initPos();
-		//mPlayer->oldY = mPlayer->y;
-		//mPlayer->oldX = mPlayer->x;
 		//---sethp를 패킷으로 넘겨받으면 이 부분 꼭 수정해주세요 
 		mPlayer->sethp(mPlayer->hp); //(jpark 확인)
 		//---
@@ -232,18 +219,14 @@ void Network::ProcessPacket(unsigned char* p)
 		if (countdown != packet->countdown)
 			cntdown_controller = true;
 
-			//init_x += 20;
 		countdown = packet->countdown;
 
-		//std::cout << packet->countdown << std::endl;
 		break;
 	}
 	case SC_PACKET_MOVE_PROCESS: {
 		if (isLogin == true) break;
 		sc_packet_move_process* packet = reinterpret_cast<sc_packet_move_process*>(p);
 
-		//std::cout << packet->x << "," << packet->y << std::endl;
-		//std::cout << (int)packet->bx << std::endl;
 		if (packet->id == mPlayer->player_cid)
 		{
 			mPlayer->h = packet->h;
@@ -255,12 +238,6 @@ void Network::ProcessPacket(unsigned char* p)
 
 			mPlayer->x = packet->x;
 			mPlayer->y = packet->y;
-			//속도구하는 공식 = 거리 /시간 => (지금패킷위치 - 예전패킷위치) / 걸린시간  
-			mPlayer->velocityX = (packet->x - mPlayer->oldX) / (packet->senddeltatime);
-			mPlayer->velocityY = (packet->y - mPlayer->oldY) / (packet->senddeltatime);
-
-			mPlayer->oldX = packet->x;
-			mPlayer->oldY = packet->y;
 
 			if (packet->hp <= 0)
 			{
@@ -274,9 +251,6 @@ void Network::ProcessPacket(unsigned char* p)
 			else {
 				mPlayer->WhenPlayerDied = false;
 			}
-			//------
-			//rank = packet->rank;
-			//------
 		}
 		else {
 			auto& other = mOthers[packet->id];
@@ -286,25 +260,14 @@ void Network::ProcessPacket(unsigned char* p)
 			other.dir = packet->dir;
 			other.hp = packet->hp;
 			other.rank = packet->rank;
-			//임계영역 자리 ----
 			other.x = packet->x;
 			other.y = packet->y;
-			//속도구하는 공식 = 거리 /시간 => (지금패킷위치 - 예전패킷위치) / 걸린시간  
-			other.velocityX = (packet->x - other.oldX) / (packet->senddeltatime);
-			other.velocityY = (packet->y - other.oldY) / (packet->senddeltatime);
-			//mPlayer->reckoningY = (mPlayer->y - mPlayer->oldY) / 2;
-			other.oldX = packet->x;
-			other.oldY = packet->y;
-			//임계영역 자리 ----
-			//std::cout << "아덜좌표 y : " << other.y << std::endl;
-			//other.bx = packet->bx;
 		}
 
 		break;
 	}
 	case SC_PACKET_GAMESTART:{
 		sc_packet_gamestart* packet = reinterpret_cast<sc_packet_gamestart*>(p);
-		//임계영역 자리
 		mPlayer->dir = packet->dir;
 		mPlayer->h = packet->h;
 		mPlayer->stage = packet->stage;
@@ -312,9 +275,6 @@ void Network::ProcessPacket(unsigned char* p)
 		mPlayer->stealth = packet->stealth;
 		mPlayer->x = packet->x;
 		mPlayer->y = packet->y;
-		mPlayer->oldX = packet->x;
-		mPlayer->oldY = packet->y;
-		//임계영역 자리
 		mPlayer->COMMAND_die = packet->COMMAND_die;
 
 		//auto gameui = make_shared<GameHUD>(1, *mPlayer);
@@ -382,16 +342,8 @@ void Network::ProcessPacket(unsigned char* p)
 		}
 		case 106: 
 		case 107: {
-			//obj.degree = packet->degree;
-			//obj.velocityDegree = (packet->degree - obj.oldDegree) / (packet->senddeltatime);
-			//if (obj.velocityDegree < 0)
-			//{
-			//	//각도는 0 = 360인데 old는 360에서 362로 갈것으로 기대하고있지만, 실제 degree는 0으로 가서 생기는 - 값 보정
-			//	obj.velocityDegree = (packet->degree + 360 - obj.oldDegree) / (packet->senddeltatime);
-			//}
 			obj.mx = packet->mx;
 			obj.my = packet->my;
-			//obj.oldDegree = packet->degree;
 
 			break;
 		}

@@ -499,7 +499,7 @@ void send_move_packet(char dr)
 	cs_packet_move packet;
 	packet.size = sizeof(packet);
 	packet.type = CS_PACKET_MOVE;
-	packet.dir = dr;
+	packet.vk_key = dr;
 
 	Network::GetNetwork()->C_Send(&packet, sizeof(packet));
 }

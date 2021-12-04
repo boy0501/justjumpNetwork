@@ -29,6 +29,7 @@ Network::Network()
 {
 	WSAStartup(MAKEWORD(2, 2), &WSAData);
 	s_socket = socket(AF_INET, SOCK_STREAM, 0);
+	//Nagle Off
 	BOOL optval = true;
 	setsockopt(s_socket, IPPROTO_TCP, TCP_NODELAY, (char*)&optval, sizeof(optval));
 	ZeroMemory(&server_addr, sizeof(server_addr));

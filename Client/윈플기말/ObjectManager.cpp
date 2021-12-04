@@ -698,7 +698,6 @@ void adjustPlayer(PLAYER& player, OBJECT* obj, MAP& m, int& ocount, HINSTANCE g_
 	if ((player.getstate() == 4 || player.getstate() == 1) || (player.getstate() == 5 || player.getstate() == 8))	//하나도 못부딪혔으면 공중에있는거니까 떨어져야한다
 	{
 		player.setstate(7);
-		player.fall2save();		//떨어지는 순간의 x좌표점 기억
 	}
 
 
