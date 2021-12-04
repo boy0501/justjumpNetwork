@@ -61,8 +61,8 @@ public:
 	unsigned char buf[MAX_BUF_SIZE];
 	SOCKADDR_IN c_addr;
 	Client();
-	virtual ~Client() noexcept;
-	virtual void update(float delta_time);
+	~Client();
+	void update(float delta_time);
 
 	int do_recv();
 	void do_send(void* packet, int bytes);

@@ -1,10 +1,9 @@
 ﻿#include "Client.h"
-#include "../CLIENT/LoginClient.h"
-#include "../CLIENT/LobbyClient.h"
 #include "../OBSTACLE/AttackObstacle.h"
 #include "../Map.h"
 
 #include <iostream>
+#include <array>
 #include "../Network.h"
 
 Client::Client()

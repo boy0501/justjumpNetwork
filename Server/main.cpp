@@ -6,9 +6,6 @@
 
 #include "Network.h"
 #include "CLIENT/Client.h"
-#include "CLIENT/LoginClient.h"
-#include "CLIENT/LobbyClient.h"
-#include "CLIENT/GameClient.h"
 #include "Object.h"
 #include "Map.h"
 #include "OBSTACLE/AttackObstacle.h"
@@ -29,7 +26,6 @@ void ChangeLobbyToGame(const int& c_id)
 {
 	CLIENTS[c_id]->elapsedtime = 0;
 	CLIENTS[c_id]->mStageNum = 1;
-	CLIENTS[c_id]->initBitPos();
 	CLIENTS[c_id]->initPos();
 
 	sc_packet_gamestart packet;
@@ -262,8 +258,8 @@ int main()
 		{
 			if (CLIENTS[i]->is_active == false)
 				flag++;
-		}
 
+		}
 		if (flag == 3)
 			break;
 	}

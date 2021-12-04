@@ -140,9 +140,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="CLIENT\Client.cpp" />
-    <ClCompile Include="CLIENT\LoginClient.cpp" />
-    <ClCompile Include="CLIENT\LobbyClient.cpp" />
-    <ClCompile Include="CLIENT\GameClient.cpp" />
     <ClCompile Include="INTERACT\Interact.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Map.cpp" />
@@ -156,9 +153,6 @@
   <ItemGroup>
     <ClInclude Include="..\Protocol\protocol.h" />
     <ClInclude Include="CLIENT\Client.h" />
-    <ClInclude Include="CLIENT\LoginClient.h" />
-    <ClInclude Include="CLIENT\LobbyClient.h" />
-    <ClInclude Include="CLIENT\GameClient.h" />
     <ClInclude Include="INTERACT\Interact.h" />
     <ClInclude Include="Map.h" />
     <ClInclude Include="Network.h" />
