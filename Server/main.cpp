@@ -400,14 +400,24 @@ int main()
 	}
 	while (1)
 	{
-		;
+		int flag = 0;
+		for (int i = 0; i < 3; ++i)
+		{
+			if (CLIENTS[i]->is_active == false)
+				flag++;
+		}
+
+		if (flag == 3)
+			break;
 	}
-	
+
 	for (int i = 0; i < 3; ++i)
 	{
 		if (CLIENTS[i] != nullptr)
 			delete CLIENTS[i];
+		CLIENTS[i] = nullptr;
 	}
+
 	CloseHandle(Client0Event);
 	CloseHandle(Client1Event);
 	CloseHandle(Client2Event);

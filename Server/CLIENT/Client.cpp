@@ -39,6 +39,7 @@ Client::Client()
 
 Client::~Client()
 {
+	closesocket(c_socket);
 }
 
 
