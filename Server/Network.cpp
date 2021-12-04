@@ -10,7 +10,7 @@ HANDLE Client0Event;
 HANDLE Client1Event;
 HANDLE Client2Event;
 int Cnt_Player = 0;
-int robby_cnt = 0;
+int lobby_cnt = 0;
 
 void error_display(int err_no)
 {

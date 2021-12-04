@@ -458,15 +458,15 @@ void send_keyup_packet(char vk_key)
 	packet.vk_key = vk_key;
 	Network::GetNetwork()->C_Send(&packet, sizeof(packet));
 }
-void send_robby_in_packet()
-{
-	cs_packet_robby packet;
-	packet.size = sizeof(packet);
-	packet.type = CS_PACKET_ROBBY;
-	
-
-	Network::GetNetwork()->C_Send(&packet, sizeof(packet));
-}
+//void send_robby_in_packet()
+//{
+//	cs_packet_robby packet;
+//	packet.size = sizeof(packet);
+//	packet.type = CS_PACKET_ROBBY;
+//	
+//
+//	Network::GetNetwork()->C_Send(&packet, sizeof(packet));
+//}
 void send_die_ok_packet()
 {
 	cs_packet_die_ok packet;
@@ -479,16 +479,7 @@ void send_die_ok_packet()
 
 void robby_waiting()
 {
-	//static bool only_once = false;
-	//map.mStartui->FindTextByNameTag("ready")->getText();
-
-	/*if (only_once == false) {
-
-		only_once = true;
-	}*/
-	/*if (Network::GetNetwork()->countdown <= 10) {
-		map.mStartui->addText(to_string(Network::GetNetwork()->countdown), "countdown", L"메이플스토리 bold", RGB(255, 255, 255), 18, Network::GetNetwork()->init_x, 200, false, 0, 0, camera);
-	}*/
+	
 	if (Network::GetNetwork()->countdown <= 10 && Network::GetNetwork()->cntdown_controller == true) {
 		map.mStartui->FindTextByNameTag("countdown")->pushString(to_wstring(Network::GetNetwork()->countdown));
 		Network::GetNetwork()->cntdown_controller = false;
@@ -603,7 +594,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 			strcpy_s(packet.username, 20, player.mPlayername.c_str());
 			Network::GetNetwork()->C_Send(&packet, sizeof(packet));
 			//로비 카운트 start===================================================
-			send_robby_in_packet();
+			//send_robby_in_packet();
 
 			//====================================================================
 
