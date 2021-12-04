@@ -12,25 +12,14 @@ Client::Client()
 	,is_ingame(false)
 	,is_active(false)
 	, lobby_timer(11)
+	,x(80),y(655),w(14),h(25),hp(100)
+	,savex(80),savey(655),state(1),dir(2),adjustspd(0)
+	,COMMAND_move(false),COMMAND_hurt(false),COMMAND_ropehurt(false)
+	,COMMAND_die(false),Gamemode(false),stealth(0),jumpignore(0)
+	,spike_hurt(0),playername(""),rank(0),c_id(0),elapsedtime(0.f),mObjectCount(0)
 {
 	ZeroMemory(buf, sizeof(buf));
-	x = 80; 
-	y = 655;
-	savey = 3700;	
-	w = 14; 
-	h = 25;
-	//charw = 31;	
-	//charh = 25;	
-	hp = 100;	
-	state = 1; 
-	dir = 2;
-	adjustspd = 0;
-	stealth = 0;
-	spike_hurt = 0;
-	COMMAND_move = false;
-	COMMAND_hurt = false;
-	COMMAND_die = false;
-	COMMAND_ropehurt = false;
+	
 
 	//
 	//bx = 0;
@@ -84,7 +73,6 @@ void Client::ProcessPacket(unsigned char* p)
 
 		mStageNum = 0;
 		elapsedtime = 0;
-		initBitPos();
 		LobbyinitPos();
 
 		//login Button 누른 플레이어는 여기 와서 비로소 active가 된다.
@@ -613,14 +601,6 @@ void Client::initPos()
 	COMMAND_hurt = false;
 	COMMAND_die = false;
 }
-void Client::initBitPos()
-{
-	bx = 0;
-	by = 0;
-	bw = 0;
-	bh = 0;
-}
-
 void Client::move(float deltatime)
 {
 	if (state == 1)
