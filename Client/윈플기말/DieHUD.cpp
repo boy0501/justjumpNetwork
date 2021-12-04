@@ -20,7 +20,7 @@ DieHUD::~DieHUD()
 void DieHUD::draw(HDC& mem1dc)
 {
 
-	drawByScreenUi(mem1dc);
+	drawByUserUi(mem1dc);
 	drawDieButton(mem1dc);
 	drawDieText(mem1dc);	
 	for (const auto& button : mButtons)
