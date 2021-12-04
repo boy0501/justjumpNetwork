@@ -36,9 +36,8 @@ LPCTSTR lpszWinodwName = L"Just Jump";
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam);
 static PAINTSTRUCT ps;
-static HDC /*hdc, mem1dc,*/ mem2dc, loaddc, playerdc, odc, /*pdc,*/ ui_dc, hp_dc, die_dc, start_dc, help_dc, login_dc; // odc = 오브젝트 dc, pdc = player dc,ui_Dc : 아래 전체적인 ui hp_Dc: hp통만 나오는거 dic_dc : 사망 ui 
-/*static RECT rectview;*/
-static HBITMAP /*hbit1,*/ loadbit, oldload, oldbit1, hbitobj[100];
+static HDC mem2dc, loaddc, playerdc, odc, ui_dc, hp_dc, die_dc, start_dc, help_dc, login_dc; // odc = 오브젝트 dc, pdc = player dc,ui_Dc : 아래 전체적인 ui hp_Dc: hp통만 나오는거 dic_dc : 사망 ui 
+static HBITMAP loadbit, oldload, oldbit1, hbitobj[100];
 static PLAYER player;
 PLAYER others[3];
 
@@ -51,26 +50,18 @@ static BLENDFUNCTION loadbf;
 bool isComposit = false;
 
 
-/*HWND hWnd;*/
 static int nCaretPosx, nCaretPosy;	//폰트 x,y크기 , 캐럿 x y 위치
-/*static int obj_t = 0;*/ //오브젝트 애니메이션을 1번타이머에 넣기위해 추가한 변수
 static int ocount;		//obj 개수를 세주는 변수
 static int help_button = 0, start_button = 0; //조작법 온오프
-//static bool occur_button = 0;	//사망했을때의 button이 활성화되었는지 
 static bool gamemode = 0;	//0이면 기본 1이면 자유모드
 static float deltatime = 0;
 static float elapsedtime = 0;
 static int Fps = 0;
 static DWORD oldtime;
 
-//static vector<shared_ptr<UI>> mUI;
-//extern int ROWSPEED;
 
-//extern int COLSPEED;
 
 using namespace std;
-//float elapsedt;
-//int Nameunsigan= 10;
 
 
 DWORD WINAPI ClientRecvThread(LPVOID arg)
@@ -91,16 +82,9 @@ bool bRobby_full = false;
 
 void update(float delta_time)
 {
-	/*if (player.hp == 0) {
-		cout << "죽음!" << endl;
-	}
-	else
-		cout << player.hp << endl;*/
-	//cout << player.hp << endl;
+	
 	player_keyProcess();
 	robby_waiting();
-
-	//Network::GetNetwork()->C_Recv();
 
 	//빼줘야 할 Ui가 있다면 Ui 삭제
 	auto iter = Network::GetNetwork()->mUI.begin();
@@ -155,25 +139,6 @@ void update(float delta_time)
 				o.bx = 0;
 			}
 		}
-		//=======================================
-		//player.move(delta_time);
-		//adjustPlayer(player, obj, map, ocount, g_hinst);
-		//cout << player.y << endl;
-		//for (auto& other : others)
-		//{
-		//	other.move(delta_time);
-		//	//adjustPlayer(other, obj, map, ocount, g_hinst);
-		//}
-		//두개 다 서버로 옮겨줬기 때문에, 이제 필요가 없다.
-		//if (player.WhenPlayerDied == false)
-		//{
-		//	if (player.hp == 0)
-		//	{
-		//		//if (player.WhenPlayerDied == false)
-		//		Network::GetNetwork()->mUI.emplace_back(map.mDieUi);
-		//		//player.WhenPlayerDied = true;
-		//	}
-		//}
 	}
 	map.movemap();
 
@@ -191,13 +156,6 @@ void update(float delta_time)
 			adjustCamera(camera, player);
 	}
 
-	//player.selectBit();
-	//player.stealthtime();
-	//player.spike_hurttime();
-	//for (auto& o : others)
-	//	o.selectBit();
-
-	// 이거를 따로 넣는게 나을듯 오브젝트 멤버함수로다가
 	for (int i = 0; i <= ocount; i++)
 	{
 		if (obj[i].getType() == 0)
@@ -229,12 +187,6 @@ void update(float delta_time)
 		}
 		if (obj[i].getType() == 103)
 		{
-			//if (obj_t % 30 == 0)
-			//{
-			//	obj[i].IndexChange();
-			//
-			//}
-
 		}
 		if (obj[i].getType() == 106 || obj[i].getType() == 107)
 		{
@@ -243,7 +195,7 @@ void update(float delta_time)
 				obj[i].IndexChange();
 
 			}
-			//obj[i].move(delta_time);
+			
 		}
 		else if (obj[i].getType() == 201)
 		{
@@ -256,13 +208,7 @@ void update(float delta_time)
 	}
 	if (obj_t >= 27000) obj_t = 0;
 
-	//바뀐 랭킹이 잘 넘어오는지 확인---
-	//cout << player.mPlayername << " : "<<player.rank << "      " <<
-	//	others[0].mPlayername << " : " << others[0].rank << "        "  
-	//	<<others[1].mPlayername<<" : "<< others[1].rank << "        " 
-	//	<<others[2].mPlayername << " : " << others[2].rank<<endl;
-	//
-	//----------------------------
+
 }
 void render()
 {
@@ -530,15 +476,6 @@ void send_die_ok_packet()
 
 	Network::GetNetwork()->C_Send(&packet, sizeof(packet));
 }
-//void send_logout_packet(char button)
-//{
-//	cs_packet_logout packet;
-//	packet.size = sizeof(packet);
-//	packet.type = CS_PACEKT_LOGOUT;
-//	packet.out = button;
-//
-//	Network::GetNetwork()->C_Send(&packet, sizeof(packet));
-//}
 
 void robby_waiting()
 {
@@ -670,8 +607,6 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 
 			//====================================================================
 
-			//player.setx(80);
-			//player.sety(655);
 			ui->closeUI();
 			Network::GetNetwork()->mUI.emplace_back(map.mStartui);
 
@@ -682,7 +617,6 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 			gameui->addText(player.mPlayerwname, "NickName", L"메이플스토리 bold", RGB(255, 255, 255), 14, 475, 705, true, 100, 65, camera);
 			gameui->LoadHpUiBitmap(g_hinst, "img/Ui_HP.bmp", 421, 728, 100, 65, RGB(0, 0, 255), camera);
 			map.mGameUi = gameui;
-			//map.mGameUi = othergameui;
 			//gameUi설정 끝 
 
 			
@@ -698,7 +632,6 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		startui->addText("", "5252", L"메이플스토리 bold", RGB(255, 0, 0), 18, 120, 250, false, 0, 0, camera);
 
 
-		//hbit = (HBITMAP)LoadImage(g_hinst, TEXT("img/NoNameUi.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION); //상대경로로 변경
 		startui->addButton([startui]() {
 			
 			//5252~3p game
@@ -708,25 +641,16 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		startui->addButton([]() {}, g_hinst, "img/help", 215, 300, 400, 200, RGB(60, 60, 60));
 		map.mStartui = startui;
 
-		//startui->addButton([]() {
-
-		//	}, g_hinst, "img/Exit", 800, 400, 138, 82, RGB(255, 0, 0));// g_hinst, "img/help", 215, 300, 400, 200, RGB(60, 60, 60));
-		//map.mStartui = startui;
 
 
 
 		auto dieui = make_shared<DieHUD>(1, player, camera);
 
-		//die ui 비트맵 수정 필요!!!
 		dieui->LoadUiBitmap(g_hinst, "img/DieNotice.bmp", 380, 240, 260, 130, RGB(255, 0, 0));
 		
 		dieui->addButton([dieui]() {
 			cout << "위치 초기화!" << endl;
-			//player.WhenPlayerDied = false;
 			send_die_ok_packet();
-			//player.initPos();
-			//player.sethp(100);
-			//player.WhenPlayerDied = false;
 			dieui->closeUI();
 		}, g_hinst, "img/DieOkButton", 583, 340, 40, 16, RGB(255, 0, 0));
 		map.mDieUi = dieui;
@@ -735,7 +659,6 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		player.setBit(g_hinst);
 		for (auto& other : others)
 			other.setBit(g_hinst);
-		//player.initBitPos();
 		Network::GetNetwork()->mUI.back()->FindTextByNameTag("id")->UpdateFontSize(hwnd);
 		nCaretPosx = 380 + Network::GetNetwork()->mUI.back()->FindTextByNameTag("id")->getFontLen().cx;
 		nCaretPosy = 330;
@@ -761,8 +684,6 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 			break;
 		if (player.getGamemode() == 0) {
 			keyboard[wParam] = true;
-			//player.PlayerSetting(wParam);
-			//send_move_packet(wParam);
 		}	
 		else if (player.getGamemode() == 1)
 			camera.CameraSetting(wParam);
@@ -771,7 +692,6 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		if (player.getCMD_die() == 1)
 			break;
 		if (player.getGamemode() == 0) {
-			//player.PlayerWaiting(wParam);
 			keyboard[wParam] = false;
 			if (player.hp != 0)
 			{
@@ -795,7 +715,6 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 	case WM_CHAR:
 		if (map.getmapnum() == LOGINBG)
 		{
-			//굉~장히 map 안의 내부 함수로 넘겨서 키보드입력처리 따로 해주고싶은데,,, 나중에 구조를 따로 옮기기 위해 일단 빼둠
 			//wParam 0x08 - 백스페이스 
 			//0x09 - 탭 , 0x0A - Line Feed , 0x0D - 엔터, 0x1B - esc 이거빼곤 나머지 다 입력가능한 것. 나중에 채팅창 쓸때 사용하도록 
 			HideCaret(hwnd);
@@ -847,13 +766,6 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 			ShowCaret(hwnd);
 			break;
 		}
-		/*if (wParam == 'r')
-		{
-			cout << "r키 누름" << endl;
-			player.setx(obj[ocount - 1].getX() + 10);
-			player.sety(obj[ocount - 1].getY() - 25);
-			break;
-		}*/
 		if (wParam == 'c')
 		{
 			player.setCMD_move(0);
@@ -876,7 +788,6 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		DestroyCaret();
 		return 0;
 	case WM_DESTROY:
-		//send_logout_packet(WM_DESTROY);
 
 		for (int i = 0; i < 5; ++i)	FMOD_Sound_Release(Sound::GetSelf()->effectSound[i]);
 		for (int i = 0; i < 5; ++i)	FMOD_Sound_Release(Sound::GetSelf()->bgmSound[i]);

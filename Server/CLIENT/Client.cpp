@@ -118,9 +118,6 @@ void Client::ProcessPacket(unsigned char* p)
 				packet.x = x;
 				packet.y = y;
 				packet.w = w;
-				packet.rank = rank;
-				//
-				//packet.bx = CLIENTS[my_id]->bx;
 
 				c->do_send(&packet, sizeof(packet));
 			}
@@ -144,7 +141,6 @@ void Client::ProcessPacket(unsigned char* p)
 			packet.x = c->x;
 			packet.y = c->y;
 			packet.w = c->w;
-			packet.rank = c->rank;
 			do_send(&packet, sizeof(packet));
 		}
 
@@ -180,7 +176,7 @@ void Client::ProcessPacket(unsigned char* p)
 	case CS_PACKET_MOVE: {
 		cs_packet_move* packet = reinterpret_cast<cs_packet_move*>(p);
 		if (COMMAND_die == true) break;	//서버에서 죽었으면 서버에서 더이상 move패킷 안받음. 
-		switch ((int)packet->dir) {
+		switch ((int)packet->vk_key) {
 		case VK_LEFT: //VK_LEFT
 			//std::cout << "left" << std::endl;
 			LEFTkey = true;
@@ -494,16 +490,6 @@ void Client::ProcessPacket(unsigned char* p)
 		cs_packet_robby* packet = reinterpret_cast<cs_packet_robby*>(p);
 		break;
 	}
-
-	//case CS_PACEKT_LOGOUT: {
-	//	cs_packet_logout* packet = reinterpret_cast<cs_packet_logout*>(p);
-	//	//std::cout << "값은: " << (int)packet->out << std::endl;
-	//	if ((int)packet->out == 2) {
-	//		is_logout = true;
-	//	}
-
-	//	break;
-	//}
 		
 	}
 
@@ -599,8 +585,6 @@ void Client::LobbyinitPos()
 	savey = 655;
 	w = 14;
 	h = 25;
-	//charw = 31;	
-	//charh = 25;	
 	hp = 5;
 	state = 1;
 	dir = 2;
@@ -637,28 +621,10 @@ void Client::initBitPos()
 	bh = 0;
 }
 
-//비트맵을 바꿔주는함수 (애니메이션)
-//void Client::BitMove()
-//{
-//	//std::cout << "bitmove" << std::endl;
-//	bx += 1; //인덱스 형식으로 바꿈
-//	if (state == 4)
-//	{
-//		if (bx >= 5) bx = 1;
-//	}
-//	if (state == 5 || state == 8)
-//	{
-//
-//		if (bx >= 2) bx = 0;
-//	}
-//}
-
 void Client::move(float deltatime)
 {
-	//std::cout << "move호출" << std::endl;
 	if (state == 1)
 	{
-		//std::cout << "state1" << std::endl;
 		adjustspd = 0;
 		if (LRkey == true)
 		{
@@ -702,7 +668,6 @@ void Client::move(float deltatime)
 	}
 	else if (state == 2)
 	{
-		//std::cout << "state2" << std::endl;
 		if (COMMAND_hurt == true)
 		{
 			if (COMMAND_move == 1)
@@ -713,7 +678,6 @@ void Client::move(float deltatime)
 			{
 				x += (int)(ROWSPEED * deltatime);
 			}
-			//y -= 1;
 			if (abs(y - savey) > 40) {
 				y -= (int)(3 * 50 * deltatime);
 			}
@@ -743,7 +707,6 @@ void Client::move(float deltatime)
 				falldy -= GroundAccel * deltatime * 50;
 			if (falldy < 0)
 			{
-				//std::cout << "state7로 change" << std::endl;
 				state = 7;
 			}
 			y -= (int)(falldy * deltatime * 60);
@@ -753,20 +716,14 @@ void Client::move(float deltatime)
 	}
 	else if (state == 3)
 	{
-		//std::cout << "state3" << std::endl;
 	}
 	else if (state == 4)
 	{
-		//std::cout << "state4" << std::endl;
 		if (LRkey == true)
 		{
 
 		}
 		else {
-			/*if (obj_t % 5 == 0)
-			{
-				BitMove();
-			}*/
 
 			if (COMMAND_move == 1)
 			{
@@ -782,7 +739,6 @@ void Client::move(float deltatime)
 	}
 	else if (state == 5)
 	{
-		//std::cout << "state5" << std::endl;
 		savey = y;
 		if (UDkey == true)
 		{
@@ -803,19 +759,11 @@ void Client::move(float deltatime)
 	}
 	else if (state == 6)
 	{
-		//std::cout << "state6" << std::endl;
-		//ROWSPEED *= 3;
-		//stealth = 100;
-		//COMMAND_hurt = true;
-		//savey = y;
-		//state = 2;
 
 	}
 	else if (state == 7)
 	{
-		//std::cout << "state7들어옴" << std::endl;
 		y += (int)(COLSPEED * deltatime);
-		//std::cout << y << std::endl;
 		if (adjustspd < 1000)
 			adjustspd++;
 		if (LEFTkey == true)
@@ -867,10 +815,7 @@ void Client::move(float deltatime)
 	}
 	else if (state == 8)
 	{
-		//std::cout << "state8" << std::endl;
 		savey = y;
-		/*if (obj_t % 10 == 0)
-			BitMove();*/
 		if (UDkey == true)
 		{
 
@@ -927,54 +872,6 @@ void Client::move(float deltatime)
 		{
 			CLIENTS[i]->rank = mRank[i];
 		}
-
-		//	auto other = CLIENTS[i];
-
-		//	//if (c_id == CLIENTS[i]->c_id)continue;
-		//	if (mStageNum != CLIENTS[i]->mStageNum) continue;
-		//	sc_packet_logout_object packet1;
-		//	packet1.size = sizeof(sc_packet_logout_object);
-		//	packet1.type = SC_PACKET_LOGOUT_OBJECT;
-		//	packet1.id = c_id;
-		//	CLIENTS[i]->do_send(&packet1, sizeof(packet1));
-
-		//	sc_packet_logout_object mypacket;
-		//	mypacket.size = sizeof(sc_packet_logout_object);
-		//	mypacket.type = SC_PACKET_LOGOUT_OBJECT;
-		//	mypacket.id = i;
-		//	do_send(&mypacket, sizeof(mypacket));
-
-		//	sc_packet_put_object packet;
-		//	packet.size = sizeof(sc_packet_put_object);
-		//	packet.type = SC_PACKET_PUT_OBJECT;
-		//	packet.dir = other->dir;
-		//	packet.h = other->h;
-		//	packet.hp = other->hp;
-		//	packet.id = other->c_id;
-		//	packet.state = other->state;
-		//	packet.stealth = other->stealth;
-		//	strcpy_s(packet.username, 20, other->playername);
-		//	packet.x = other->x;
-		//	packet.y = other->y;
-		//	packet.w = other->w;
-		//	packet.rank = mRank[i] ;
-		//	do_send(&packet, sizeof(packet));
-
-		//	sc_packet_put_object otherpacket;
-		//	otherpacket.size = sizeof(sc_packet_put_object);
-		//	otherpacket.type = SC_PACKET_PUT_OBJECT;
-		//	otherpacket.id = c_id;
-		//	otherpacket.dir = dir;
-		//	otherpacket.h = h;
-		//	otherpacket.hp = hp;
-		//	otherpacket.state = state;
-		//	otherpacket.stealth = stealth;
-		//	strcpy_s(otherpacket.username, 20, playername);
-		//	otherpacket.w = w;
-		//	otherpacket.x = x;
-		//	otherpacket.y = y;
-		//	otherpacket.rank = rank;
-		//	CLIENTS[i]->do_send(&otherpacket, sizeof(otherpacket));
 
 	}
 }
@@ -1044,7 +941,6 @@ bool Client::collp2o(Object* Obj)
 			if (Obj->y <= y + h && y + h <= Obj->y + adjust)
 			{
 				return 1;
-				//ㅇㅇ
 			}
 		}
 	}
@@ -1073,7 +969,6 @@ void Client::adjustPlayer(float deltatime)
 	{
 		if (collp2o(obj))
 		{
-			//std::cout << "부딪힘" << std::endl;
 			check_coll++;	//하나라도 부딪혔으면 coll이 올라감
 			if (obj->type < 101 && obj->type > 0)			//근데 그게 땅바닥이였다?
 			{
@@ -1085,12 +980,10 @@ void Client::adjustPlayer(float deltatime)
 						if (stealth == 0)	//무적이 아니라면
 						{
 							COMMAND_move = dir;//보고있는방향으로 앞으로 나가게, 떨어졌는데 가만히있진 않지요
-							//ROWSPEED *= 3;
 							stealth = 100;
 							COMMAND_hurt = true;
 							savey = y;
 							state = 2;
-							//state = 6;//피격으로감
 							hurt();
 							return;
 						}
@@ -1160,12 +1053,10 @@ void Client::adjustPlayer(float deltatime)
 							stealth = 100;	//무적시간 넣어줌 (이동하는로직은 state==7 일때 알아서 다뤄줌
 						}
 						else {
-							//ROWSPEED *= 3;
 							stealth = 100;
 							COMMAND_hurt = true;
 							savey = y;
 							state = 2;
-							//state = 6;		//피격으로감
 						}
 						hurt();
 					}
@@ -1209,10 +1100,8 @@ void Client::adjustPlayer(float deltatime)
 				else if (obj->type == 103) //왼쪽 증기, 가시와 비슷함 대신 증기가 완전히 뿜어져  나왔을때 피격판정이 있다.
 				{
 					auto steamobj = reinterpret_cast<AttackObstacle*>(obj);
-					//std::cout << "인덱스" << steamobj->index << std::endl;
 					if (steamobj->index == 2) //증기가 완전히 뿜어졌을때만 피격이 발생한다
 					{
-						//std::cout << "인덱스 들어옴" << stealth << std::endl;
 
 						if (stealth == 0)
 						{
@@ -1235,12 +1124,10 @@ void Client::adjustPlayer(float deltatime)
 							}
 							else {
 								COMMAND_move = 1;//무조건 왼쪽임
-								//ROWSPEED *= 3;
 								stealth = 100;
 								COMMAND_hurt = true;
 								savey = y;
 								state = 2;
-								//state = 6;
 							}
 							hurt();
 						}
@@ -1248,11 +1135,9 @@ void Client::adjustPlayer(float deltatime)
 				}
 				else if (obj->type == 104) //Break Pipe Right
 				{
-					//Update Cooming Soon
 				}
 				else if (obj->type == 105) //Gas Right
 				{
-					//Update Cooming Soon
 				}
 				else if (obj->type == 106)
 				{
@@ -1323,13 +1208,10 @@ void Client::adjustPlayer(float deltatime)
 						}
 						else {
 							COMMAND_move = dir;
-							//
-							//ROWSPEED *= 3;
 							stealth = 100;
 							COMMAND_hurt = true;
 							savey = y;
 							state = 2;
-							//state = 6;		//피격으로감
 						}
 						hurt();
 					}
@@ -1394,7 +1276,6 @@ void Client::adjustPlayer(float deltatime)
 							packet.w = other->w;
 							packet.x = other->x;
 							packet.y = other->y;
-							packet.rank = CLIENTS[i]->rank;
 							do_send(&packet, sizeof(packet));
 
 							sc_packet_put_object otherpacket;
@@ -1410,7 +1291,6 @@ void Client::adjustPlayer(float deltatime)
 							otherpacket.w = w;
 							otherpacket.x = x;
 							otherpacket.y = y;
-							otherpacket.rank = rank;
 							CLIENTS[i]->do_send(&otherpacket, sizeof(otherpacket));
 						}
 					}
@@ -1441,7 +1321,6 @@ void Client::adjustPlayer(float deltatime)
 									h = 25;
 								}
 							}
-							//player.BitMove();
 						}
 					}
 				}
@@ -1453,7 +1332,6 @@ void Client::adjustPlayer(float deltatime)
 			if (ROWSPEED != 150)		//ROWSPEED를 임의로 바꿔주었다면 땅에 닿으면 초기화니 원래대로 돌려준다
 				ROWSPEED = 150;			//잠깐 위로 올려줬음 주석처리하고 ㅇㅇ 근데 이게 맞을거같긴해
 
-			//return;			//하나라도 부딪혔다면 그대로 탈출한다
 		}
 	}
 
@@ -1462,7 +1340,6 @@ void Client::adjustPlayer(float deltatime)
 	if ((state == 4 || state == 1) || (state == 5 || state == 8))	//하나도 못부딪혔으면 공중에있는거니까 떨어져야한다
 	{
 		state = 7;
-		//player.fall2save();		//떨어지는 순간의 x좌표점 기억
 	}
 
 
@@ -1471,8 +1348,6 @@ void Client::adjustPlayer(float deltatime)
 
 void Client::hurt()
 {
-	//std::cout << "다침상태 들어오지 ?" << std::endl;
-	//std::cout << "hp는 ? : " << COMMAND_die << "," << hp << std::endl;
 	if (COMMAND_die == false)
 		hp -= 5;
 	if (hp <= 0)	//0 이하라면
@@ -1497,7 +1372,6 @@ void Client::spike_hurttime(float deltatime)
 	if (spike_hurt < 0)
 	{
 		spike_hurt++;
-		//std::cout << "들어오긴하냐" << std::endl;
 		x -= (int)(200 * deltatime);			//왼쪽으로감
 	}
 	else if (spike_hurt > 0)
@@ -1512,9 +1386,7 @@ void Client::stealthtime(float deltatime)
 	if (COMMAND_die == 0)	//죽으면 무적안풀림
 		if (stealth > 0)
 		{
-			//stealth -= (int)(200 * deltatime);
 			stealth = max(stealth - (int)(100 * deltatime), 0);
-			//std::cout << stealth << std::endl;
 			if (stealth == 0)
 				COMMAND_hurt = 0;
 		}
