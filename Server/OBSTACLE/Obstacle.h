@@ -9,7 +9,6 @@ public:
 	virtual void update(float deltatime);
 
 
-	Type mType;
 
 };
 

@@ -25,8 +25,6 @@ public:
 	HBITMAP hbitex;		//점프,숙이기 줄타기 비트맵
 	int bx, by, bw, bh; //비트맵의 스프라이트위치를 바꾸기위한 좌표 변수
 	bool is_active;		//캐릭터가 그려져야하는지 아닌지 판단변수(other player를 그려주기 위함.)
-	int oldY, oldX;		//데드레커닝용
-	float velocityX, velocityY;	//데드레커닝용
 public:
 	//HDC hdc, pdc, mem1dc;
 	int ready_players = 0;
@@ -135,31 +133,10 @@ public:
 
 
 
-
-
-
-	//방향키 눌렀을때 플레이어 세팅
-	void PlayerSetting(WPARAM);
-	//방향키 땠을때 플레이어 세팅풀기
-	void PlayerWaiting(WPARAM);
-	//떨어지는 시점의 y좌표 기억
-	void fall2save();
-	//플레이어 무브
-	void move(float deltatime);
-	//플레이어 스프라이트선택
-	void selectBit();	   
 	//애니메이션
 	void BitMove();		 
 	//플레이어 그림
 	void draw(HDC&, HDC&); 
-	//피격시 무적시간
-	void stealthtime();
-	//가시한테 찔렸을때 강제이동값
-	void spike_hurttime();
-	//다쳤을때 피 다는 계산식 + 뒤지면초기화
-	void hurt();
-	//뒤지면 초기화
-	void die();
 };
 
 

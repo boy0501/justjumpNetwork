@@ -848,7 +848,6 @@ void GameClient::adjustPlayer(float deltatime)
 							packet.w = other->w;
 							packet.x = other->x;
 							packet.y = other->y;
-							packet.rank = CLIENTS[i]->rank;
 							do_send(&packet, sizeof(packet));
 
 							sc_packet_put_object otherpacket;
@@ -864,7 +863,6 @@ void GameClient::adjustPlayer(float deltatime)
 							otherpacket.w = w;
 							otherpacket.x = x;
 							otherpacket.y = y;
-							otherpacket.rank = rank;
 							CLIENTS[i]->do_send(&otherpacket, sizeof(otherpacket));
 						}
 					}

@@ -18,11 +18,13 @@ Map::~Map()
 {
 	for (int i = 0; i < 5; ++i)
 	{
-		for (auto& p : mObjects[i])
+		for (auto p : mObjects[i])
 		{
 			delete p;
 		}
+		mObjects[i].clear();
 	}
+
 }
 
 
