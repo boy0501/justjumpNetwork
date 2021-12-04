@@ -15,14 +15,14 @@ const char CS_PACKET_LOGIN = 1;
 const char CS_PACKET_MOVE = 2;
 const char CS_PACKET_KEYUP = 5;
 const char CS_PACKET_DIEOK = 6;
-const char CS_PACKET_ROBBY = 98;
+//const char CS_PACKET_ROBBY = 98;
 
 
 const char SC_PACKET_LOGIN_OK = 1;
 const char SC_PACKET_MOVE_PROCESS = 2;
 const char SC_PACKET_PUT_OBJECT = 3;
 const char SC_PACKET_LOGOUT_OBJECT = 4;
-const char SC_PACKET_ROBBY = 5;
+const char SC_PACKET_LOBBY = 5;
 const char SC_PACKET_GAMESTART = 7;
 const char SC_PACKET_PORTAL = 9;
 const char SC_PACKET_OBJECT_SYNC = 10;
@@ -60,11 +60,11 @@ struct cs_packet_scene_change {		//미사용 - 워드검증필요
 	char stage;
 };
 
-struct cs_packet_robby {		//? 주용이형 검증 필요 - 워드검증필요
-	unsigned char size;
-	char type;
-	
-};
+//struct cs_packet_robby {		//? 주용이형 검증 필요 - 워드검증필요
+//	unsigned char size;
+//	char type;
+//	
+//};
 
 struct cs_packet_die_ok {		//사용 워드추가필요.
 	unsigned char size;
@@ -112,14 +112,14 @@ struct sc_packet_logout_object {	//사용-워드검증.
 	int id;
 };
 
-struct sc_packet_robby {			//주용이형 검증 필요 - 워드검증필요
+struct sc_packet_lobby {			//주용이형 검증 필요 - 워드검증필요 (주용 확인- 사용)
 	unsigned char size;
 	char type;
-	int player_cnt;
+	//int player_cnt;
 	int countdown;
 };
 
-struct sc_packet_gamestart {		//주용이형 검증필요 - 워드검증필요
+struct sc_packet_gamestart {		//주용이형 검증필요 - 워드검증필요 (필요 없음 - 미사용)
 	unsigned char size;
 	char type;
 	char stage;

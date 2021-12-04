@@ -11,7 +11,7 @@ Client::Client()
 	:prev_size(0)
 	,is_ingame(false)
 	,is_active(false)
-	, robby_timer(3)
+	, robby_timer(11)
 {
 	ZeroMemory(buf, sizeof(buf));
 	x = 80; 
@@ -147,7 +147,7 @@ void Client::ProcessPacket(unsigned char* p)
 		//여기서 드디어 로그인이 승인되고 하나의 Client로 인정받아, GameLogic의 Loop문을 실행하게 됨 .
 		SceneName = Scene_Name::SN_LOBBY;
 		Cnt_Player++;
-		robby_cnt++;
+		lobby_cnt++;
 		
 		break;
 	}
@@ -486,10 +486,10 @@ void Client::ProcessPacket(unsigned char* p)
 		}		
 		break;
 	}
-	case CS_PACKET_ROBBY: {
+	/*case CS_PACKET_ROBBY: {
 		cs_packet_robby* packet = reinterpret_cast<cs_packet_robby*>(p);
 		break;
-	}
+	}*/
 		
 	}
 
@@ -585,7 +585,7 @@ void Client::LobbyinitPos()
 	savey = 655;
 	w = 14;
 	h = 25;
-	hp = 5;
+	hp = 100;
 	state = 1;
 	dir = 2;
 	adjustspd = 0;
@@ -1398,14 +1398,11 @@ void Client::stealthtime(float deltatime)
 
 void Client::RobbyCountDown()
 {
-	if (robby_cnt == 3)
+	if (lobby_cnt == 3)
 	{
 
 		robby_timer--;
 		if (robby_timer < 0) {
-			//mCss = CSS_DEAD;
-			//mSn = SN_INGAME;
-			//SetEvent(SceneChangeTrigger);
 			robby_timer = 0;
 
 			//gamestart initpos
@@ -1422,7 +1419,6 @@ void Client::RobbyCountDown()
 			COMMAND_move = false;
 			COMMAND_hurt = false;
 			COMMAND_die = false;
-			//mStageNum = 1;
 
 			for (auto& c : CLIENTS)
 			{
@@ -1439,11 +1435,11 @@ void Client::RobbyCountDown()
 
 		}
 
-		for (int i = 0; i < robby_cnt; ++i) {
+		for (int i = 0; i < lobby_cnt; ++i) {
 			std::cout << robby_timer << std::endl;
-			sc_packet_robby packet;
-			packet.size = sizeof(sc_packet_robby);
-			packet.type = SC_PACKET_ROBBY;
+			sc_packet_lobby packet;
+			packet.size = sizeof(sc_packet_lobby);
+			packet.type = SC_PACKET_LOBBY;
 			packet.countdown = robby_timer;
 
 			CLIENTS[i]->do_send(&packet, sizeof(packet));

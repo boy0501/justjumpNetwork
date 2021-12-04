@@ -28,9 +28,9 @@ void LobbyClient::update(float delta_time)
 	
 		elapsedtime = 0;
 		std::cout << "로비클라" << std::endl;
-		std::cout << robby_cnt << std::endl;
+		std::cout << lobby_cnt << std::endl;
 
-		if (robby_cnt == 3)
+		if (lobby_cnt == 3)
 		{
 
 			robby_timer--;
@@ -67,11 +67,11 @@ void LobbyClient::update(float delta_time)
 
 			}
 
-			for (int i = 0; i < robby_cnt; ++i) {
+			for (int i = 0; i < lobby_cnt; ++i) {
 				std::cout << robby_timer << std::endl;
-				sc_packet_robby packet;
-				packet.size = sizeof(sc_packet_robby);
-				packet.type = SC_PACKET_ROBBY;
+				sc_packet_lobby packet;
+				packet.size = sizeof(sc_packet_lobby);
+				packet.type = SC_PACKET_LOBBY;
 				packet.countdown = robby_timer;
 				
 				CLIENTS[i]->do_send(&packet, sizeof(packet));

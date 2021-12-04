@@ -4,7 +4,7 @@
 
 extern std::array<class Client*, 3> CLIENTS;
 extern int Cnt_Player;
-extern int robby_cnt;
+extern int lobby_cnt;
 
 extern HANDLE Client0Event;
 extern HANDLE Client1Event;
