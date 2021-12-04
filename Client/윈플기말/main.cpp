@@ -26,9 +26,9 @@
 #pragma comment(lib,"Winmm.lib")
 #pragma comment(lib,"imm32.lib")
 #pragma comment(lib, "ws2_32")
-#ifdef _DEBUG
+//#ifdef _DEBUG
 #pragma comment(linker, "/entry:WinMainCRTStartup /subsystem:console")
-#endif
+//#endif
 
 
 LPCTSTR lpszClass = L"Just Jump";
@@ -264,7 +264,7 @@ void ProcessingLoop()
 		Fps++;
 		if (elapsedtime > 1.0f)
 		{
-			//cout << "FPS:" << Fps << endl;
+			cout << "FPS:" << Fps << endl;
 			Fps = 0;
 			elapsedtime = 0;
 

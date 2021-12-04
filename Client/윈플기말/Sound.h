@@ -17,7 +17,7 @@
 #define MCLICKEF 3
 #define MOVEREF 4
 
-#define BGMVOL 0.0
+#define BGMVOL 0.5
 #define EFVOL 0.5
 class Sound {
 	int index;
