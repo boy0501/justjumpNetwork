@@ -47,12 +47,6 @@ public:
 	int COLSPEED = 500;
 	int beltspeed = 100;
 	int ROPESPEED = 150;
-	//bool LEFTkey = 0;
-	//bool RIGHTkey = 0;
-	//bool UPkey = 0;
-	//bool DOWNkey = 0;
-	//bool LRkey = 0;
-	//bool UDkey = 0;
 	int jumpcount = 0;
 	int diecount = 0;
 
@@ -85,9 +79,7 @@ public:
 	void adjustPlayer(float deltatime);
 	void spike_hurttime(float deltatime);
 
-	//int obj_t; // for 애니메이션
 	void move(float deltatime);
-	//void BitMove();
 	void LobbyinitPos();
 	void initPos();
 	void initBitPos();
