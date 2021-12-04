@@ -113,7 +113,6 @@ void Network::ProcessPacket(unsigned char* p)
 	unsigned char packet_type = p[1];
 	switch (packet_type) {
 	case SC_PACKET_LOGIN_OK: {
-		isLogin = false;
 		sc_packet_login_ok* packet = reinterpret_cast<sc_packet_login_ok*>(p);
 		mPlayer->stage = packet->stage;
 		mPlayer->player_cid = packet->id;
@@ -189,7 +188,6 @@ void Network::ProcessPacket(unsigned char* p)
 		break;
 	}
 	case SC_PACKET_MOVE_PROCESS: {
-		if (isLogin == true) break;
 		sc_packet_move_process* packet = reinterpret_cast<sc_packet_move_process*>(p);
 
 		if (packet->id == mPlayer->player_cid)

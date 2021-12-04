@@ -78,7 +78,6 @@ bool IsKeyPressed(char key)
 }
 void robby_waiting();
 void player_keyProcess();
-bool bRobby_full = false;
 
 void update(float delta_time)
 {

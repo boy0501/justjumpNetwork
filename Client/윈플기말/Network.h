@@ -48,13 +48,6 @@ public:
 	std::vector<std::shared_ptr<class UI>> mUI;
 
 public:
-	bool isLogin = true;
-	int net_x, net_y;
-	int net_h;
-	int net_state;
-	int net_stealth;
-	int net_dir;
-	int net_bx;
 
 	int countdown;
 	bool cntdown_controller = false;
@@ -62,6 +55,5 @@ public:
 
 	int rank;
 
-	void test();
 };
 

@@ -22,7 +22,7 @@ public:
 	void initBitPos();
 	void initPos();
 
-	int robby_timer;
+	int lobby_timer;
 	
 
 	bool is_robby = false;

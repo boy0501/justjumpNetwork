@@ -25,39 +25,25 @@ LARGE_INTEGER Endtime;
 float elapsed_time;
 int Fps = 0;
 
-void ChangeRobbyToGame(const int& c_id)
+void ChangeLobbyToGame(const int& c_id)
 {
-	int my_id = c_id;
-	//auto p = reinterpret_cast<LobbyClient*>(CLIENTS[my_id]);
-	//GameClient* willbe_changed = new GameClient();
-	//auto Upcasting_changed = reinterpret_cast<Client*>(willbe_changed);
-	//auto Upcasted_original = reinterpret_cast<Client*>(p);
-	//*Upcasting_changed = *Upcasted_original;
-	//willbe_changed->elapsedtime = 0;
-	//willbe_changed->mStageNum = 1;
-	//willbe_changed->mMap = mainMap;
-	//willbe_changed->initBitPos();
-	//willbe_changed->initPos();
-	//CLIENTS[my_id] = willbe_changed;
-	//delete p;
-
-	CLIENTS[my_id]->elapsedtime = 0;
-	CLIENTS[my_id]->mStageNum = 1;
-	CLIENTS[my_id]->initBitPos();
-	CLIENTS[my_id]->initPos();
+	CLIENTS[c_id]->elapsedtime = 0;
+	CLIENTS[c_id]->mStageNum = 1;
+	CLIENTS[c_id]->initBitPos();
+	CLIENTS[c_id]->initPos();
 
 	sc_packet_gamestart packet;
 	packet.size = sizeof(sc_packet_gamestart);
 	packet.type = SC_PACKET_GAMESTART;
-	packet.dir = CLIENTS[my_id]->dir;
-	packet.h = CLIENTS[my_id]->h;
+	packet.dir = CLIENTS[c_id]->dir;
+	packet.h = CLIENTS[c_id]->h;
 	packet.stage = 9;
-	packet.state = CLIENTS[my_id]->state;
-	packet.stealth = CLIENTS[my_id]->stealth;
-	packet.x = CLIENTS[my_id]->x;
-	packet.y = CLIENTS[my_id]->y;
-	packet.COMMAND_die = CLIENTS[my_id]->COMMAND_die;
-	CLIENTS[my_id]->do_send(&packet, sizeof(packet));
+	packet.state = CLIENTS[c_id]->state;
+	packet.stealth = CLIENTS[c_id]->stealth;
+	packet.x = CLIENTS[c_id]->x;
+	packet.y = CLIENTS[c_id]->y;
+	packet.COMMAND_die = CLIENTS[c_id]->COMMAND_die;
+	CLIENTS[c_id]->do_send(&packet, sizeof(packet));
 
 }
 void send_move_process(int player_id, int movePlayer_id)
@@ -74,12 +60,8 @@ void send_move_process(int player_id, int movePlayer_id)
 	packet.dir = CLIENTS[movePlayer_id]->dir;
 	packet.rank = CLIENTS[movePlayer_id]->rank;
 	packet.hp = CLIENTS[movePlayer_id]->hp;
-	//packet.bx = CLIENTS[mover]->bx;
 	CLIENTS[player_id]->do_send(&packet, sizeof(packet));
 }
-
-
-
 
 //http://www.tipssoft.com/bulletin/board.php?bo_table=FAQ&wr_id=735 타임관련
 
@@ -111,53 +93,6 @@ DWORD WINAPI GameLogicThread(LPVOID arg)
 				}
 			}
 
-			// Scene Changer
-			for (auto& c : CLIENTS)
-			{
-				if (c->SceneChangeTrigger == true)
-				{
-					c->SceneName = Scene_Name::SN_INGAME;
-					c->SceneChangeTrigger = false;
-					ChangeRobbyToGame(c->c_id);
-				}
-				//if (c->mCss == CSS_LIVE) continue;
-				////PlayerInputThread에서 mCss와 mSn을 바꿔주는데
-				//// mCss가 바뀌고 mSn이 바뀌기 전에(순서가 존재함) 이 아래 코드를 실행하면 동기화문제가 생기니
-				//// Event를 사용하여 동기화문제를 해결한다.
-				//WaitForSingleObject(c->SceneChangeTrigger, INFINITE);
-				//
-				//switch (c->mSn)
-				//{
-				//case SN_LOBBY:
-				//{
-				//	ChangeLoginToRobby(c->c_id);
-				//	c->mCss = CSS_LIVE;
-				//	auto lc = reinterpret_cast<LobbyClient*>(c);
-				//	//WaitForSingleObject(lc->CountSendController, INFINITE);
-				//
-				//	robby_cnt += 1;
-				//	//cout << "lc로비카운트는"<<robby_cnt << endl;
-				//
-				//	SetEvent(c->SceneChangeIsDone);
- 				//	break;
-				//}
-				//case SN_INGAME: 
-				//{
-				//	//로비에서 인게임으로 다같이 가자
-				//	
-				//	ChangeRobbyToGame(c->c_id);
-				//	c->mCss = CSS_LIVE;
-				//	//SetEvent(c->SceneChangeIsDone);
-				//
-				//	break;
-				//}
-				//}
-				//서버에서 플레이어를 옮겨줬다면 SetEvent를 하여 클라이언트에게 바뀌었다고 패킷을 날림
-				//1.서버처리 2.클라에게 패킷처리 [ 순서 존재 ]
-			}
-
-
-			
 			for (int i = 0; i < Cnt_Player; ++i)
 			{			
 				CLIENTS[i]->update(deltatime);	
@@ -169,6 +104,17 @@ DWORD WINAPI GameLogicThread(LPVOID arg)
 
 					send_move_process(i, j);
 					
+				}
+			}
+
+			// Scene Changer
+			for (auto& c : CLIENTS)
+			{
+				if (c->SceneChangeTrigger == true)
+				{
+					c->SceneName = Scene_Name::SN_INGAME;
+					c->SceneChangeTrigger = false;
+					ChangeLobbyToGame(c->c_id);
 				}
 			}
 

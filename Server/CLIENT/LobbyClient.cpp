@@ -7,7 +7,7 @@
 
 LobbyClient::LobbyClient()
 	:elapsedtime(0),
-	robby_timer(2)
+	lobby_timer(2)
 {
 	
 }
@@ -33,12 +33,12 @@ void LobbyClient::update(float delta_time)
 		if (lobby_cnt == 3)
 		{
 
-			robby_timer--;
-			if (robby_timer < 0) {
+			lobby_timer--;
+			if (lobby_timer < 0) {
 				//mCss = CSS_DEAD;
 				//mSn = SN_INGAME;
 				//SetEvent(SceneChangeTrigger);
-				robby_timer = 0;
+				lobby_timer = 0;
 
 				//gamestart initpos
 				x = 80;
@@ -68,11 +68,11 @@ void LobbyClient::update(float delta_time)
 			}
 
 			for (int i = 0; i < lobby_cnt; ++i) {
-				std::cout << robby_timer << std::endl;
+				std::cout << lobby_timer << std::endl;
 				sc_packet_lobby packet;
 				packet.size = sizeof(sc_packet_lobby);
 				packet.type = SC_PACKET_LOBBY;
-				packet.countdown = robby_timer;
+				packet.countdown = lobby_timer;
 				
 				CLIENTS[i]->do_send(&packet, sizeof(packet));
 

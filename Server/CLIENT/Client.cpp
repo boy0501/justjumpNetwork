@@ -11,7 +11,7 @@ Client::Client()
 	:prev_size(0)
 	,is_ingame(false)
 	,is_active(false)
-	, robby_timer(11)
+	, lobby_timer(11)
 {
 	ZeroMemory(buf, sizeof(buf));
 	x = 80; 
@@ -50,7 +50,7 @@ void Client::update(float delta_time)
 	{
 		if (SceneName == Scene_Name::SN_LOBBY)
 		{
-			RobbyCountDown();
+			LobbyCountDown();
 		}
 		elapsedtime = 0;
 	}
@@ -1396,14 +1396,14 @@ void Client::stealthtime(float deltatime)
 	}
 }
 
-void Client::RobbyCountDown()
+void Client::LobbyCountDown()
 {
 	if (lobby_cnt == 3)
 	{
 
-		robby_timer--;
-		if (robby_timer < 0) {
-			robby_timer = 0;
+		lobby_timer--;
+		if (lobby_timer < 0) {
+			lobby_timer = 0;
 
 			//gamestart initpos
 			x = 80;
@@ -1424,23 +1424,13 @@ void Client::RobbyCountDown()
 			{
 				c->SceneChangeTrigger = true;
 			}
-			//for (auto& c : CLIENTS)
-			//{
-			//	c->mCss = CSS_DEAD;
-			//	c->mSn = SN_INGAME;
-			//	SetEvent(c->SceneChangeTrigger);
-			//}
-
-
-
 		}
 
 		for (int i = 0; i < lobby_cnt; ++i) {
-			std::cout << robby_timer << std::endl;
 			sc_packet_lobby packet;
 			packet.size = sizeof(sc_packet_lobby);
 			packet.type = SC_PACKET_LOBBY;
-			packet.countdown = robby_timer;
+			packet.countdown = lobby_timer;
 
 			CLIENTS[i]->do_send(&packet, sizeof(packet));
 

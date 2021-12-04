@@ -86,9 +86,8 @@ public:
 	void hurt();	//로그인은 hurt필요없고, lobby도 사실상 다칠 일이 없기때문에 이곳에만 넣음
 	void stealthtime(float deltatime);
 
-	void RobbyCountDown();
-	int robby_timer;
-	bool is_robby = false;
+	void LobbyCountDown();
+	int lobby_timer;
 private:
 	int mRank[3] = { 1,1,1 };//랭킹을 저장할 변수
 	int mmStagenum[3] = { 1,1,1 };
