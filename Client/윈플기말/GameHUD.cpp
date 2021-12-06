@@ -44,7 +44,6 @@ void GameHUD::draw(HDC& mem1dc)
 void GameHUD::drawExit(HDC& mem1dc)
 {
 	drawByUserUi(mem1dc);
-	drawByScreenUi(mem1dc);
 	for (const auto& button : mButtons)
 	{
 		button->drawByUserButton(mem1dc,mCamera);
@@ -124,8 +123,6 @@ void GameHUD::drawOtherPlayerRanking(HDC& mem1dc)
 				
 		}
 	}
-
-
 
 	SelectObject(mem1dc, oldfont);
 	DeleteObject(hfont);
