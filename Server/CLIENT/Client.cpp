@@ -827,7 +827,7 @@ void Client::move(float deltatime)
 			mRank[i] = 1;
 			for (int j = 0; j < Cnt_Player; ++j)
 			{
-
+				if (i == j)continue;
 
 				if (CLIENTS[i]->mStageNum < CLIENTS[j]->mStageNum)
 				{
