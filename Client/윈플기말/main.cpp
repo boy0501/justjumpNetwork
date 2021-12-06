@@ -549,7 +549,6 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 		oldtime = timeGetTime();
 		map.CreateMap(g_hinst);
 
-		player.is_active = true;
 		Network::GetNetwork()->mPlayer = &player;
 		Network::GetNetwork()->mMap = &map;
 		Network::GetNetwork()->mOcount = &ocount;
@@ -608,6 +607,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 			gameui->LoadHpUiBitmap(g_hinst, "img/Ui_HP.bmp", 421, 728, 100, 65, RGB(0, 0, 255), camera);
 			map.mGameUi = gameui;
 			//gameUi설정 끝 
+			player.is_active = true;
 
 			
 
