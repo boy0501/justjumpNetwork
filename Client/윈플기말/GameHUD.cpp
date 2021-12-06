@@ -34,7 +34,6 @@ void GameHUD::draw(HDC& mem1dc)
 		button->drawByScreenButton(mem1dc);
 	}
 
-	//drawMyRanking(mem1dc);
 	drawOtherPlayerRanking(mem1dc);
 
 		
@@ -70,24 +69,6 @@ void GameHUD::update(float deltatime)
 }
 
 
-void GameHUD::drawMyRanking(HDC& mem1dc)
-{
-	int ranking = mPlayer->getRanking();
-
-	TCHAR playerRanking[100];
-
-	HFONT hfont = CreateFont(14, 0, 0, 0, 0, 0, 0, 0, HANGEUL_CHARSET, 0, 0, 0, VARIABLE_PITCH | FF_ROMAN, TEXT("메이플스토리 bold"));
-	HFONT oldfont = (HFONT)SelectObject(mem1dc, hfont);
-	SetTextColor(mem1dc, RGB(255, 255, 0));
-
-	_itow_s(mPlayer->getRanking(), playerRanking, 10);
-	TextOut(mem1dc, mCamera->getx() + 80, mCamera->gety() + 30, mPlayer->mPlayerwname.c_str(), lstrlenW(mPlayer->mPlayerwname.c_str()));
-	TextOut(mem1dc, mCamera->getx() + 40, mCamera->gety() + 30, playerRanking, lstrlenW(playerRanking));
-	TextOut(mem1dc, mCamera->getx() + 50, mCamera->gety() + 30, L"등", lstrlenW(L"등"));
-
-	SelectObject(mem1dc, oldfont); 
-	DeleteObject(hfont);
-}
 
 void GameHUD::drawOtherPlayerRanking(HDC& mem1dc)
 {
