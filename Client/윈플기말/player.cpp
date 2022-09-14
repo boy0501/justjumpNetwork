@@ -495,12 +495,12 @@ void PLAYER::move(float deltatime)
 
 	if (state == 2)
 	{
-		x += ((vx * deltatime);
+		x += (vx * deltatime);
 		y += ((vy * deltatime) + ((-25 * deltatime * deltatime) / 2));
 	}
 	else 
 	{
-		x += ((vx * deltatime);
-		y += ((vy * deltatime);
+		x += (vx * deltatime);
+		y += (vy * deltatime);
 	}
 }
