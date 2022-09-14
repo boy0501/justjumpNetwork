@@ -13,6 +13,6 @@ public:
     virtual void update(float deltatime);
     MoveType mMoveType;
     float degree;
-
+    float vd;
 
 };

@@ -216,7 +216,7 @@ void OBJECT::move(float deltatime)
 	}*/
 	if (dir == 0) //Left or Down
 	{
-		mx = sin(degree * PI / 180) * GEARSPEED * deltatime;
+		mx = sin(degree * PI / 180) * GEARSPEED;
 		//if (mx > 150) s = -1;
 		//else if (mx < -150) s = 1;
 		//mx += s * gearrowspeed;
@@ -224,7 +224,7 @@ void OBJECT::move(float deltatime)
 	}
 	else if (dir == 1) //Up or Down
 	{
-		my = sin(degree * PI / 180) * GEARSPEED * deltatime;
+		my = sin(degree * PI / 180) * GEARSPEED;
 		//if (my > 100) s = -1;
 		//else if (my < -100) s = 1;
 		//my += s * gearcolspeed;

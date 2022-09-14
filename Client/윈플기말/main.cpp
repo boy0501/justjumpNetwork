@@ -122,7 +122,13 @@ void update(float delta_time)
 		if (player.state == 5) {
 			player.bx = 0;
 		}
-
+		player.move(delta_time);
+		//adjustPlayer(player, obj, map, ocount, g_hinst);
+		for (auto& other : others)
+		{
+			other.move(delta_time);
+			//adjustPlayer(other, obj, map, ocount, g_hinst);
+		}
 		for (auto& o : others) {
 			if (o.state == 4) {
 				if (obj_t % 5 == 0)
@@ -194,7 +200,8 @@ void update(float delta_time)
 				obj[i].IndexChange();
 
 			}
-			
+			//add
+			obj[i].move(delta_time);
 		}
 		else if (obj[i].getType() == 201)
 		{

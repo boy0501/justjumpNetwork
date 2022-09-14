@@ -201,7 +201,8 @@ void Network::ProcessPacket(unsigned char* p)
 
 			mPlayer->x = packet->x;
 			mPlayer->y = packet->y;
-
+			mPlayer->vx = packet->vx;
+			mPlayer->vy = packet->vy;
 			if (packet->hp <= 0)
 			{
 				if (mPlayer->WhenPlayerDied == false)
@@ -277,7 +278,8 @@ void Network::ProcessPacket(unsigned char* p)
 		case 107: {
 			obj.mx = packet->mx;
 			obj.my = packet->my;
-
+			obj.degree = packet->degree;
+			obj.velocityDegree = packet->vd;
 			break;
 		}
 		}

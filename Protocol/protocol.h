@@ -8,7 +8,8 @@ const int  MAX_NAME_SIZE = 20;
 const int  MAX_USER = 10;
 const int GEARCYCLE = 180;
 const int GEARSPEED = 150;
-
+const float CHARROWSPD = 150;
+const float CHARCOLSPD = 0.05;
 const float PI = 3.14159265;
 
 const char CS_PACKET_LOGIN = 1;
@@ -66,12 +67,13 @@ struct sc_packet_move_process {
 	unsigned char size;
 	char type;
 	int		id;
-	short  x, y, h;
+	int  x, y, h;
 	short state;
 	short dir;
 	short stealth;
 	short hp;
 	char rank;
+	float vx, vy;
 }; 
 
 struct sc_packet_put_object {		
@@ -123,5 +125,6 @@ struct sc_packet_object_sync {
 	char objnum;
 	short mx, my;
 	char index;
+	float degree,vd;
 };
 #pragma pack(pop)

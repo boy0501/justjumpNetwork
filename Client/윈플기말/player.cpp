@@ -3,6 +3,7 @@
 #include "Load.h"
 #include <iostream>
 
+using namespace std;
 //원래 3이었는데 50배 해줌 
 int ROWSPEED = 150; 	//가로 이동속도
 int COLSPEED = 500;	//세로 이동속도
@@ -485,4 +486,21 @@ void PLAYER::draw(HDC& mem1dc, HDC& pdc)
 	DeleteObject(gdidc);
 	DeleteObject(pdc);
 
+}
+
+void PLAYER::move(float deltatime)
+{
+	if (false == is_active) return;
+
+
+	if (state == 2)
+	{
+		x += ((vx * deltatime) + ((0 * deltatime * deltatime) / 2));
+		y += ((vy * deltatime) + ((-25 * deltatime * deltatime) / 2));
+	}
+	else 
+	{
+		x += ((vx * deltatime) + ((0 * deltatime * deltatime) / 2));
+		y += ((vy * deltatime) + ((0 * deltatime * deltatime) / 2));
+	}
 }

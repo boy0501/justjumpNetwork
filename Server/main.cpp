@@ -19,6 +19,8 @@ Map* mainMap;
 LARGE_INTEGER Frequency;
 LARGE_INTEGER BeginTime;
 LARGE_INTEGER Endtime;
+LARGE_INTEGER GBeginTime;
+LARGE_INTEGER GEndtime;
 float elapsed_time;
 int Fps = 0;
 
@@ -46,16 +48,19 @@ void send_move_process(int player_id, int movePlayer_id)
 {
 	sc_packet_move_process packet;
 	packet.size = sizeof(sc_packet_move_process);
+	auto mover = CLIENTS[movePlayer_id];
 	packet.type = SC_PACKET_MOVE_PROCESS;
 	packet.id = movePlayer_id;
-	packet.x = CLIENTS[movePlayer_id]->x;
-	packet.y = CLIENTS[movePlayer_id]->y;
-	packet.h = CLIENTS[movePlayer_id]->h;
-	packet.state = CLIENTS[movePlayer_id]->state;
-	packet.stealth = CLIENTS[movePlayer_id]->stealth;
-	packet.dir = CLIENTS[movePlayer_id]->dir;
-	packet.rank = CLIENTS[movePlayer_id]->rank;
-	packet.hp = CLIENTS[movePlayer_id]->hp;
+	packet.x = mover->x;
+	packet.y = mover->y;
+	packet.h = mover->h;
+	packet.state = mover->state;
+	packet.stealth = mover->stealth;
+	packet.dir = mover->dir;
+	packet.rank = mover->rank;
+	packet.hp = mover->hp;
+	packet.vx = mover->vx;
+	packet.vy = mover->vy;
 	CLIENTS[player_id]->do_send(&packet, sizeof(packet));
 }
 
@@ -65,38 +70,37 @@ DWORD WINAPI GameLogicThread(LPVOID arg)
 {
 	QueryPerformanceFrequency(&Frequency);
 	QueryPerformanceCounter(&Endtime);
+	QueryPerformanceCounter(&GEndtime);
 	while (1) {
 		QueryPerformanceCounter(&BeginTime);
+		QueryPerformanceCounter(&GBeginTime);
 		auto elapsed = BeginTime.QuadPart - Endtime.QuadPart;
-		auto deltatime = (double)elapsed / (double)Frequency.QuadPart;
-		if (deltatime >= 0.016f)
+		auto deltatime = (float)elapsed / (float)Frequency.QuadPart;
+		auto gelapsed = GBeginTime.QuadPart - GEndtime.QuadPart;
+		auto gdeltatime = (float)gelapsed / (float)Frequency.QuadPart;
+		if (gdeltatime >= 0.00001f)
 		{
-			Endtime = BeginTime;
+
+			GEndtime = GBeginTime;
 			elapsed_time += deltatime;
 			Fps++;
 			if (elapsed_time > 1.0f)
 			{
 				//cout << "FPS:" << Fps << endl;
 				Fps = 0;
-				elapsed_time = 0;				
+				elapsed_time = 0;
 			}
-
 			for (auto& c : mainMap->mObjects)
 			{
 				for (auto& t : c)
 				{
-					t->update(deltatime);
+					t->update(gdeltatime);
 				}
 			}
 
 			for (int i = 0; i < Cnt_Player; ++i)
-			{			
-				CLIENTS[i]->update(deltatime);	
-				//send packet			
-				for (int j = 0; j < Cnt_Player; ++j)
-				{
-					send_move_process(i, j);
-				}
+			{
+				CLIENTS[i]->update(gdeltatime);
 			}
 
 			// Scene Changer
@@ -107,6 +111,22 @@ DWORD WINAPI GameLogicThread(LPVOID arg)
 					c->SceneName = Scene_Name::SN_INGAME;
 					c->SceneChangeTrigger = false;
 					ChangeLobbyToGame(c->c_id);
+				}
+			}
+		}
+
+
+		if (deltatime >= 0.032f) {
+
+			Endtime = BeginTime;
+
+
+			for (int i = 0; i < Cnt_Player; ++i)
+			{
+				//send packet			
+				for (int j = 0; j < Cnt_Player; ++j)
+				{
+					send_move_process(i, j);
 				}
 			}
 
@@ -140,6 +160,8 @@ DWORD WINAPI GameLogicThread(LPVOID arg)
 							packet.objnum = objNum;
 							packet.mx = moveobj->mx;
 							packet.my = moveobj->my;
+							packet.vd = moveobj->vd;
+							packet.degree = moveobj->degree;
 							game->do_send(&packet, sizeof(packet));
 							break;
 						}
@@ -149,6 +171,8 @@ DWORD WINAPI GameLogicThread(LPVOID arg)
 				}
 			}
 		}
+
+		
 	}
 	return 0;
 }

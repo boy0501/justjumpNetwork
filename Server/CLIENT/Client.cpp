@@ -12,6 +12,7 @@ Client::Client()
 	,is_active(false)
 	, lobby_timer(11)
 	,x(80),y(655),w(14),h(25),hp(100)
+	,oldx(80),oldy(80)
 	,savex(80),savey(655),state(1),dir(2),adjustspd(0)
 	,COMMAND_move(false),COMMAND_hurt(false),COMMAND_ropehurt(false)
 	,COMMAND_die(false),Gamemode(false),stealth(0),jumpignore(0)
@@ -45,14 +46,22 @@ void Client::update(float delta_time)
 
 	if (SceneName == Scene_Name::SN_INGAME)
 	{
+		oldx = x;
+		oldy = y;
 		move(delta_time);
 		adjustPlayer(delta_time);
 		spike_hurttime(delta_time);
 		stealthtime(delta_time);
+		vx = (x - oldx) / delta_time;
+		vy = (y - oldy) / delta_time;
 	}else if (SceneName == Scene_Name::SN_LOBBY)
 	{
+		oldx = x;
+		oldy = y;
 		move(delta_time);
 		adjustPlayer(delta_time);
+		vx = (x - oldx) / delta_time;
+		vy = (y - oldy) / delta_time;
 	}
 }
 
@@ -651,17 +660,17 @@ void Client::move(float deltatime)
 		{
 			if (COMMAND_move == 1)
 			{
-				x -= (int)(ROWSPEED * deltatime);
+				x -= (ROWSPEED * deltatime);
 			}
 			else if (COMMAND_move == 2)
 			{
-				x += (int)(ROWSPEED * deltatime);
+				x += (ROWSPEED * deltatime);
 			}
 			if (abs(y - savey) > 40) {
-				y -= (int)(3 * 50 * deltatime);
+				y -= (3 * 50 * deltatime);
 			}
 			else {
-				y -= (int)(COLSPEED / 2 * deltatime);
+				y -= (COLSPEED / 2 * deltatime);
 			}
 			if (abs((y - savey)) >= 40)
 			{
@@ -674,11 +683,11 @@ void Client::move(float deltatime)
 			if (COMMAND_move == 1)
 			{
 
-				x -= (int)(ROWSPEED * deltatime);
+				x -= (ROWSPEED * deltatime);
 			}
 			else if (COMMAND_move == 2)
 			{
-				x += (int)(ROWSPEED * deltatime);
+				x += (ROWSPEED * deltatime);
 			}
 
 
@@ -688,7 +697,7 @@ void Client::move(float deltatime)
 			{
 				state = 7;
 			}
-			y -= (int)(falldy * deltatime * 60);
+			y -= (falldy * deltatime * 60);
 		}
 
 
@@ -706,12 +715,12 @@ void Client::move(float deltatime)
 
 			if (COMMAND_move == 1)
 			{
-				x -= (int)(ROWSPEED * deltatime);
+				x -= (ROWSPEED * deltatime);
 
 			}
 			else if (COMMAND_move == 2)
 			{
-				x += (int)(ROWSPEED * deltatime);
+				x += (ROWSPEED * deltatime);
 
 			}
 		}
@@ -742,28 +751,28 @@ void Client::move(float deltatime)
 	}
 	else if (state == 7)
 	{
-		y += (int)(COLSPEED * deltatime);
+		y += (COLSPEED * deltatime);
 		if (adjustspd < 1000)
 			adjustspd++;
 		if (LEFTkey == true)
 			if (adjustspd % 30 == 0)
-				x -= (int)(ROWSPEED * deltatime);
+				x -= (ROWSPEED * deltatime);
 		if (RIGHTkey == true)
 			if (adjustspd % 30 == 0)
-				x += (int)(ROWSPEED * deltatime);
+				x += (ROWSPEED * deltatime);
 		if (COMMAND_move == 1)
 		{
 			if (adjustspd <= 10)
-				x -= (int)(ROWSPEED * deltatime);
+				x -= (ROWSPEED * deltatime);
 			if (adjustspd > 10)
 			{
 				if (adjustspd % 2 == 0)
-					x -= (int)(ROWSPEED * deltatime);
+					x -= (ROWSPEED * deltatime);
 			}
 			else if (adjustspd > 30)
 			{
 				if (adjustspd % 5 == 0)
-					x -= (int)(ROWSPEED * deltatime);
+					x -= (ROWSPEED * deltatime);
 			}
 
 			if (LEFTkey == 0)
@@ -775,17 +784,17 @@ void Client::move(float deltatime)
 		{
 			if (adjustspd <= 10)
 			{
-				x += (int)(ROWSPEED * deltatime);
+				x += (ROWSPEED * deltatime);
 			}
 			if (adjustspd > 10)
 			{
 				if (adjustspd % 2 == 0)
-					x += (int)(ROWSPEED * deltatime);
+					x += (ROWSPEED * deltatime);
 			}
 			else if (adjustspd > 30)
 			{
 				if (adjustspd % 5 == 0)
-					x += (int)(ROWSPEED * deltatime);
+					x += (ROWSPEED * deltatime);
 			}
 			if (RIGHTkey == 0)
 				if (abs(x - savex) > 50)
@@ -804,11 +813,11 @@ void Client::move(float deltatime)
 
 			if (COMMAND_move == 3)
 			{
-				y -= (int)(ROPESPEED * deltatime);
+				y -= (ROPESPEED * deltatime);
 			}
 			else if (COMMAND_move == 4)
 			{
-				y += (int)(ROPESPEED * deltatime);
+				y += (ROPESPEED * deltatime);
 			}
 		}
 	}
@@ -994,11 +1003,11 @@ void Client::adjustPlayer(float deltatime)
 
 				if (obj->type == 4)
 				{
-					x += (int)(beltspeed * deltatime);
+					x += (beltspeed * deltatime);
 				}
 				if (obj->type == 6)
 				{
-					x -= (int)(beltspeed * deltatime);
+					x -= (beltspeed * deltatime);
 				}
 			}
 			else if (obj->type >= 101 && obj->type <= 200)	//장애물에 부딪히면
@@ -1351,12 +1360,12 @@ void Client::spike_hurttime(float deltatime)
 	if (spike_hurt < 0)
 	{
 		spike_hurt++;
-		x -= (int)(200 * deltatime);			//왼쪽으로감
+		x -= (200 * deltatime);			//왼쪽으로감
 	}
 	else if (spike_hurt > 0)
 	{
 		spike_hurt--;
-		x += (int)(200 * deltatime);
+		x += (200 * deltatime);
 	}
 }
 
@@ -1365,13 +1374,13 @@ void Client::stealthtime(float deltatime)
 	if (COMMAND_die == 0)	//죽으면 무적안풀림
 		if (stealth > 0)
 		{
-			stealth = max(stealth - (int)(100 * deltatime), 0);
+			stealth = max(stealth - (100 * deltatime), 0);
 			if (stealth == 0)
 				COMMAND_hurt = 0;
 		}
 	if (jumpignore > 0)
 	{
-		jumpignore = max(jumpignore - (int)(100 * deltatime), 0);
+		jumpignore = max(jumpignore - (100 * deltatime), 0);
 	}
 }
 

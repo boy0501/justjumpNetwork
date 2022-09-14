@@ -6,6 +6,7 @@
 class PLAYER {
 public:
 	int x, y, w, h;		// x y 는 캐릭터의 중심좌표이고 w,h 는 xy에서 좌우로 반틈씩만 간 좌표이다.
+	float vx, vy;
 	int charw, charh;	//캐릭터 전체 사이즈이다. 
 	int hp;				//플레이어의 hp이다.
 	int savex, savey;	//savey 는 점프뛸때 그 순간의 y좌표를 기억하기 위함이고 x는 혹시몰라서 넣어둠
@@ -137,6 +138,7 @@ public:
 	void BitMove();		 
 	//플레이어 그림
 	void draw(HDC&, HDC&); 
+	void move(float deltatime);
 };
 
 
